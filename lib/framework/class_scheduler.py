@@ -10,7 +10,7 @@ import time
 import sys
 # third-party
 from apscheduler.jobstores.base import JobLookupError
-from apscheduler.schedulers.gevent import GeventScheduler
+
 #from apscheduler.jobstores.mongodb import MongoDBJobStore
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
@@ -46,6 +46,7 @@ class Scheduler(object):
         #(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
         #self.sched = GeventScheduler( executors=executors)
         try:
+            from apscheduler.schedulers.gevent import GeventScheduler
             self.sched = GeventScheduler(timezone='Asia/Seoul')
         except:
             from apscheduler.schedulers.background import BackgroundScheduler
