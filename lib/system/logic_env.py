@@ -10,7 +10,7 @@ import threading
 
 # third-party
 from flask import Blueprint, request, Response, send_file, render_template, redirect, jsonify
-from celery.exceptions import TimeoutError, NotRegistered
+
 
 # sjva 공용
 from framework.logger import get_logger
@@ -89,6 +89,7 @@ class SystemLogicEnv(object):
     def celery_test():
         if app.config['config']['use_celery']:
             from celery import Celery
+            from celery.exceptions import TimeoutError, NotRegistered
             
             data = {}
             try:
