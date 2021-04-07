@@ -45,7 +45,11 @@ class Scheduler(object):
     def __init__(self):
         #(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
         #self.sched = GeventScheduler( executors=executors)
-        self.sched = GeventScheduler(timezone='Asia/Seoul')
+        try:
+            self.sched = GeventScheduler(timezone='Asia/Seoul')
+        except:
+            from apscheduler.schedulers.background import BackgroundScheduler
+            self.sched = BackgroundScheduler(timezone='Asia/Seoul')
         #jobstores=jobstores,  에러 pickle 직렬화 할수없다
         #self.sched.configure(executors=executors, job_defaults=job_defaults, timezone='Asia/Seoul')
         #self.sched.configure(executors=executors, timezone='Asia/Seoul')
