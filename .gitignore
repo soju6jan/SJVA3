@@ -1,8 +1,13 @@
 __pycache__/
+.git/
+
 data/
 pyvenv/
+
 *.pyc 
 *.pyo
 *.bat
 *.sh
-
+*.log
+*.db
+*.txt
