@@ -85,7 +85,7 @@ def config_initialize(action):
         app.config['config']['rss_subtitle_webhook'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
 
         app.config['config']['run_by_real'] = True if sys.argv[0] == 'sjva.py' else False
-        app.config['config']['run_by_migration'] = True if sys.argv[-2] == 'db' else False
+        #app.config['config']['run_by_migration'] = True if sys.argv[-2] == 'db' else False
         app.config['config']['run_by_worker'] = True if sys.argv[0].find('celery') != -1 else False
         app.config['config']['run_by_init_db'] = True if sys.argv[-1] == 'init_db' else False
         if sys.version_info[0] == 2: 
