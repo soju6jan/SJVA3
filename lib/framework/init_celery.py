@@ -29,9 +29,11 @@ try:
     )
 
 except:
-    class Celery:
+    class DummyCelery:
         def task(original_function):
             @wraps(original_function)
             def wrapper_function(*args, **kwargs):  #1
                 return original_function(*args, **kwargs)  #2
             return wrapper_function
+    
+    celery = DummyCelery()
