@@ -120,7 +120,8 @@ try: logging.getLogger('apscheduler.scheduler').setLevel(logging.ERROR)
 except: pass
 try: logging.getLogger('apscheduler.scheduler.default').setLevel(logging.ERROR)
 except: pass
-
+try: logging.getLogger('werkzeug').setLevel(logging.ERROR)
+except: pass
 
 def set_level(level):
     global logger_list
