@@ -110,6 +110,18 @@ def get_logger(name):
 get_logger('apscheduler.scheduler')
 get_logger('apscheduler.executors.default')
 
+try: logging.getLogger('socketio').setLevel(logging.ERROR)
+except: pass
+
+try: logging.getLogger('engineio').setLevel(logging.ERROR)
+except: pass
+
+try: logging.getLogger('apscheduler.scheduler').setLevel(logging.ERROR)
+except: pass
+try: logging.getLogger('apscheduler.scheduler.default').setLevel(logging.ERROR)
+except: pass
+
+
 def set_level(level):
     global logger_list
     try:
