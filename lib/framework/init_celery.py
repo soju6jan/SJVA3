@@ -29,6 +29,7 @@ try:
     )
 
 except:
+    from functools import wraps
     class DummyCelery:
         def task(self, original_function):
             @wraps(original_function)
