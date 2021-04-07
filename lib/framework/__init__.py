@@ -69,7 +69,7 @@ try:
     scheduler = Scheduler()
 
     #socketio = SocketIO(app, cors_allowed_origins="*") #, async_mode='gevent')
-    socketio = SocketIO(app, cors_allowed_origins="*", logger=False, engineio_logger=False) #, async_mode='gevent')
+    socketio = SocketIO(app, cors_allowed_origins="*", logger=False, engineio_logger=False, debug=True) #, async_mode='gevent')
 
     from flask_cors import CORS
     CORS(app)
