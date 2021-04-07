@@ -5,8 +5,8 @@ import os
 import traceback
 
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from telepot import Bot, glance
-from telepot.loop import MessageLoop
+from telepot2 import Bot, glance
+from telepot2.loop import MessageLoop
 
 from . import logger
 
