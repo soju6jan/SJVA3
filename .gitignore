@@ -3,4 +3,6 @@ data/
 pyvenv/
 *.pyc 
 *.pyo
+*.bat
+*.sh
 
