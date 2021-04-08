@@ -28,7 +28,7 @@ def prepare_starting():
                     os.system("chmod 777 -R %s" % custom)
                     custom = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
                     os.system("chmod 777 -R %s" % custom)
-            except:
+            except Exception as e:
                 print('Exception:%s', e)
     except Exception as exception:
         print('Exception:%s' % exception)
