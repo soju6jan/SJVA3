@@ -84,7 +84,7 @@ def config_initialize(action):
         app.config['config']['server_url'] = 'https://server.sjva.me'
         app.config['config']['rss_subtitle_webhook'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
 
-        app.config['config']['run_by_real'] = True if sys.argv[0] == 'sjva.py' else False
+        app.config['config']['run_by_real'] = True if sys.argv[0] == 'sjva.py' or sys.argv[0] == 'sjva3.py' else False
         #app.config['config']['run_by_migration'] = True if sys.argv[-2] == 'db' else False
         app.config['config']['run_by_worker'] = True if sys.argv[0].find('celery') != -1 else False
         app.config['config']['run_by_init_db'] = True if sys.argv[-1] == 'init_db' else False
@@ -101,10 +101,16 @@ def config_initialize(action):
         app.config['config']['repeat'] = -1
 
         if app.config['config']['run_by_real']:
-            if len(sys.argv) > 2:
-                app.config['config']['repeat'] = int(sys.argv[2])
+            try:
+                if len(sys.argv) > 2:
+                    app.config['config']['repeat'] = int(sys.argv[2])
+            except:
+                app.config['config']['repeat'] = 0
         if len(sys.argv) > 3:
-            app.config['config']['is_debug'] = (sys.argv[-1] == 'debug')
+            try:
+                app.config['config']['is_debug'] = (sys.argv[-1] == 'debug')
+            except:
+                app.config['config']['is_debug'] = False
         app.config['config']['use_celery'] = True
         for tmp in sys.argv:
             if tmp == 'no_celery':
