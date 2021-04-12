@@ -5,13 +5,11 @@ if sys.version_info[0] == 2:
     reload(sys)
     sys.setdefaultencoding('utf-8')
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
+print('[SJVA3] sys.path : %s' % sys.path)
+print('[SJVA3] sys.argv : %s' % sys.argv)
 
 def prepare_starting():
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
-
-    print('[SJVA3] sys.path : %s' % sys.path)
-    print('[SJVA3] sys.argv : %s' % sys.argv)
-
     try:
         from gevent import monkey;monkey.patch_all()
         print('[SJVA3] gevent mokey patch!!')
