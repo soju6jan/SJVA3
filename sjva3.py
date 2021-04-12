@@ -92,3 +92,9 @@ if __name__ == '__main__':
     except Exception as exception:
         print(str(exception))
         
+else:
+    import framework
+    import system
+    app = framework.app
+    celery = framework.celery
+
