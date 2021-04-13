@@ -91,7 +91,7 @@ if __name__ == '__main__':
         print(str(exception))
         print(traceback.format_exc())
         
-else:
+if sys.argv[0] != 'sjva3.py':
     import framework
     import system
     app = framework.app
