@@ -103,8 +103,9 @@ class ToolExpandDiscord(object):
     def discord_proxy_image(cls, image_url, webhook_url=None, retry=True):
         #2020-12-23
         #image_url = None
+        if image_url == '' or image_url is None:
+            return
         data = None
-
         """
         if image_url is None or image_url == '':
             return image_url
@@ -130,8 +131,8 @@ class ToolExpandDiscord(object):
             byteio = io.BytesIO()
             webhook.add_file(file=byteio.getvalue(), filename='dummy')
             response = webhook.execute()
-            logger.debug(response)
-            logger.debug(type(response))
+            #logger.debug(response)
+            #logger.debug(type(response))
             data = None
             if type(response) == type([]):
                 if len(response) > 0:
@@ -139,6 +140,7 @@ class ToolExpandDiscord(object):
             else:
                 data = response.json()    
             
+            #logger.debug(data)
             if data is not None and 'embeds' in data:
                 target = data['embeds'][0]['image']['proxy_url']
                 if requests.get(target).status_code == 200:
@@ -152,8 +154,8 @@ class ToolExpandDiscord(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-            logger.debug(image_url) 
-            logger.debug(data)
+            #logger.debug(image_url) 
+            #logger.debug(data)
             if retry:
                 time.sleep(1)
                 return cls.discord_proxy_image(image_url, webhook_url=None, retry=False)
