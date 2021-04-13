@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #########################################################
-import os, sys, platform
+import os, sys, platform, traceback
 if sys.version_info[0] == 2:
     reload(sys)
     sys.setdefaultencoding('utf-8')
@@ -89,6 +89,7 @@ if __name__ == '__main__':
         start_app()
     except Exception as exception:
         print(str(exception))
+        print(traceback.format_exc())
         
 else:
     import framework
