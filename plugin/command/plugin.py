@@ -252,7 +252,7 @@ def api(sub):
                 mode = 'json'
             kwargs = {}
             for key, value in request.args.items():
-                if key in ['apikey', 'id', 'mode']:
+                if key in ['apikey', 'mode']:
                     continue
                 if key not in kwargs:
                     kwargs[key] = value
