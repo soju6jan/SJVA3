@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #########################################################
-import os, sys, platform, traceback
+import os, sys, platform, traceback, shutil
 if sys.version_info[0] == 2:
     reload(sys)
     sys.setdefaultencoding('utf-8')
