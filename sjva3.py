@@ -17,22 +17,9 @@ def prepare_starting():
         print('[SJVA3] gevent not installed!!')
     ######################################
 
-    
-    try:
-        if sys.argv[0].startswith('sjva3.py'):
-            try:
-                if platform.system() != 'Windows':
-                    custom = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom')
-                    os.system("chmod 777 -R %s" % custom)
-                    custom = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
-                    os.system("chmod 777 -R %s" % custom)
-            except Exception as e:
-                print('Exception:%s', e)
-    except Exception as exception:
-        print('Exception:%s' % exception)
-
     try:
         av_agent = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', 'av_agent')
+        print(av_agent)
         if os.path.exists(av_agent):
             shutil.rmtree(av_agent)
     except Exception as exception:
