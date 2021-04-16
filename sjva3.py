@@ -24,6 +24,7 @@ def prepare_starting():
             shutil.rmtree(av_agent)
     except Exception as exception:
         print('Exception:%s' % exception)
+        print(traceback.format_exc())
 
 
 
