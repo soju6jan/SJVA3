@@ -12,6 +12,24 @@ import threading
 import json
 import requests
 
+
+
+
+# sjva 공용
+from framework.logger import get_logger
+from framework import app, db, scheduler, path_app_root, socketio, SystemModelSetting, py_urllib2, py_urllib
+from framework.job import Job
+from framework.util import Util
+from system.logic import SystemLogic
+
+
+try:
+    import plexapi
+except ImportError:
+    os.system("{} install plexapi".format(app.config['config']['pip']))
+    import plexapi 
+
+    
 # third-party
 from sqlalchemy import desc
 from sqlalchemy import or_, and_, func, not_
@@ -22,12 +40,6 @@ from plexapi.library import ShowSection
 from lxml import etree as ET
 import lxml
 
-# sjva 공용
-from framework.logger import get_logger
-from framework import app, db, scheduler, path_app_root, socketio, SystemModelSetting, py_urllib2, py_urllib
-from framework.job import Job
-from framework.util import Util
-from system.logic import SystemLogic
 
 # 패키지
 from framework.common.daum import DaumTV

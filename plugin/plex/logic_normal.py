@@ -15,11 +15,7 @@ from framework import app, db, scheduler, path_app_root, celery, py_urllib
 from framework.job import Job
 from framework.util import Util
 
-try:
-    import plexapi
-except ImportError:
-    os.system("{} install plexapi".format(app.config['config']['pip']))
-    import plexapi  
+ 
 
 from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
