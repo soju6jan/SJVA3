@@ -28,25 +28,10 @@ from system.logic import SystemLogic
 #import plex
 from .model import ModelSetting, ModelGDriveScanJob,ModelGDriveScanFile
 
-
-
+import oauth2client
+from apiclient.discovery import build
 # third-party
-try:
-    import oauth2client
-except ImportError:
-    try:
-        os.system("{} install oauth2client".format(app.config['config']['pip']))
-        import oauth2client
-    except:
-        pass
-try:
-    from apiclient.discovery import build
-except ImportError:
-    try:
-        os.system("{} install google-api-python-client".format(app.config['config']['pip']))
-        from apiclient.discovery import build
-    except:
-        pass
+
 
 from apiclient.discovery import build
 from oauth2client.file import Storage
