@@ -164,6 +164,8 @@ try:
         if platform.system() == 'Windows':
             app.config['config']['use_celery'] = False
         app.config['config']['use_gevent'] = args.use_gevent
+    logger.debug('### config ###')
+    logger.debug(json.dumps(app.config['config'], indent=4))
 
     logger.debug('### LAST')
     logger.debug('### PORT:%s', app.config['config']['port'])

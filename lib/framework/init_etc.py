@@ -116,7 +116,7 @@ def config_initialize(action):
             if tmp == 'no_celery':
                 app.config['config']['use_celery'] = False
                 break
-        logger.debug('use_celery : %s', app.config['config']['use_celery'])
+        #logger.debug('use_celery : %s', app.config['config']['use_celery'])
         logger.debug('======================================')
     elif action == 'auth':
         from system.logic_auth import SystemLogicAuth
