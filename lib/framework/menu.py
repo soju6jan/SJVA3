@@ -167,12 +167,12 @@ MENU_MAP = [
             #{'type':'direct', 'name' : u'정보', 'link':'/system/information'},
             {'type':'plugin', 'plugin' : 'command', 'name' : u'Command'},
             {'type':'divider'},
-            {'type':'link', 'name' : u'FileManager', 'link':'/iframe/file_manager'},
-            {'type':'system_value', 'name' : u'FileBrowser.xyz', 'link':'url_filebrowser'},
+            #{'type':'link', 'name' : u'FileManager', 'link':'/iframe/file_manager'},
+            #{'type':'system_value', 'name' : u'FileBrowser.xyz', 'link':'url_filebrowser'},
             #{'type':'system_value', 'name' : u'Celery Monitoring', 'link':'url_celery_monitoring'},
-            {'type':'divider'},
-            {'type':'link', 'name':u'SJVA.ME', 'link':'https://sjva.me'},
-            {'type':'divider'},
+            #{'type':'divider'},
+            #{'type':'link', 'name':u'위키', 'link':'https://sjva.me/wiki/public/start'},
+            #{'type':'divider'},
             {'type':'direct', 'name' : u'로그아웃', 'link':'/logout'},
             {'type':'direct', 'name' : u'재시작(업데이트)', 'link':'/system/restart'},
             {'type':'direct', 'name' : u'종료', 'link':'/system/shutdown'},
@@ -276,6 +276,7 @@ def init_menu(plugin_menus):
                     category['list'].append(category_child)
                 if 'exist' in category_child and category_child['exist'] == True:
                     category['list'].append(category_child)
+    """
     try:
         import flaskfilemanager
     except:
@@ -290,7 +291,8 @@ def init_menu(plugin_menus):
                 del MENU_MAP[-1]['list'][index]
         except:
             pass
-    
+    """
+
     try:
         ## 선 제거
         for category in MENU_MAP:

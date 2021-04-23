@@ -37,7 +37,7 @@ class SystemLogic(object):
         'db_version' : '1',
         'port' : '9999',
         'ddns' : 'http://localhost:9999',
-        'url_filebrowser' : 'http://localhost:9998',
+        #'url_filebrowser' : 'http://localhost:9998',
         #'url_celery_monitoring' : 'http://localhost:9997',
         'id' : 'sjva', 
         'pw' : 'sjva',
@@ -48,7 +48,7 @@ class SystemLogic(object):
         'theme' : 'Default',
         'log_level' : '10',
         'use_login' : 'False',
-        'link_json' : '[]', 
+        'link_json' : '[{"type":"link", "name":"위키", "link":"https://sjva.me/wiki/public/start"}]', 
         'plugin_dev_path': '',
         'plugin_tving_level2' : 'False', 
         'web_title' : 'SJ Video Assistant',
@@ -490,6 +490,7 @@ class SystemLogic(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             return False
+
 
     @staticmethod
     def apply_menu_link():

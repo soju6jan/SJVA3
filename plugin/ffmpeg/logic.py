@@ -75,7 +75,7 @@ class Logic(object):
         'max_pf_count' : '0',
         'if_fail_remove_tmp_file' : 'True', 
         'timeout_minute' : '60',
-        'ffmpeg_path' : 'ffmpeg',
+        'ffmpeg_path' : 'ffmpeg' if platform.system() != 'Windows' else os.path.join(path_data, 'bin', 'ffmpeg.exe'),
     }
 
     @staticmethod

@@ -18,7 +18,7 @@ from sqlalchemy import or_, and_, func, not_
 
 # sjva 공용
 from framework.logger import get_logger
-from framework import app, db, scheduler, path_app_root
+from framework import app, db, scheduler, path_app_root, path_data
 from framework.job import Job
 from framework.util import Util
 from system.logic import SystemLogic
@@ -38,8 +38,8 @@ class Logic(object):
         'interval' : '10',
         'web_page_size' : '30',
         'auro_start_rcd' : 'False',
-        'rclone_bin_path' : '',
-        'rclone_config_path' : '',
+        'rclone_bin_path' : 'rclone' if platform.system() != 'Windows' else os.path.join(path_data, 'bin', 'rclone.exe'),
+        'rclone_config_path' : os.path.join(path_app_root, 'data', 'db', 'rclone.conf')
     }
     
     path_bin = path_rclone = path_config = None
@@ -68,8 +68,8 @@ class Logic(object):
     @staticmethod
     def plugin_load():
         try:
+            """
             import platform
-            
             Logic.path_bin = os.path.join(path_app_root, 'bin', platform.system())
             if platform.system() == 'Linux':
                 if platform.platform().find('86') == -1 and platform.platform().find('64') == -1:
@@ -93,7 +93,7 @@ class Logic(object):
                 ModelSetting.set('rclone_config_path', Logic.path_config)
             else:
                 Logic.path_config = ModelSetting.get('rclone_config_path')
-
+            """
             # 사이트 목록 로딩
             if ModelSetting.query.filter_by(key='auto_start').first().value == 'True':
                 Logic.scheduler_start()
