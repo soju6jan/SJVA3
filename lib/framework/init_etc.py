@@ -142,5 +142,10 @@ def config_initialize(action):
         app.config['config']['running_type'] = 'native'
         if 'SJVA_RUNNING_TYPE' in os.environ:
             app.config['config']['running_type'] = os.environ['SJVA_RUNNING_TYPE']
+        else:
+            import platform
+            if platform.system() == 'Windows':
+                app.config['config']['running_type'] = 'windows'
+
 
 
