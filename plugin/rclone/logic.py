@@ -13,6 +13,7 @@ import json
 import platform
 
 # third-party
+import sqlalchemy
 from sqlalchemy import desc
 from sqlalchemy import or_, and_, func, not_
 
@@ -68,7 +69,7 @@ class Logic(object):
     @staticmethod
     def plugin_load():
         try:
-            """
+            
             import platform
             Logic.path_bin = os.path.join(path_app_root, 'bin', platform.system())
             if platform.system() == 'Linux':
@@ -93,7 +94,7 @@ class Logic(object):
                 ModelSetting.set('rclone_config_path', Logic.path_config)
             else:
                 Logic.path_config = ModelSetting.get('rclone_config_path')
-            """
+            
             # 사이트 목록 로딩
             if ModelSetting.query.filter_by(key='auto_start').first().value == 'True':
                 Logic.scheduler_start()
@@ -346,7 +347,7 @@ class Logic(object):
             job.last_run_time = datetime.now()
             job.last_file_count = len(Logic.current_data['files'])
             db.session.commit()
-        except OperationalError as exception:
+        except sqlalchemy.exc.OperationalError  as exception:
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             db.session.rollback()
