@@ -48,7 +48,7 @@ class SystemLogic(object):
         'theme' : 'Default',
         'log_level' : '10',
         'use_login' : 'False',
-        'link_json' : '[{"type":"link", "name":"위키", "link":"https://sjva.me/wiki/public/start"}]', 
+        'link_json' : '[{"type":"link","title":"위키","url":"https://sjva.me/wiki/public/start"}]', 
         'plugin_dev_path': '',
         'plugin_tving_level2' : 'False', 
         'web_title' : 'SJ Video Assistant',
