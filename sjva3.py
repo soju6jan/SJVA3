@@ -19,7 +19,6 @@ def prepare_starting():
 
     try:
         av_agent = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', 'av_agent')
-        print(av_agent)
         if os.path.exists(av_agent):
             shutil.rmtree(av_agent)
     except Exception as exception:

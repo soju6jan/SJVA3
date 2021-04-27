@@ -6,28 +6,35 @@ from datetime import datetime
 from framework import path_data
 from pytz import timezone, utc
 
-"""
-def logger_init(name):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+#from colorlog import ColoredFormatter
 
-    # formmater 생성
-    formatter = logging.Formatter(u'[%(asctime)s|%(levelname)s|%(filename)s:%(lineno)s]  : %(message)s')
-    formatter2 = logging.Formatter(u'[%(levelname)s|%(filename)s:%(lineno)s]  : %(message)s'.encode('cp949')) 
+class CustomFormatter(logging.Formatter):
+    """Logging Formatter to add colors and count warning / errors"""
 
-    # fileHandler와 StreamHandler를 생성
-    file_max_bytes = 10 * 1024 * 1024 
-    fileHandler = logging.handlers.RotatingFileHandler(filename=os.path.join(framework.path_data, 'log', '%s.log' % name), maxBytes=file_max_bytes, backupCount=5, encoding='utf8')
-    streamHandler = logging.StreamHandler() 
+    grey = "\x1b[38;21m"
+    yellow = "\x1b[33;21m"
+    red = "\x1b[31;21m"
+    bold_red = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    #format = "[%(asctime)s|%(name)s|%(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = u'[%(asctime)s|%(levelname)s|%(name)s:%(filename)s:%(lineno)s] %(message)s'
 
-    # handler에 fommater 세팅 
-    fileHandler.setFormatter(formatter)
-    #streamHandler.setFormatter(formatter) 
-    
-    # Handler를 logging에 추가
-    logger.addHandler(fileHandler)
-    logger.addHandler(streamHandler)
-"""
+    FORMATS = {
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: grey + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
+
+
+
+
 
 #system_loading = False
 level_unset_logger_list = []
@@ -42,25 +49,6 @@ def get_logger(name):
         level = logging.DEBUG
         from framework import flag_system_loading 
         try:
-            """
-            if not system_loading:
-                if name == 'system':
-                    system_loading = True
-                level_unset_logger_list.append(logger)
-            else:
-                try:
-                    from system.model import ModelSetting as SystemModelSetting
-                    level = SystemModelSetting.get('log_level')
-                    level = int(level)
-                except:
-                    level = logging.DEBUG
-
-                if level_unset_logger_list is not None:
-                    for item in level_unset_logger_list:
-                        item.setLevel(level)
-                    level_unset_logger_list = None
-            logger_list.append(logger)
-            """
             if flag_system_loading:
                 try:
                     from system.model import ModelSetting as SystemModelSetting
@@ -78,10 +66,7 @@ def get_logger(name):
         except:
             pass
         logger.setLevel(level)
-        # formmater 생성
-        #formatter = logging.Formatter(u'[%(asctime)s|%(levelname)s|%(pathname)s:%(lineno)s] %(message)s')
         formatter = logging.Formatter(u'[%(asctime)s|%(levelname)s|%(filename)s:%(lineno)s] %(message)s')
-        #formatter2 = logging.Formatter(u'[%(levelname)s|%(filename)s:%(lineno)s]  : %(message)s'.encode('cp949')) 
         def customTime(*args):
             utc_dt = utc.localize(datetime.utcnow())
             my_tz = timezone("Asia/Seoul")
@@ -89,18 +74,14 @@ def get_logger(name):
             return converted.timetuple()
 
         formatter.converter = customTime
-
-        # fileHandler와 StreamHandler를 생성
-        #file_max_bytes = 10 * 1024 * 1024 
         file_max_bytes = 1 * 1024 * 1024 
         fileHandler = logging.handlers.RotatingFileHandler(filename=os.path.join(path_data, 'log', '%s.log' % name), maxBytes=file_max_bytes, backupCount=5, encoding='utf8', delay=True)
         streamHandler = logging.StreamHandler() 
 
-        
 
         # handler에 fommater 세팅 
         fileHandler.setFormatter(formatter)
-        streamHandler.setFormatter(formatter) 
+        streamHandler.setFormatter(CustomFormatter()) 
         
         # Handler를 logging에 추가
         logger.addHandler(fileHandler)
