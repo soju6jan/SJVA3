@@ -175,7 +175,7 @@ MENU_MAP = [
             #{'type':'divider'},
             {'type':'direct', 'name' : u'로그아웃', 'link':'/logout'},
             {'type':'direct', 'name' : u'재시작(업데이트)', 'link':'/system/restart'},
-            {'type':'direct', 'name' : u'종료', 'link':'/system/shutdown'},
+            {'type':'direct', 'name' : u'종료', 'link':'javascript:shutdown_confirm();'},
         ],
         'count' : 0,
     }

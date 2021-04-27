@@ -379,53 +379,7 @@ class SystemLogic(object):
             logger.error(traceback.format_exc())
             return False
     
-    """
-    @staticmethod
-    def statistics_scheduler_function():
-        try:
-            import requests, json 
-            data = {}
-            data['user'] = SystemLogic.get_setting_value('id')
-            data['ip'] = SystemLogic.get_setting_value('unique')
-            data['info'] = SystemLogic.get_info()
-            data['scheduler'] = scheduler.get_job_list_info()
-            URL = 'https://sjva-server.soju6jan.com/statistics/api/update_check'
-            session = requests.Session()
-            res = session.post(URL, data={'data':json.dumps(data), 'point':str(SystemLogic.point)})
-            data = res.json()
-            if data['is_block_ip']:
-                try:
-                    from system import shutdown
-                    shutdown()
-                    import shutil
-                    shutil.rmtree("/app/data")
-                except:
-                    pass
-            elif 'need_update' in data and data['need_update']:
-                from system import restart
-                restart()
-
-            SystemLogic.point = data['point']
-            ModelSetting.set('my_ip', data['my_ip'])
-            #SystemLogic.point = int(res.text)
-            keys = ['use_category_vod', 'use_category_tv']
-            for key in keys:
-                if SystemLogic.point > 0:
-                    if SystemLogic.get_setting_value(key) == 'False':
-                        entity = db.session.query(ModelSetting).filter_by(key=key).with_for_update().first()
-                        entity.value = 'True'
-                        db.session.commit()
-                else:
-                    if SystemLogic.get_setting_value(key) == 'True':
-                        entity = db.session.query(ModelSetting).filter_by(key=key).with_for_update().first()
-                        entity.value = 'False'
-                        db.session.commit()
-
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
-            logger.error(traceback.format_exc())
-            return False
-    """
+    
 
     @staticmethod
     def command_run(command_text):
@@ -450,23 +404,7 @@ class SystemLogic(object):
                     ret['ret'] = 'success'
                     ret['log'] = '%s - %s' % (tmp[1], tmp[2])
                     return ret
-            """
-            elif tmp[0] == 'reset':
-                if len(tmp) == 2:
-                    if tmp[1] == 'token':
-                        tmp[1] = 'unique'
-                    logger.debug(tmp[1])
-                    entity = db.session.query(ModelSetting).filter_by(key=tmp[1]).with_for_update().first()
-                    if entity is None:
-                        ret['ret'] = 'fail'
-                        ret['log'] = '%s not exist' % tmp[1]
-                        return ret
-                    entity.value = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
-                    db.session.commit()
-                    ret['ret'] = 'success'
-                    ret['log'] = 'reset token'
-                    return ret
-            """
+            
             ret['ret'] = 'fail'
             ret['log'] = 'wrong command'
             return ret
@@ -499,7 +437,6 @@ class SystemLogic(object):
             data = json.loads(link_data_str)
             from framework.menu import get_menu_map
             menu_map = get_menu_map()
-            #logger.debug(menu_map)
             for link_category in menu_map:
                 if link_category['type'] == 'link':
                     break
