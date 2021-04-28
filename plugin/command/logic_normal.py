@@ -459,6 +459,9 @@ class LogicNormal(object):
                 mod = __import__(module_name, fromlist=[])
                 py_reload(mod)
             else:
+                if module_name not in sys.path:
+                    sys.path.insert(0, module_name)
+                logger.debug(sys.path)
                 import importlib
                 mod = importlib.import_module(module_name)
                 #importlib.reload(mod)
