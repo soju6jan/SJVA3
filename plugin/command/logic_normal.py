@@ -455,8 +455,13 @@ class LogicNormal(object):
             logger.debug(sys.path)
             module_name = os.path.basename(python_filename).split('.py')[0]
             
-            mod = __import__(module_name, fromlist=[])
-            py_reload(mod)
+            if sys.version_info[0] == 2:
+                mod = __import__(module_name, fromlist=[])
+                py_reload(mod)
+            else:
+                import importlib
+                mod = importlib.import_module(module_name)
+                importlib.reload(mod)
 
             args = command
             mod_command_load = getattr(mod, 'main')
