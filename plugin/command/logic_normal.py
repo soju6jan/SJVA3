@@ -461,7 +461,7 @@ class LogicNormal(object):
             else:
                 import importlib
                 mod = importlib.import_module(module_name)
-                importlib.reload(mod)
+                #importlib.reload(mod)
 
             args = command
             mod_command_load = getattr(mod, 'main')
