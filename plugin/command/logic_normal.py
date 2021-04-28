@@ -393,7 +393,7 @@ class LogicNormal(object):
                     logs = LogicNormal.load_log_list.getvalue()
                     LogicNormal.load_log_list.truncate(0)
                     if logs:
-                        LogicNormal.command_queue.put(log.strip() + '\n')
+                        LogicNormal.command_queue.put(logs.strip() + '\n')
                 
                 time.sleep(1)
         th = threading.Thread(target=func)
