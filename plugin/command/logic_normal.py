@@ -123,7 +123,7 @@ class LogicNormal(object):
                                 LogicNormal.module_load(command, logger=command_logger)
                             else:
                                 LogicNormal.module_load(command)
-                        LogicNormal.command_queue.put(LogicNormal.load_log_list.getvalue().decode("utf-8") + '\n')
+                        LogicNormal.command_queue.put(LogicNormal.load_log_list.getvalue() + '\n')
 
                     LogicNormal.command_queue.put('<END>')
                 th = threading.Thread(target=func, args=())
@@ -387,7 +387,7 @@ class LogicNormal(object):
                 if sys.version_info[0] == 2: 
                     logs = LogicNormal.load_log_list.get_log()
                 else:
-                    logs = LogicNormal.load_log_list.getvalue().decode("utf-8")
+                    logs = LogicNormal.load_log_list.getvalue()
                     LogicNormal.load_log_list.truncate(0)
                 if logs:
                     for log in logs:
