@@ -386,12 +386,15 @@ class LogicNormal(object):
             while LogicNormal.command_queue is not None:
                 if sys.version_info[0] == 2: 
                     logs = LogicNormal.load_log_list.get_log()
+                    if logs:
+                        for log in logs:
+                            LogicNormal.command_queue.put(log.strip() + '\n')
                 else:
                     logs = LogicNormal.load_log_list.getvalue()
                     LogicNormal.load_log_list.truncate(0)
-                if logs:
-                    for log in logs:
+                    if logs:
                         LogicNormal.command_queue.put(log.strip() + '\n')
+                
                 time.sleep(1)
         th = threading.Thread(target=func)
         th.setDaemon(True)
