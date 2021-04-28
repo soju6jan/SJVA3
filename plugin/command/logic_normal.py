@@ -455,8 +455,12 @@ class LogicNormal(object):
             logger.debug(sys.path)
             module_name = os.path.basename(python_filename).split('.py')[0]
             
+            import sys
+            if module_name in sys.modules:
+                del sys.modules[module_name]
+
             mod = __import__(module_name, fromlist=[])
-            py_reload(mod)
+            #py_reload(mod)
 
             args = command
             mod_command_load = getattr(mod, 'main')
