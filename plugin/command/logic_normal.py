@@ -450,19 +450,13 @@ class LogicNormal(object):
         try:
             python_filename = command[1]
             python_sys_path = os.path.dirname(python_filename)
-            #if python_sys_path not in sys.path:
-            #    sys.path.insert(0, python_sys_path)
-
+            if python_sys_path not in sys.path:
+                sys.path.insert(0, python_sys_path)
             logger.debug(sys.path)
             module_name = os.path.basename(python_filename).split('.py')[0]
             
-            #module_name
-            
-            if module_name in sys.modules:
-                del sys.modules[module_name]
-
             mod = __import__(module_name, fromlist=[])
-            #py_reload(mod)
+            py_reload(mod)
 
             args = command
             mod_command_load = getattr(mod, 'main')
