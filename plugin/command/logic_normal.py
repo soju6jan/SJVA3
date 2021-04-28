@@ -463,8 +463,8 @@ class LogicNormal(object):
                     sys.path.insert(0, module_name)
                 logger.debug(sys.path)
                 import importlib
-                mod = importlib.import_module(module_name)
-                #importlib.reload(mod)
+                #mod = importlib.import_module(module_name)
+                importlib.reload(module_name)
 
             args = command
             mod_command_load = getattr(mod, 'main')
