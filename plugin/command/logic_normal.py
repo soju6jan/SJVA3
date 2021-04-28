@@ -455,7 +455,7 @@ class LogicNormal(object):
             logger.debug(sys.path)
             module_name = os.path.basename(python_filename).split('.py')[0]
             
-            import sys
+            
             if module_name in sys.modules:
                 del sys.modules[module_name]
 
