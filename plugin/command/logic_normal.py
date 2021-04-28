@@ -468,6 +468,11 @@ class LogicNormal(object):
 
             args = command
             mod_command_load = getattr(mod, 'main')
+            logger.debug(mod_command_load)
+            logger.debug(mod_command_load)
+            
+            logger.debug(mod_command_load)
+            
             if mod_command_load:
                 ret = mod_command_load(*args, **kwargs)
             return ret
