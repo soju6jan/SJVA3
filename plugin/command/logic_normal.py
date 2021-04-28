@@ -464,7 +464,7 @@ class LogicNormal(object):
                 logger.debug(sys.path)
                 import importlib
                 mod = importlib.import_module(module_name)
-                importlib.reload(module_name)
+                importlib.reload(mod)
 
             args = command
             mod_command_load = getattr(mod, 'main')
