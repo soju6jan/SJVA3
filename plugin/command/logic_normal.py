@@ -116,7 +116,7 @@ class LogicNormal(object):
                         import io
                         from contextlib import redirect_stdout
                         LogicNormal.load_log_list = io.StringIO()
-                        with redirect_stdout(LogicNormal.load_log_list)
+                        with redirect_stdout(LogicNormal.load_log_list):
                             LogicNormal.start_communicate_load()
                             if job_id is not None:
                                 command_logger = get_logger('%s_%s' % (package_name, job_id))
