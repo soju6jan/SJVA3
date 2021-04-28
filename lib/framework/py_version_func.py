@@ -11,6 +11,7 @@ else:
     import queue as py_queue
     import urllib.request as py_urllib2
     import urllib.parse as py_urllib #urlencode
-    from imp import reload as py_reload
+    #from imp import reload as py_reload
+    from importlib import reload as py_reload
     def py_unicode(v):
         return str(v)
