@@ -21,7 +21,6 @@ from system.logic import SystemLogic
 # 패키지
 from .model import ModelSetting, ModelFileprocessMovieItem
 from .logic_movie import LogicMovie
-import plex
 
 # 로그
 package_name = __name__.split('.')[0]
@@ -210,7 +209,10 @@ class Logic(object):
             lists = query.all()
             ret['list'] = [item.as_dict() for item in lists]
             ret['paging'] = Util.get_paging_info(count, page, page_size)
-            ret['plex_server_hash'] = plex.Logic.get_server_hash()
+            try:
+                ret['plex_server_hash'] = plex.Logic.get_server_hash()
+            except:
+                ret['plex_server_hash'] = ''
             return ret
         except Exception as exception:
             logger.error('Exception:%s', exception)
