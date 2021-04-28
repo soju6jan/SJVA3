@@ -101,16 +101,30 @@ class LogicNormal(object):
             command = command.split(' ')
             if command[0] == 'LOAD':
                 def func():
-                    LogicNormal.load_log_list = []
-                    with Capturing() as LogicNormal.load_log_list:  # note the constructor argument
-                        LogicNormal.start_communicate_load()
-                        if job_id is not None:
-                            command_logger = get_logger('%s_%s' % (package_name, job_id))
-                            LogicNormal.module_load(command, logger=command_logger)
-                        else:
-                            LogicNormal.module_load(command)
-                    for t in LogicNormal.load_log_list:
-                        LogicNormal.command_queue.put(t + '\n')
+                    if sys.version_info[0] == 2: 
+                        LogicNormal.load_log_list = []
+                        with Capturing() as LogicNormal.load_log_list:  # note the constructor argument
+                            LogicNormal.start_communicate_load()
+                            if job_id is not None:
+                                command_logger = get_logger('%s_%s' % (package_name, job_id))
+                                LogicNormal.module_load(command, logger=command_logger)
+                            else:
+                                LogicNormal.module_load(command)
+                        for t in LogicNormal.load_log_list:
+                            LogicNormal.command_queue.put(t + '\n')
+                    else:
+                        import io
+                        from contextlib import redirect_stdout
+                        LogicNormal.load_log_list = io.StringIO()
+                        with redirect_stdout(LogicNormal.load_log_list)
+                            LogicNormal.start_communicate_load()
+                            if job_id is not None:
+                                command_logger = get_logger('%s_%s' % (package_name, job_id))
+                                LogicNormal.module_load(command, logger=command_logger)
+                            else:
+                                LogicNormal.module_load(command)
+                        LogicNormal.command_queue.put(LogicNormal.load_log_list.getvalue().decode("utf-8") + '\n')
+
                     LogicNormal.command_queue.put('<END>')
                 th = threading.Thread(target=func, args=())
                 th.setDaemon(True)
@@ -370,10 +384,11 @@ class LogicNormal(object):
             position = 0
             flag = True
             while LogicNormal.command_queue is not None:
-                #logger.debug('index: %s %s', position, len(LogicNormal.load_log_list))
-                logs = LogicNormal.load_log_list.get_log()
-                #logger.debug(logs)
-                
+                if sys.version_info[0] == 2: 
+                    logs = LogicNormal.load_log_list.get_log()
+                else:
+                    logs = LogicNormal.load_log_list.getvalue().decode("utf-8")
+                    LogicNormal.load_log_list.truncate(0)
                 if logs:
                     for log in logs:
                         LogicNormal.command_queue.put(log.strip() + '\n')
