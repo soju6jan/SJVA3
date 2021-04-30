@@ -3,6 +3,7 @@ __pycache__/
 
 data/
 pyvenv/
+false/
 
 *.pyc 
 *.pyo
