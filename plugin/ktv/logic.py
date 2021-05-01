@@ -261,7 +261,7 @@ class Logic(object):
                                         import plex
                                         plex.Logic.send_scan_command(entity.modelfile, package_name)
                                     except Exception as exception:
-                                        logger.error('NOT IMPORT PLEX!!')
+                                        logger.debug('NOT IMPORT PLEX!!')
                                     db.session.add(entity.modelfile)
                                     db.session.commit()
                                 if entity.move_type == EntityLibraryPathRoot.DriveType.RCLONE:
