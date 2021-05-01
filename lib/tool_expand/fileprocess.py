@@ -137,6 +137,7 @@ class ToolExpandFileProcess(object):
         filename = filename.replace('z_1080p', '').replace('z_720p', '')
         filename = filename.replace('z_', '')
         filename = filename.replace('-c', '')
+        
         #if file.find('@') != -1:
         #    file = file.split('@')[1]
 
