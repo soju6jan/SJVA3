@@ -123,7 +123,11 @@ class FfmpegQueue(object):
                         if self.current_ffmpeg_count < self.max_ffmpeg_count:
                             break
                         time.sleep(5)
-                    except:
+                    except Exception as exception: 
+                        self.P.logger.error('Exception:%s', exception)
+                        self.P.logger.error(traceback.format_exc())
+                        self.P.logger.error('current_ffmpeg_count : %s', self.current_ffmpeg_count)
+                        self.P.logger.error('max_ffmpeg_count : %s', self.max_ffmpeg_count)
                         break
                 entity = self.download_queue.get()
                 if entity.cancel:
