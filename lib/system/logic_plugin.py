@@ -303,9 +303,6 @@ class LogicPlugin(object):
         try:
             if os.environ.get('UPDATE_STOP') == 'true':
                 return
-            logger.warning(os.environ.get('PLUGIN_UPDATE_FROM_PYTHON'))
-            logger.warning(os.environ)
-
             if os.environ.get('PLUGIN_UPDATE_FROM_PYTHON') == 'false':
                 return
             custom_path = os.path.join(path_data, 'custom')
