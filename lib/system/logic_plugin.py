@@ -301,7 +301,9 @@ class LogicPlugin(object):
     @staticmethod
     def custom_plugin_update():
         try:
-            if  os.environ.get('UPDATE_STOP') == 'true':
+            if os.environ.get('UPDATE_STOP') == 'true':
+                return
+            if os.environ.get('PLUGIN_UPDATE_FROM_PYTHON') == 'false':
                 return
             custom_path = os.path.join(path_data, 'custom')
             tmps = os.listdir(custom_path)
