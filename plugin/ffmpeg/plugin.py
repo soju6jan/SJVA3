@@ -9,7 +9,7 @@ from pytz import timezone
 
 # third-party
 import requests
-from flask import Blueprint, request, Response, send_file, render_template, redirect, jsonify, session, send_from_directory
+from flask import Blueprint, request, Response, send_file, render_template, redirect, jsonify, session, send_from_directory, stream_with_context
 from flask_socketio import SocketIO, emit, send
 from flask_login import login_user, logout_user, current_user, login_required
 # sjva 공용
@@ -46,6 +46,18 @@ def plugin_load():
 
 def plugin_unload():
     Logic.plugin_unload()  
+    global process_list
+    try:
+        for p in process_list:
+            if p is not None and p.poll() is None:
+                import psutil
+                process = psutil.Process(p.pid)
+                for proc in process.children(recursive=True):
+                    proc.kill()
+                process.kill()
+    except Exception as e: 
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
 
 #########################################################
 # WEB Menu 
@@ -195,3 +207,64 @@ def connect():
 @socketio.on('disconnect', namespace='/%s' % package_name)
 def disconnect():
     logger.debug('ffmpeg socketio disconnect')
+
+
+process_list = []
+@blueprint.route('/streaming', methods=['GET'])
+def streaming():
+    import subprocess
+    def generate():
+        startTime = time.time()
+        buffer = []
+        sentBurst = False
+        
+        path_ffmpeg = 'ffmpeg'
+
+        #filename = '/home/coder/project/SJ/mnt/soju6janm/AV/censored/library2/vr/C/CBIKMV/CBIKMV-093/cbikmv-093cd1.mp4'
+        filename = '/home/coder/project/SJ/mnt/soju6janw/1.mp4'
+        #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-f", "mpegts", "-tune", "zerolatency", "pipe:stdout"]
+
+        ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", "libvpx", "-qmin", "0", "-qmax", "50", "-crf", "50", "-b:v", "1M", '-acodec', 'libvorbis', '-f', 'webm', "pipe:stdout"]
+
+        #ffmpeg -i input.mov -vcodec libvpx -qmin 0 -qmax 50 -crf 10 -b:v 1M -acodec libvorbis output.webm
+
+        #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", 'libx264',  '-acodec', 'aac ', '-f', 'mp4', "pipe:stdout"]
+
+        logger.debug(ffmpeg_command)
+        #logger.debug('command : %s', ffmpeg_command)
+        process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
+        global process_list
+        process_list.append(process)
+        while True:
+            line = process.stdout.read(1024)
+            buffer.append(line)
+            if sentBurst is False and time.time() > startTime + 1 and len(buffer) > 0:
+                sentBurst = True
+                for i in range(0, len(buffer) - 2):
+                    yield buffer.pop(0)
+            elif time.time() > startTime + 1 and len(buffer) > 0:
+                yield buffer.pop(0)
+            process.poll()
+            if isinstance(process.returncode, int):
+                if process.returncode > 0:
+                    logger.debug('FFmpeg Error :%s', process.returncode)
+                break
+    return Response(stream_with_context(generate()), mimetype = "video/MP2T")
+
+
+"""
+ffmpeg version 3.4.8-0ubuntu0.2 Copyright (c) 2000-2020 the FFmpeg developers
+  built with gcc 7 (Ubuntu 7.5.0-3ubuntu1~18.04)
+  configuration: --prefix=/usr --extra-version=0ubuntu0.2 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --enable-gpl --disable-stripping --enable-avresample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-librsvg --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-omx --enable-openal --enable-opengl --enable-sdl2 --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-libopencv --enable-libx264 --enable-shared
+  libavutil      55. 78.100 / 55. 78.100
+  libavcodec     57.107.100 / 57.107.100
+  libavformat    57. 83.100 / 57. 83.100
+  libavdevice    57. 10.100 / 57. 10.100
+  libavfilter     6.107.100 /  6.107.100
+  libavresample   3.  7.  0 /  3.  7.  0
+  libswscale      4.  8.100 /  4.  8.100
+  libswresample   2.  9.100 /  2.  9.100
+  libpostproc    54.  7.100 / 54.  7.100
+Hyper fast Audio and Video encoder
+usage: ffmpeg [options] [[infile options] -i infile]... {[outfile options] outfile}...
+"""
