@@ -99,6 +99,8 @@ class FfmpegQueue(object):
     def __init__(self, P, max_ffmpeg_count):
         self.P = P
         self.max_ffmpeg_count = max_ffmpeg_count
+        if self.max_ffmpeg_count is None or self.max_ffmpeg_count == '':
+            self.max_ffmpeg_count = 1
 
     def queue_start(self):
         try:
@@ -117,11 +119,12 @@ class FfmpegQueue(object):
         while True:
             try:
                 while True:
-                    self.P.logger.warning('current_ffmpeg_count:%s', self.current_ffmpeg_count)
-                    self.P.logger.warning('current_ffmpeg_count:%s', self.max_ffmpeg_count)
-                    if self.current_ffmpeg_count < self.max_ffmpeg_count:
+                    try:
+                        if self.current_ffmpeg_count < self.max_ffmpeg_count:
+                            break
+                        time.sleep(5)
+                    except:
                         break
-                    time.sleep(5)
                 entity = self.download_queue.get()
                 if entity.cancel:
                     continue
