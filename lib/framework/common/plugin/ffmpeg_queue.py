@@ -118,8 +118,8 @@ class FfmpegQueue(object):
             try:
                 while True:
                     try:
-                        self.P.logger.debug('current_ffmpeg_count:%s', self.current_ffmpeg_count)
-                        self.P.logger.debug('max_ffmpeg_count:%s', self.max_ffmpeg_count)
+                        self.P.logger.warning('current_ffmpeg_count:%s', self.current_ffmpeg_count)
+                        self.P.logger.warning('max_ffmpeg_count:%s', self.max_ffmpeg_count)
                         if self.current_ffmpeg_count < self.max_ffmpeg_count:
                             break
                         time.sleep(5)
