@@ -208,7 +208,7 @@ class Ffmpeg(object):
                         #    os.chmod(self.temp_fullpath, 0777)
                         #else:
                         #    os.chmod(self.temp_fullpath, 777)
-                        os.system('chmod 777 %s' % self.temp_fullpath)
+                        os.system('chmod 777 "%s"' % self.temp_fullpath)
                         # 2020-03-19 씹힌다 ㅠ
                         #import framework.common.celery as celery_task
                         #celery_task.move(self.temp_fullpath, self.save_fullpath)
