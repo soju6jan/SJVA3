@@ -45,7 +45,11 @@ def plugin_load():
 
 
 def plugin_unload():
-    Logic.plugin_unload()  
+    Logic.plugin_unload()
+    streaming_kill()
+
+def streaming_kill():
+    logger.debug('streaming_kill...')
     global process_list
     try:
         for p in process_list:
@@ -119,6 +123,9 @@ def ajax(sub):
             for ffmpeg in Ffmpeg.instance_list:
                 ret.append(ffmpeg.get_data())
             return jsonify(ret)
+        elif sub == 'streaming_kill':
+            streaming_kill()
+            return jsonify('')
     except Exception as exception: 
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
@@ -215,40 +222,57 @@ def streaming():
     mode = request.args.get('mode')
     if mode == 'file':
         try:
+            import subprocess
             filename =  request.args.get('value')
             if filename.endswith('mp4'):
+                """
+                output = os.path.join(path_data, 'tmp', 'index.m3u8')
+                #ffmpeg_command = ['ffmpeg', "-loglevel", "quiet", "-i", filename, '-ss', '00:00:03', '-t', '00:03:00', "-vcodec", 'libx264', '-vf', 'scale=160:-1', '-qscale:v', '1', '-acodec', 'aac', '-qscale:a', '1', '-f', 'mp4', output, '-y']
+                ffmpeg_command = ['ffmpeg', "-loglevel", "quiet", "-i", filename, '-ss', '00:00:03', '-t', '00:03:00', "-start_number", '0', '-vf', 'scale=320:-1', '-hls_list_size', '0', '-hls_time', '10', '-f', 'hls', output, '-y']
+                
+                logger.warning(' '.join(ffmpeg_command))
+                #subprocess.check_output(ffmpeg_command)
+                subprocess.Popen(ffmpeg_command)
+                time.sleep(5)
+                
+                filename = output
+                """
+
                 url = '/open_file%s' % filename
                 logger.debug(url)
                 return redirect(url)
+         
+
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
 
 
-        import subprocess
+        
         def generate():
             startTime = time.time()
             buffer = []
             sentBurst = False
             
             path_ffmpeg = 'ffmpeg'
-
             #filename = '/home/coder/project/SJ/mnt/soju6janm/AV/censored/library2/vr/C/CBIKMV/CBIKMV-093/cbikmv-093cd1.mp4'
             #filename = '/home/coder/project/SJ/mnt/soju6janw/1.mp4'
             #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-f", "mpegts", "-tune", "zerolatency", "pipe:stdout"]
 
-            ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", "libvpx", "-qmin", "0", "-qmax", "50", "-crf", "50", "-b:v", "0.1M", '-acodec', 'libvorbis', '-f', 'webm', "pipe:stdout"]
+            ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, '-ss', '00:00:03', '-t', '00:03:00', "-vcodec", "libvpx", '-vf', 'scale=320:-1', "-qmin", "0", "-qmax", "50", "-crf", "50", "-b:v", "0.1M", '-acodec', 'libvorbis', '-f', 'webm', "pipe:stdout"]
 
-            #ffmpeg -i input.mov -vcodec libvpx -qmin 0 -qmax 50 -crf 10 -b:v 1M -acodec libvorbis output.webm
+            #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", "libtheora", '-vf', 'scale=320:-1', "-qscale:v", '1', '-acodec', 'libvorbis', '-qscale:a', '1', '-f', 'ogv', "pipe:stdout"]
 
             #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", 'libx264',  '-acodec', 'aac ', '-f', 'mp4', "pipe:stdout"]
 
-            logger.debug(ffmpeg_command)
+            logger.debug(' '.join(ffmpeg_command))
             #logger.debug('command : %s', ffmpeg_command)
             process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
             global process_list
             process_list.append(process)
             while True:
+                #if time.time() - startTime > 120:
+                #    break
                 line = process.stdout.read(1024)
                 buffer.append(line)
                 if sentBurst is False and time.time() > startTime + 1 and len(buffer) > 0:
@@ -262,7 +286,22 @@ def streaming():
                     if process.returncode > 0:
                         logger.debug('FFmpeg Error :%s', process.returncode)
                     break
+                
+            if process is not None and process.poll() is None:
+                process.kill()
         return Response(stream_with_context(generate()), mimetype = "video/MP2T")
+
+
+
+def get_video_info(filepath):
+    try:
+        from system.logic_command import SystemLogicCommand
+        command = ['ffprobe', '-v', 'error', '-print_format', 'json', '-show_format', '-show_streams', "%s" % filepath]
+        ret = SystemLogicCommand.execute_command_return(command, format='json')
+        return ret
+    except Exception as exception: 
+        logger.error('Exception:%s', exception)
+        logger.error(traceback.format_exc())
 
 
 """
