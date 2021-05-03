@@ -212,44 +212,57 @@ def disconnect():
 process_list = []
 @blueprint.route('/streaming', methods=['GET'])
 def streaming():
-    import subprocess
-    def generate():
-        startTime = time.time()
-        buffer = []
-        sentBurst = False
-        
-        path_ffmpeg = 'ffmpeg'
+    mode = request.args.get('mode')
+    if mode == 'file':
+        try:
+            filename =  request.args.get('value')
+            if filename.endswith('mp4'):
+                url = '/open_file%s' % filename
+                logger.debug(url)
+                return redirect(url)
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
 
-        #filename = '/home/coder/project/SJ/mnt/soju6janm/AV/censored/library2/vr/C/CBIKMV/CBIKMV-093/cbikmv-093cd1.mp4'
-        filename = '/home/coder/project/SJ/mnt/soju6janw/1.mp4'
-        #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-f", "mpegts", "-tune", "zerolatency", "pipe:stdout"]
 
-        ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", "libvpx", "-qmin", "0", "-qmax", "50", "-crf", "50", "-b:v", "1M", '-acodec', 'libvorbis', '-f', 'webm', "pipe:stdout"]
+        import subprocess
+        def generate():
+            startTime = time.time()
+            buffer = []
+            sentBurst = False
+            
+            path_ffmpeg = 'ffmpeg'
 
-        #ffmpeg -i input.mov -vcodec libvpx -qmin 0 -qmax 50 -crf 10 -b:v 1M -acodec libvorbis output.webm
+            #filename = '/home/coder/project/SJ/mnt/soju6janm/AV/censored/library2/vr/C/CBIKMV/CBIKMV-093/cbikmv-093cd1.mp4'
+            #filename = '/home/coder/project/SJ/mnt/soju6janw/1.mp4'
+            #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-f", "mpegts", "-tune", "zerolatency", "pipe:stdout"]
 
-        #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", 'libx264',  '-acodec', 'aac ', '-f', 'mp4', "pipe:stdout"]
+            ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", "libvpx", "-qmin", "0", "-qmax", "50", "-crf", "50", "-b:v", "0.1M", '-acodec', 'libvorbis', '-f', 'webm', "pipe:stdout"]
 
-        logger.debug(ffmpeg_command)
-        #logger.debug('command : %s', ffmpeg_command)
-        process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
-        global process_list
-        process_list.append(process)
-        while True:
-            line = process.stdout.read(1024)
-            buffer.append(line)
-            if sentBurst is False and time.time() > startTime + 1 and len(buffer) > 0:
-                sentBurst = True
-                for i in range(0, len(buffer) - 2):
+            #ffmpeg -i input.mov -vcodec libvpx -qmin 0 -qmax 50 -crf 10 -b:v 1M -acodec libvorbis output.webm
+
+            #ffmpeg_command = [path_ffmpeg, "-loglevel", "quiet", "-i", filename, "-vcodec", 'libx264',  '-acodec', 'aac ', '-f', 'mp4', "pipe:stdout"]
+
+            logger.debug(ffmpeg_command)
+            #logger.debug('command : %s', ffmpeg_command)
+            process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
+            global process_list
+            process_list.append(process)
+            while True:
+                line = process.stdout.read(1024)
+                buffer.append(line)
+                if sentBurst is False and time.time() > startTime + 1 and len(buffer) > 0:
+                    sentBurst = True
+                    for i in range(0, len(buffer) - 2):
+                        yield buffer.pop(0)
+                elif time.time() > startTime + 1 and len(buffer) > 0:
                     yield buffer.pop(0)
-            elif time.time() > startTime + 1 and len(buffer) > 0:
-                yield buffer.pop(0)
-            process.poll()
-            if isinstance(process.returncode, int):
-                if process.returncode > 0:
-                    logger.debug('FFmpeg Error :%s', process.returncode)
-                break
-    return Response(stream_with_context(generate()), mimetype = "video/MP2T")
+                process.poll()
+                if isinstance(process.returncode, int):
+                    if process.returncode > 0:
+                        logger.debug('FFmpeg Error :%s', process.returncode)
+                    break
+        return Response(stream_with_context(generate()), mimetype = "video/MP2T")
 
 
 """

@@ -75,11 +75,12 @@ def get_version():
     #return jsonify(version)
     return version
 
+
 @app.route("/open_file/<path:path>")
 @login_required
 def open_file(path):
     logger.debug('open_file :%s', path)
-    return send_from_directory('', path)
+    return send_from_directory('/', path)
 
 @app.route("/file/<path:path>")
 @check_api
