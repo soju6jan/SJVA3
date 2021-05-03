@@ -10,9 +10,9 @@ from framework import db
 from framework.util import Util
 
 #########################################################
-def get_model_setting(package_name, logger):
+def get_model_setting(package_name, logger, table_name=None):
     class ModelSetting(db.Model):
-        __tablename__ = '%s_setting' % package_name
+        __tablename__ = '%s_setting' % package_name if table_name is None else table_name
         __table_args__ = {'mysql_collate': 'utf8_general_ci'}
         __bind_key__ = package_name
 
