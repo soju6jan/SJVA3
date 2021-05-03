@@ -31,7 +31,7 @@ try:
 except:
     from functools import wraps
     class DummyCelery:
-        def task(self, original_function, bind=True):
+        def task(self, original_function):
             @wraps(original_function)
             def wrapper_function(*args, **kwargs):  #1
                 return original_function(*args, **kwargs)  #2
