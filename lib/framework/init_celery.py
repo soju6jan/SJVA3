@@ -6,6 +6,10 @@
 import os
 import sys
 
+def is_python3():
+    return sys.version_info >= (3, 0)
+
+
 from framework import app, logger, path_app_root
 try:
     from celery import Celery
@@ -30,11 +34,33 @@ try:
 
 except:
     from functools import wraps
-    class DummyCelery:
-        def task(self, original_function):
-            @wraps(original_function)
-            def wrapper_function(*args, **kwargs):  #1
-                return original_function(*args, **kwargs)  #2
-            return wrapper_function
-    
-    celery = DummyCelery()
+    try:
+        class DummyCelery:
+            def task(**extras):
+                def wrapper(f):
+                    @wraps(f)
+                    def wrapped(*args, **kwargs):
+                        #fn_globals = {}
+                        #fn_globals.update(globals())
+                        #fn_globals.update(extras)
+                        #if is_python3():
+                        #    func_code = '__code__'
+                        #else:
+                        #    func_code = 'func_code'
+                        #call_fn = FunctionType(getattr(f, func_code), fn_globals)
+
+                        return f(*args, **kwargs)
+                    return wrapped
+                return wrapper
+
+
+
+            #def task(self, original_function):
+            #    @wraps(original_function)
+            #    def wrapper_function(*args, **kwargs):  #1
+            #        return original_function(*args, **kwargs)  #2
+            #    return wrapper_function
+        
+        celery = DummyCelery()
+    except:
+        pass
