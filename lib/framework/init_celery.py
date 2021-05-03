@@ -34,6 +34,7 @@ try:
 
 except:
     from functools import wraps
+    from types import FunctionType
     try:
         class DummyCelery:
             def task(**extras):
