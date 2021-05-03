@@ -40,16 +40,15 @@ except:
                 def wrapper(f):
                     @wraps(f)
                     def wrapped(*args, **kwargs):
-                        #fn_globals = {}
-                        #fn_globals.update(globals())
-                        #fn_globals.update(extras)
-                        #if is_python3():
-                        #    func_code = '__code__'
-                        #else:
-                        #    func_code = 'func_code'
-                        #call_fn = FunctionType(getattr(f, func_code), fn_globals)
-
-                        return f(*args, **kwargs)
+                        fn_globals = {}
+                        fn_globals.update(globals())
+                        fn_globals.update(extras)
+                        if is_python3():
+                            func_code = '__code__'
+                        else:
+                            func_code = 'func_code'
+                        call_fn = FunctionType(getattr(f, func_code), fn_globals)
+                        return call_fn(*args, **kwargs)
                     return wrapped
                 return wrapper
 
