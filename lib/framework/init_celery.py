@@ -41,6 +41,10 @@ except:
     celery = DummyCelery()
     """
 
+    def ffff():
+        pass
+    
+            
     class celery(object):
         class task(object):
             def __init__(self, *args, **kwargs):
@@ -48,7 +52,6 @@ except:
                     self.f = args[0]
         
             def __call__(self, *args, **kwargs):
-                if len(args) > 0:
+                if len(args) > 0 and type(args[0]) == type(ffff):
                     return args[0]
-                self.f()
-            
+                self.f(*args, **kwargs)
