@@ -29,6 +29,7 @@ try:
     )
 
 except:
+    """
     from functools import wraps
     class DummyCelery:
         def task(self, original_function):
@@ -38,3 +39,16 @@ except:
             return wrapper_function
     
     celery = DummyCelery()
+    """
+
+    class celery(object):
+        class task(object):
+            def __init__(self, *args, **kwargs):
+                if len(args) > 0:
+                    self.f = args[0]
+        
+            def __call__(self, *args, **kwargs):
+                if len(args) > 0:
+                    return args[0]
+                self.f()
+            
