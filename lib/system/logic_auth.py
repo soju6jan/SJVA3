@@ -86,20 +86,6 @@ class SystemLogicAuth(object):
         try:
             
             from framework.common.util import AESCipher
-            #return (AESCipher.decrypt(value, mykey=(SystemLogicAuth.get_ip().encode('hex') + ModelSetting.get('auth_apikey').encode("hex")).zfill(32)[:32]) == ModelSetting.get('sjva_id'))
-            
-            #SystemLogicAuth.get_ip().encode('hex')
-            #codecs.encode(SystemLogicAuth.get_ip().encode(), 'hex')
-            #ModelSetting.get('auth_apikey').encode("hex")
-            #codecs.encode(ModelSetting.get('auth_apikey').encode(), 'hex')
-
-            #py3
-            #value : b'VePa3PcftBJtVryNgNh3faMJjc4NRFtf822F181qS/hsRqH1H5QsmlWXMJZO/clt'
-            #[2020-10-20 13:14:02,344|DEBUG|logic_auth.py:131] IP:172.26.10.217
-            #[2020-10-20 13:14:02,344|DEBUG|logic_auth.py:97] SystemLogicAuth.get_ip() : 172.26.10.217
-            #[2020-10-20 13:14:02,344|DEBUG|logic_auth.py:131] IP:172.26.10.217
-            #[2020-10-20 13:14:02,344|DEBUG|logic_auth.py:98] SystemLogicAuth.get_ip() : b'3137322e32362e31302e323137'
-
             if app.config['config']['is_py2']:
                 tmp = AESCipher.decrypt(value, mykey=(SystemLogicAuth.get_ip().encode('hex') + ModelSetting.get('auth_apikey').encode("hex")).zfill(32)[:32]).split('_')
             else:

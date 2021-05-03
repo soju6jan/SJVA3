@@ -321,8 +321,8 @@ class LogicMovie(object):
             LogicMovie.start_task(source_path, target_path)
 
     @staticmethod
-    @celery.task(bind=True)
-    def start_task(self, source_path, target_path):
+    @celery.task
+    def start_task(source_path, target_path):
         logger.debug('movie %s, %s', source_path, target_path)
         LogicMovie.prepare_target(target_path)
         try:
