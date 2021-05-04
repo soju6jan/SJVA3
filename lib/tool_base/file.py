@@ -40,6 +40,8 @@ class ToolBaseFile(object):
         try:
             import codecs
             ofp = codecs.open(filepath, mode, encoding='utf8')
+            if isinstance(data, (bytes, bytearray)):
+                data = data.encode('utf-8')
             ofp.write(data)
             ofp.close()
             return True
