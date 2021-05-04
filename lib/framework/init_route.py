@@ -109,7 +109,7 @@ def iframe(sub):
             logger.debug(request.base_url)
             logger.debug(request.path)
             #from system.logic import SystemLogic
-            site = request.host_url + 'flaskfilemanager'
+            site = 'flaskfilemanager'
             logger.debug(site)
             return render_template('iframe.html', site=site)
         else:
