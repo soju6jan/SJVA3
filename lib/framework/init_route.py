@@ -106,9 +106,10 @@ def iframe(sub):
     if sub == 'file_manager':
         if app.config['config']['is_debug'] or current_user.is_authenticated:
             logger.debug(request.base_url)
+            logger.debug(request.base_url)
             logger.debug(request.path)
             #from system.logic import SystemLogic
-            site = request.host_url + '/flaskfilemanager'
+            site = request.host_url + 'flaskfilemanager'
             logger.debug(site)
             return render_template('iframe.html', site=site)
         else:
