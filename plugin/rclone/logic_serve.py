@@ -89,6 +89,8 @@ class LogicServe(object):
             else:
                 log_filename = 'serve_%s' % item.name
             log_filename = os.path.join(path_app_root, 'data', 'log', '%s.log' % log_filename)
+            if os.path.exists(log_filename):
+                os.remove(log_filename)
             command.append(log_filename)
             logger.debug(command)
             #if platform.system() == 'Linux':
