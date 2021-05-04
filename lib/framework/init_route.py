@@ -105,12 +105,12 @@ def hls_play():
 def iframe(sub):
     if sub == 'file_manager':
         if app.config['config']['is_debug'] or current_user.is_authenticated:
+            host = request.base_url.replace(request.path, '')
             logger.debug(request.base_url)
             logger.debug(request.path)
-            from system.logic import SystemLogic
-            site = SystemLogic.get_setting_value('ddns') + '/flaskfilemanager'
+            #from system.logic import SystemLogic
+            site = host + '/flaskfilemanager'
             logger.debug(site)
-            
             return render_template('iframe.html', site=site)
         else:
             return redirect('/login?next=' + request.path)
