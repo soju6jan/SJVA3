@@ -75,12 +75,11 @@ def get_version():
     #return jsonify(version)
     return version
 
-
 @app.route("/open_file/<path:path>")
 @login_required
 def open_file(path):
     logger.debug('open_file :%s', path)
-    return send_from_directory('/', path)
+    return send_from_directory('', path)
 
 @app.route("/file/<path:path>")
 @check_api
@@ -106,12 +105,16 @@ def iframe(sub):
     if sub == 'file_manager':
         if app.config['config']['is_debug'] or current_user.is_authenticated:
             logger.debug(request.base_url)
-            logger.debug(request.base_url)
             logger.debug(request.path)
-            #from system.logic import SystemLogic
-            site = 'flaskfilemanager'
+            from system.logic import SystemLogic
+            site = SystemLogic.get_setting_value('ddns')
+            if site == 'http://localhost:9999':
+                site = 'flaskfilemanager'
+            else:
+                site += '/flaskfilemanager'
             logger.debug(site)
             return render_template('iframe.html', site=site)
+
         else:
             return redirect('/login?next=' + request.path)
     elif sub == 'file_manager2':
