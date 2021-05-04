@@ -166,6 +166,7 @@ MENU_MAP = [
             #{'type':'direct', 'name' : u'플러그인', 'link':'/system/plugin'},
             #{'type':'direct', 'name' : u'정보', 'link':'/system/information'},
             {'type':'plugin', 'plugin' : 'command', 'name' : u'Command'},
+            {'type':'direct', 'name' : u'파일 매니저', 'link':'/iframe/file_manager'},
             {'type':'divider'},
             #{'type':'link', 'name' : u'FileManager', 'link':'/iframe/file_manager'},
             #{'type':'system_value', 'name' : u'FileBrowser.xyz', 'link':'url_filebrowser'},
@@ -276,7 +277,7 @@ def init_menu(plugin_menus):
                     category['list'].append(category_child)
                 if 'exist' in category_child and category_child['exist'] == True:
                     category['list'].append(category_child)
-    """
+    
     try:
         import flaskfilemanager
     except:
@@ -284,14 +285,14 @@ def init_menu(plugin_menus):
         try:
             index = -1
             for idx, item in enumerate(MENU_MAP[-1]['list']):
-                if 'name' in item and item['name'] == 'FileManager':
+                if 'name' in item and item['link'].find('file_manager') != -1:
                     index = idx
                     break
             if index != -1:
                 del MENU_MAP[-1]['list'][index]
         except:
             pass
-    """
+    
 
     try:
         ## 선 제거
