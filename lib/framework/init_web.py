@@ -72,6 +72,10 @@ def show_menu():
             return False
     return True
 
+def is_https():
+    from system.model import ModelSetting as SystemModelSetting
+    return (SystemModelSetting.get('ddns').find('https://') != -1)
+
 
 def jinja_initialize(app):
     from .menu import get_menu_map, get_plugin_menu
@@ -82,6 +86,7 @@ def jinja_initialize(app):
     app.jinja_env.globals.update(get_web_title=get_web_title)
     app.jinja_env.globals.update(get_plugin_menu=get_plugin_menu)
     app.jinja_env.globals.update(show_menu=show_menu)
+    app.jinja_env.globals.update(is_https=is_https)
     app.jinja_env.filters['get_menu'] = get_menu
     app.jinja_env.filters['get_theme'] = get_theme
     app.jinja_env.filters['get_menu_map'] = get_menu_map
@@ -89,4 +94,6 @@ def jinja_initialize(app):
     app.jinja_env.filters['get_web_title'] = get_web_title
     app.jinja_env.filters['get_plugin_menu'] = get_plugin_menu
     app.jinja_env.filters['show_menu'] = show_menu
+    app.jinja_env.filters['is_https'] = is_https
+
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')

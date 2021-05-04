@@ -333,3 +333,4 @@ def get_plugin_menu(plugin_name):
                     continue
             if category_child['plugin'] == plugin_name:
                 return category_child
+
