@@ -12,12 +12,14 @@ $(document).ready(function() {
   var url = "{{site}}"
   var protocol = window.location.protocol;
   console.log(protocol);
-  tmp = url;
+  console.log(url);
+  
   if (url.search('flaskfilemanager') != -1) {
     if (protocol == 'https:' && url.search('http:') != -1)  {
       url = url.replace('http:', 'https:')
     }
   }
+  console.log(url);
   $('#iframe').attr('src', url)
   $('#link').attr('href', url)
   Resize();
