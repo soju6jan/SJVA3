@@ -79,19 +79,19 @@ def get_version():
 @login_required
 def open_file(path):
     logger.debug('open_file :%s', path)
-    return send_from_directory('', path)
+    return send_from_directory('/', path)
 
 @app.route("/file/<path:path>")
 @check_api
 def file2(path):
     logger.debug('file2 :%s', path)
-    return send_from_directory('', path)
+    return send_from_directory('/', path)
 
 @app.route("/download_file/<path:path>")
 @login_required
 def download_file(path):
     logger.debug('download_file :%s', path)
-    return send_from_directory('', path, as_attachment=True)
+    return send_from_directory('/', path, as_attachment=True)
 
 @app.route("/hls")
 def hls_play():
