@@ -14,6 +14,8 @@ class ToolBaseFile(object):
             import codecs
             ifp = codecs.open(filepath, mode, encoding='utf8')
             data = ifp.read()
+            if isinstance(data, (bytes, bytearray)):
+                data = data.encode('utf-8')
             ifp.close()
             return data
         except Exception as exception: 
