@@ -288,6 +288,7 @@ def init_menu(plugin_menus):
                 if 'name' in item and item['link'].find('file_manager') != -1:
                     index = idx
                     break
+            logger.warning('index : %s', index)
             if index != -1:
                 del MENU_MAP[-1]['list'][index]
         except:

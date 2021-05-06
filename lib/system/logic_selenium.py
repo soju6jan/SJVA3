@@ -54,7 +54,7 @@ class SystemLogicSelenium(object):
                 img.save(tmp)
                 from system.model import ModelSetting as SystemModelSetting
                 ddns = SystemModelSetting.get('ddns')
-                url = '%s/open_file%s' % (ddns, tmp.replace(path_app_root, ''))
+                url = '%s/open_file%s' % (ddns, tmp)
                 logger.debug(url)
                 ret = {}
                 ret['ret'] = 'success'
