@@ -294,6 +294,7 @@ def init_menu(plugin_menus):
             if index != -1:
                 del MENU_MAP[-1]['list'][index]
         except Exception as exception: 
+            import traceback
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
     
