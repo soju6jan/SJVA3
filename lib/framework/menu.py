@@ -279,18 +279,15 @@ def init_menu(plugin_menus):
                     category['list'].append(category_child)
     
     try:
-        logger.warning('flaskfilemanager 1')
         import flaskfilemanager
-        logger.warning('flaskfilemanager 2')
     except:
         #del MENU_MAP[-1]['list'][2]
         try:
             index = -1
             for idx, item in enumerate(MENU_MAP[-1]['list']):
-                if 'name' in item and item['link'].find('file_manager') != -1:
+                if 'link' in item and item['link'].find('file_manager') != -1:
                     index = idx
                     break
-            logger.warning('index : %s', index)
             if index != -1:
                 del MENU_MAP[-1]['list'][index]
         except Exception as exception: 
