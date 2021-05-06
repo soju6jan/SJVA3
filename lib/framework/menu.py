@@ -279,7 +279,9 @@ def init_menu(plugin_menus):
                     category['list'].append(category_child)
     
     try:
+        logger.warning('flaskfilemanager 1')
         import flaskfilemanager
+        logger.warning('flaskfilemanager 2')
     except:
         #del MENU_MAP[-1]['list'][2]
         try:
