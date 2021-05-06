@@ -5,9 +5,7 @@ import shutil
 
 from framework import app, celery, logger
 
-
 class ToolShutil(object):
-    
     # run_in_celery=True 이미 celery안에서 실행된다. 바로 콜한다.
     @staticmethod
     def move(source_path, target_path, run_in_celery=False):
