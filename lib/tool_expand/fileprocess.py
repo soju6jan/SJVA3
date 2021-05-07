@@ -136,7 +136,8 @@ class ToolExpandFileProcess(object):
         #2019-10-06 -■-IBW-670Z_1080p.mkv => ibw-6701080 [-■-IBW-670Z_1080p].mkv
         filename = filename.replace('z_1080p', '').replace('z_720p', '')
         filename = filename.replace('z_', '')
-        filename = filename.replace('-c', '')
+        filename = filename.replace('-c.', '.')
+        filename = filename.replace('c.', '.')
         
         #if file.find('@') != -1:
         #    file = file.split('@')[1]
