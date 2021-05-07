@@ -15,6 +15,8 @@ class ToolBaseFile(object):
             ifp = codecs.open(filepath, mode, encoding='utf8')
             data = ifp.read()
             ifp.close()
+            if isinstance(data, bytes):
+                data = data.decode('utf-8') 
             return data
         except Exception as exception: 
             logger.error('Exception:%s', exception)
@@ -40,6 +42,8 @@ class ToolBaseFile(object):
         try:
             import codecs
             ofp = codecs.open(filepath, mode, encoding='utf8')
+            if isinstance(data, bytes) and mode == 'w':
+                data = data.decode('utf-8') 
             ofp.write(data)
             ofp.close()
             return True

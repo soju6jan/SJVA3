@@ -15,7 +15,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from framework.logger import get_logger
 from framework import app, db, scheduler, path_data, socketio, check_api
 from framework.util import Util
-
+from tool_base import ToolBaseFile
 # 패키지
 package_name = __name__.split('.')[0]
 logger = get_logger(package_name)
@@ -129,8 +129,7 @@ def ajax(sub):
             ret = {}
             job_id = request.form['job_id']
             job = ModelCommand.get_job_by_id(job_id)
-            import framework.common.util as CommonUtil
-            ret['data'] = CommonUtil.read_file(job.filename) 
+            ret['data'] = ToolBaseFile.read(job.filename) 
             ret['ret'] = True
             return jsonify(ret)
         elif sub == 'file_save':
@@ -139,14 +138,7 @@ def ajax(sub):
             logger.debug(job_id)
             data = request.form['file_textarea']
             job = ModelCommand.get_job_by_id(job_id)
-            import framework.common.util as CommonUtil
-            logger.debug(job.filename)
-            CommonUtil.write_file(data, job.filename) 
-            try:
-                os.system('dos2unix %s' % job.filename)
-            except Exception as exception: 
-                logger.error('Exception:%s', exception)
-                logger.error(traceback.format_exc())         
+            ToolBaseFile.write(data.replace('\r\n', '\n'), job.filename) 
             ret['ret'] = True
             return jsonify(ret)
         elif sub == 'foreground_command_by_job':
@@ -227,14 +219,7 @@ def api(sub):
             if os.path.exists(download_path):
                 os.remove(download_path)
                 update = True
-            import framework.common.util as CommonUtil
-            #open(download_path, 'wb').write(r.text)
-            CommonUtil.write_file(r.text, download_path)
-            try:
-                os.system('dos2unix %s' % download_path)
-            except Exception as exception: 
-                logger.error('Exception:%s', exception)
-                logger.error(traceback.format_exc()) 
+            ToolBaseFile.write(r.text.replace('\r\n', '\n'), download_path)
             try:
                 os.system('chmod 777 "%s"' % download_path)
             except Exception as exception: 
