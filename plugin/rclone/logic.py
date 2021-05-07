@@ -133,7 +133,7 @@ class Logic(object):
     @staticmethod
     def rclone_version():
         try:
-            command = [u'%s' % Logic.path_rclone,  'version']
+            command = [u'%s' % Logic.path_rclone,  'version', '--config', Logic.path_config]
             ret = SystemLogicCommand.execute_command_return(command)
             return ret
         except Exception as exception: 
