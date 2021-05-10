@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #########################################################
-import os, sys, traceback, subprocess, json
+import os, sys, traceback, subprocess, json, platform
 from framework import app, logger
 
 
@@ -9,9 +9,12 @@ class ToolSubprocess(object):
     @classmethod
     def execute_command_return(cls, command, format=None, force_log=False):
         try:
+            shell = False
+            if platform.system() == 'Windows':
+                shell = True
             logger.debug('execute_command_return : %s', ' '.join(command))
             if app.config['config']['is_py2']:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1, shell=shell)
                 ret = []
                 with process.stdout:
                     for line in iter(process.stdout.readline, b''):
@@ -20,7 +23,7 @@ class ToolSubprocess(object):
                             logger.debug(ret[-1])
                     process.wait() # wait for the subprocess to exit
             else:
-                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell)
                 ret = []
                 with process.stdout:
                     for line in iter(process.stdout.readline, ''):
