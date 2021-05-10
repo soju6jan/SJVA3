@@ -86,6 +86,8 @@ class SystemLogicTrans(object):
                 return SystemLogicTrans.trans_google(text, source, target) 
             elif trans_type == '2':
                 return SystemLogicTrans.trans_papago(text, source, target) 
+            elif trans_type == '3':
+                return SystemLogicTrans.trans_google_web(text, source, target) 
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
