@@ -5,8 +5,9 @@ from framework import app, logger
 
 
 class ToolSubprocess(object):
+
     @classmethod
-    def execute_command_return(command, format=None, force_log=False):
+    def execute_command_return(cls, command, format=None, force_log=False):
         try:
             logger.debug('execute_command_return : %s', ' '.join(command))
             if app.config['config']['is_py2']:
