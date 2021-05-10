@@ -11,7 +11,7 @@ from flask import Blueprint, request, Response, send_file, render_template, redi
 
 # sjva 공용
 from framework.logger import get_logger
-from framework import path_app_root, py_urllib2, py_urllib
+from framework import path_app_root, py_urllib2, py_urllib, app
 from framework.util import Util
 
 # 패키지
@@ -69,6 +69,8 @@ class SystemLogicTrans(object):
                 return SystemLogicTrans.trans_google(source) 
             elif trans_type == '2':
                 return SystemLogicTrans.trans_papago(source)
+            elif trans_type == '3':
+                return SystemLogicTrans.trans_google_web(source)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -176,6 +178,26 @@ class SystemLogicTrans(object):
                 return data['data']['translations'][0]['translatedText']
             else:
                 return text
+        except Exception as exception:
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+            return text
+
+
+    @staticmethod
+    def trans_google_web(text, source='ja', target='ko'):
+        if app.config['config']['is_py2']:
+            return u'Python >=3.6'
+        try:
+            from google_trans_new import google_translator
+        except:
+            try: os.system("{} install google_trans_new".format(app.config['config']['pip']))
+            except: pass
+            from google_trans_new import google_translator
+        try:
+            translator = google_translator()  
+            translate_text = translator.translate(text, lang_src=source, lang_tgt=target)
+            return translate_text
         except Exception as exception:
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
