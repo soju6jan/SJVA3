@@ -402,7 +402,7 @@ class Logic(object):
                     logger.debug('ROLLBACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                 except:
                     logger.debug('>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                logger.error('Exception:%s', e)
+                logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())
 
             finally:
