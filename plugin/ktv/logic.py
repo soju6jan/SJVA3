@@ -167,7 +167,8 @@ class Logic(object):
                         pass
                 #logger.debug('CELERY ktv end.. rclone_start : %s', flag_rclone_start)
             else:
-                Logic.process_download_file()
+                # 2021-05-18 bind=True
+                Logic.process_download_file(None)
             # 2020-08-08
             if Logic.plex_update_list:
                 logger.debug('>> len plex_update_list : %s', len(Logic.plex_update_list))
