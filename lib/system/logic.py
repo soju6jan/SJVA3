@@ -243,6 +243,7 @@ class SystemLogic(object):
         info['auth'] = app.config['config']['auth_desc']
         info['cpu_percent'] = 'not supported'
         info['memory'] = 'not supported'
+        info['disk'] = 'not supported'
         if app.config['config']['running_type'] != 'termux':
             try:
                 import psutil
@@ -254,21 +255,17 @@ class SystemLogic(object):
             except:
                 pass
 
-        try:
-            import platform
-            if platform.system() == 'Windows':
-                s = os.path.splitdrive(path_app_root)
-                root = s[0]
-            elif app.config['config']['running_type'] == 'termux':
-                root = '/data/data/com.termux'
-            else:
-                root = '/'
-            tmp = psutil.disk_usage(root)
-            info['disk'] = u'전체 : %s   사용량 : %s   남은량 : %s  (%s%%) - 드라이브 (%s)' % (Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[1], suffix='B'), Util.sizeof_fmt(tmp[2], suffix='B'), tmp[3], root)
-        except Exception as exception: 
-            #logger.error('Exception:%s', exception)
-            #logger.error(traceback.format_exc())
-            info['disk'] = 'not supported'
+            try:
+                import platform
+                if platform.system() == 'Windows':
+                    s = os.path.splitdrive(path_app_root)
+                    root = s[0]
+                else:
+                    root = '/'
+                tmp = psutil.disk_usage(root)
+                info['disk'] = u'전체 : %s   사용량 : %s   남은량 : %s  (%s%%) - 드라이브 (%s)' % (Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[1], suffix='B'), Util.sizeof_fmt(tmp[2], suffix='B'), tmp[3], root)
+            except Exception as exception: 
+                pass
         try:
             tmp = SystemLogic.get_setting_value('system_start_time')
             #logger.debug('SYSTEM_START_TIME:%s', tmp)
