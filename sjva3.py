@@ -38,14 +38,14 @@ def start_app():
         try:
             framework.socketio.run(app, host='0.0.0.0', port=app.config['config']['port'])
             print('EXIT CODE : %s' % framework.exit_code)
-            if framework.exit_code != -1:
-                # 2021-05-18
-                if framework.exit_code == 1 and app.config['config']['running_type'] in ['termux', 'entware']:
-                    os._exit(framework.exit_code)
-                else:
-                    sys.exit(framework.exit_code)
+            # 2021-05-18
+            if app.config['config']['running_type'] in ['termux', 'entware']:
+                os._exit(framework.exit_code)
             else:
-                print('framework.exit_code is -1')
+                if framework.exit_code != -1:
+                    sys.exit(framework.exit_code)
+                else:
+                    print('framework.exit_code is -1')
             break
         except Exception as exception:
             print(str(exception))
