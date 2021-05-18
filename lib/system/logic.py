@@ -241,16 +241,18 @@ class SystemLogic(object):
         import system
         
         info['auth'] = app.config['config']['auth_desc']
-        try:
-            import psutil
-            from framework.util import Util
-            info['cpu_percent'] = '%s %%' % psutil.cpu_percent() 
-            tmp = psutil.virtual_memory()
-            #info['memory'] = [Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[3]), Util.sizeof_fmt(tmp[1]), tmp[2]]
-            info['memory'] = u'전체 : %s   사용량 : %s   남은량 : %s  (%s%%)' % (Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[3], suffix='B'), Util.sizeof_fmt(tmp[1], suffix='B'), tmp[2])
-        except:
-            info['cpu_percent'] = 'not supported'
-            info['memory'] = 'not supported'
+        info['cpu_percent'] = 'not supported'
+        info['memory'] = 'not supported'
+        if app.config['config']['running_type'] != 'termux':
+            try:
+                import psutil
+                from framework.util import Util
+                info['cpu_percent'] = '%s %%' % psutil.cpu_percent() 
+                tmp = psutil.virtual_memory()
+                #info['memory'] = [Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[3]), Util.sizeof_fmt(tmp[1]), tmp[2]]
+                info['memory'] = u'전체 : %s   사용량 : %s   남은량 : %s  (%s%%)' % (Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[3], suffix='B'), Util.sizeof_fmt(tmp[1], suffix='B'), tmp[2])
+            except:
+                pass
 
         try:
             import platform
