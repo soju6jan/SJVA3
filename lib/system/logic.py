@@ -261,6 +261,8 @@ class SystemLogic(object):
                 root = s[0]
             elif app.config['config']['running_type'] == 'termux':
                 root = '/data/data/com.termux'
+            else:
+                root = '/'
             tmp = psutil.disk_usage(root)
             info['disk'] = u'전체 : %s   사용량 : %s   남은량 : %s  (%s%%) - 드라이브 (%s)' % (Util.sizeof_fmt(tmp[0], suffix='B'), Util.sizeof_fmt(tmp[1], suffix='B'), Util.sizeof_fmt(tmp[2], suffix='B'), tmp[3], root)
         except Exception as exception: 
