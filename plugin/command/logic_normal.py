@@ -98,7 +98,7 @@ class LogicNormal(object):
     @staticmethod
     def foreground_command(command, job_id=None):
         try:
-            command = command.split(' ')
+            command = command.strip().split(' ')
             if command[0] == 'LOAD':
                 def func():
                     if sys.version_info[0] == 2: 
