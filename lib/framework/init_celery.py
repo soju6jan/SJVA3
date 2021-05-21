@@ -9,7 +9,8 @@ import sys
 from framework import app, logger, path_app_root
 try:
     from celery import Celery
-
+    if app.config['config']['use_celery'] == False:
+        raise Exception('no celery')
     try:
         redis_port = os.environ['REDIS_PORT']
     except:
