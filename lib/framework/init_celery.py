@@ -1,15 +1,13 @@
-
-
 # -*- coding: utf-8 -*-
 #########################################################
 # python
-import os
-import sys
+import os, sys, platform
 
-from framework import app, logger, path_app_root
+from framework import app, logger, args
 try:
     from celery import Celery
-    if app.config['config']['use_celery'] == False:
+    #if app.config['config']['use_celery'] == False: # 변수 할당 전
+    if (args is not None and args.use_gevent == False) or platform.system() == 'Windows':
         raise Exception('no celery')
     try:
         redis_port = os.environ['REDIS_PORT']

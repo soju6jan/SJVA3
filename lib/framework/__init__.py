@@ -71,7 +71,7 @@ try:
 
     #socketio = SocketIO(app, cors_allowed_origins="*") #, async_mode='gevent')
     if args is not None and args.use_gevent == False:
-            socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+        socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
     else:
         socketio = SocketIO(app, cors_allowed_origins="*") #, async_mode='gevent')
 
@@ -90,7 +90,7 @@ try:
     # 추후 삭제
     USERS = {"sjva"+version : User("sjva"+version, passwd_hash="sjva"+version),}
     
-    # System plugin import
+    
     
     ##########################################
     from .init_celery import celery
@@ -146,6 +146,7 @@ try:
     system.SystemLogic.apply_menu_link()
     logger.debug('### menu loading completed')
 
+    logger.debug("### init app.config['config]")
     app.config['config']['port'] = 0
     if sys.argv[0] == 'sjva.py' or sys.argv[0] == 'sjva3.py':
         try:
