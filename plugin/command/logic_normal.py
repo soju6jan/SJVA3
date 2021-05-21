@@ -427,7 +427,7 @@ class LogicNormal(object):
     @staticmethod
     def send_process_command(req):
         try:
-            command = req.form['command']
+            command = req.form['command'].strip()
             if app.config['config']['is_py2']:
                 LogicNormal.foreground_process.stdin.write(b'%s\n' % command)
             else:
