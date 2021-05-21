@@ -452,7 +452,7 @@ class LogicNormal(object):
             for f in file_list:
                 c = os.path.join(command_path, f)
                 if f.endswith('.py'):
-                    c = 'python %s' % c
+                    c = 'python3 %s' % c
                 #ret.append({'filename':f, 'command':c})
                 ret.append({'text':f, 'value':c})
             return ret
