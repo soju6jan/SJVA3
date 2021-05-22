@@ -68,6 +68,7 @@ def logout():
 @app.route("/None")
 @app.route("/home")
 def home():
+    logger.warning(request.host_url)
     return redirect('/system/home')
 
 @app.route("/version")
