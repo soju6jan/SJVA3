@@ -60,3 +60,10 @@ class LogicModuleBase(object):
     
     def get_scheduler_name(self):
         return '%s_%s' % (self.P.package_name, self.name)
+
+    def dump(self, data):
+        if type(data) == type({}):
+            import json
+            return json.dumps(data, indent=4)
+        else:
+            return str(data)
