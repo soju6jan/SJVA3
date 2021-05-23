@@ -62,7 +62,7 @@ class LogicModuleBase(object):
         return '%s_%s' % (self.P.package_name, self.name)
 
     def dump(self, data):
-        if type(data) == type({}):
+        if type(data) in [type({}), type([])]:
             import json
             return json.dumps(data, indent=4)
         else:
