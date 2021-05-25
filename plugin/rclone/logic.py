@@ -318,7 +318,7 @@ class Logic(object):
             logger.debug(job)
             command = '%s %s %s %s:%s %s %s' % (Logic.path_rclone, job.command, job.local_path, job.remote, job.remote_path, job.option_static, job.option_user)
             import platform
-            if platform.system() == 'Windows':
+            if platform.system() == 'Windows'  and app.config['config']['is_py2']:
                 tmp = command
                 tmp = command.encode('cp949')
             else:
@@ -742,7 +742,7 @@ class Logic(object):
             remote_path = '%s:%s' % (item.remote, item.remote_path)
             local_path = item.local_path
 
-            if platform.system() == 'Windows':
+            if platform.system() == 'Windows' and app.config['config']['is_py2']:
                 remote_path = remote_path.encode('cp949')
                 local_path = local_path.encode('cp949')
 

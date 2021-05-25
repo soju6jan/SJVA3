@@ -64,6 +64,6 @@ class LogicModuleBase(object):
     def dump(self, data):
         if type(data) in [type({}), type([])]:
             import json
-            return '\n' + json.dumps(data, indent=4)
+            return '\n' + json.dumps(data, indent=4, ensure_ascii=False)
         else:
             return str(data)
