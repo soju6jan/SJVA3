@@ -462,6 +462,7 @@ def first_api(sub):
         elif sub == 'gds':
             url = f"https://sjva.me/sjva/gds.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
             data = requests.get(url).json()['data']
+            logger.debug(data)
             req_headers = dict(request.headers)
             headers = {}
 
@@ -503,5 +504,5 @@ def videojs():
     data['play_title'] = request.form['play_title']
     data['play_source_src'] = request.form['play_source_src']
     data['play_source_type'] = request.form['play_source_type']
-    #logger.warning(data)
+    logger.warning(data)
     return render_template('videojs.html', data=data)
