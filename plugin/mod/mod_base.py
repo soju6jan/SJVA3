@@ -133,7 +133,7 @@ class ModuleBase(LogicModuleBase):
     def make_module_list(self):
         url = 'https://sjva.me/p/module/home/0'
         data = requests.get(url).json()
-        logger.warning(self.dump(data))
+        #logger.warning(self.dump(data))
         for mod in data:
             for install_mod in self.module_list_install:
                 if mod['name'] == install_mod['name']:
@@ -156,35 +156,49 @@ class ModuleBase(LogicModuleBase):
             logger.warning(mod_list)
             tmp_module_list = []
             for mod_name in mod_list:
-                if mod_name.startswith('_'):
-                    continue
-                mod = __import__(mod_name, fromlist=[])
                 try:
-                    mod_dir_list.append(os.path.join(mod_root_path, mod_name))
-                    mod_info = getattr(mod, 'mod_info')
-                    mod_info['name'] = mod_info['sub'][0]
-                    tmp_module_list.append(mod_info)
+                    if mod_name.startswith('_'):
+                        continue
+                    mod = __import__(mod_name, fromlist=[])
+                    try:
+                        mod_dir_list.append(os.path.join(mod_root_path, mod_name))
+                        mod_info = getattr(mod, 'mod_info')
+                        mod_info['name'] = mod_info['sub'][0]
+                        tmp_module_list.append(mod_info)
+                    except Exception as exception:
+                        logger.error('Exception:%s', exception)
+                        logger.error(traceback.format_exc())
+                        logger.debug('no mod_name : %s', mod_name)
                 except Exception as exception:
                     logger.error('Exception:%s', exception)
                     logger.error(traceback.format_exc())
-                    logger.debug('no mod_name : %s', mod_name)
-
-            for order in ModelSetting.get_list(f"{name}_mod_order", ','):
-                for idx, mod in enumerate(tmp_module_list):
-                    if order == mod['name']:
-                        self.module_list_install.append(mod)
-                        del tmp_module_list[idx]
-                        break
+                    continue
+            
+            try:
+                for order in ModelSetting.get_list(f"{name}_mod_order", ','):
+                    for idx, mod in enumerate(tmp_module_list):
+                        if order == mod['name']:
+                            self.module_list_install.append(mod)
+                            del tmp_module_list[idx]
+                            break
+            except Exception as exception:
+                logger.error('Exception:%s', exception)
+                logger.error(traceback.format_exc())
+                
 
             self.module_list_install += tmp_module_list
             for mod_info in self.module_list_install:
-                P.menu['sub'].insert(-1, mod_info['sub'])
-                if 'sub2' in mod_info:
-                    P.menu['sub2'][mod_info['sub'][0]] = mod_info['sub2']
-                mod_instance = mod_info['mod_class'](P)
-                P.module_list.append(mod_instance)
-                del mod_info['mod_class']
-                logger.info(f'module loading : {mod_name}')
+                try:
+                    P.menu['sub'].insert(-1, mod_info['sub'])
+                    if 'sub2' in mod_info:
+                        P.menu['sub2'][mod_info['sub'][0]] = mod_info['sub2']
+                    mod_instance = mod_info['mod_class'](P)
+                    P.module_list.append(mod_instance)
+                    del mod_info['mod_class']
+                    logger.info(f'module loading : {mod_name}')
+                except Exception as exception:
+                    logger.error('Exception:%s', exception)
+                    logger.error(traceback.format_exc())
             
             import jinja2 
             my_loader = jinja2.ChoiceLoader([
