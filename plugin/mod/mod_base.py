@@ -24,7 +24,7 @@ class ModuleBase(LogicModuleBase):
     }
     
     def __init__(self, P):
-        super(ModuleBase, self).__init__(P, 'install')
+        super(ModuleBase, self).__init__(P, 'total')
         self.name = name
         self.module_list_install = None
         self.module_list_total = None
@@ -47,10 +47,6 @@ class ModuleBase(LogicModuleBase):
                 command = req.form['command']
                 arg1 = req.form['arg1'] 
                 arg2 = req.form['arg2'] 
-                logger.warning(sub2)
-                logger.warning(command)
-                logger.warning(arg1)
-                logger.warning(arg2)
 
                 if command == 'module_list':
                     if sub2 == 'total':
@@ -61,6 +57,9 @@ class ModuleBase(LogicModuleBase):
                 elif command == 'module_install':
                     self.module_install(arg1)
                     ret['msg'] = "설치중입니다."
+                elif command == 'module_remove':
+                    self.module_remove(arg1)
+                    ret['msg'] = "삭제중입니다."
             return jsonify(ret)
         except Exception as e: 
             logger.error('Exception:%s', e)
@@ -124,6 +123,45 @@ class ModuleBase(LogicModuleBase):
             logger.error(traceback.format_exc())
 
 
+    def module_remove(self, module_name):
+        try:
+            def func():
+                from system.logic_command2 import SystemLogicCommand2
+                return_log = SystemLogicCommand2(f"{module_name} 모듈 삭제", [
+                    ['msg', u'잠시만 기다려주세요.'],
+                ], wait=True, show_modal=True, clear=True).start()
+
+                mod_data = self.find_module_from_total(module_name)
+                if mod_data is None:
+                    socketio.emit("command_modal_add_text", f"{module_name} 정보 없음\n\n", namespace='/framework', broadcast=True)
+                else:
+                    mod_root_path = ModelSetting.get(f'{name}_mod_root_path')
+                    mod_path = os.path.join(mod_root_path, module_name)
+                    if os.path.exists(mod_path):
+                        socketio.emit("command_modal_add_text", f"{mod_path} 폴더 삭제\n\n", namespace='/framework', broadcast=True)
+                        shutil.rmtree(mod_path)
+                    mod_order = ModelSetting.get_list(f"{name}_mod_order", ',')
+                    new = []
+                    for tmp in mod_order:
+                        if module_name != tmp:
+                            new.append(tmp)
+                    ModelSetting.set(f"{name}_mod_order", ','.join(new))
+                return_log = SystemLogicCommand2(f"{module_name} 모듈 삭제", [
+                    ['msg', '재시작 후 적용됩니다.'],
+                    ['msg', u'\n삭제 완료..'],
+                ], wait=True, show_modal=True, clear=False).start()
+
+            th = threading.Thread(target=func)
+            th.setDaemon(True)
+            th.start() 
+
+
+        except Exception as e: 
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+
+
+
     def find_module_from_total(self, module_name):
         for mod in self.module_list_total:
             if mod['name'] == module_name:
@@ -148,7 +186,6 @@ class ModuleBase(LogicModuleBase):
         ret = []
         try:
             mod_root_path = ModelSetting.get(f'{name}_mod_root_path')
-            logger.warning(f'mod_root_path : {mod_root_path}')
             if not os.path.exists(mod_root_path):
                 return
             mod_list = os.listdir(mod_root_path)
@@ -195,7 +232,7 @@ class ModuleBase(LogicModuleBase):
                     mod_instance = mod_info['mod_class'](P)
                     P.module_list.append(mod_instance)
                     del mod_info['mod_class']
-                    logger.info(f'module loading : {mod_name}')
+                    #logger.info(f"module loading : {mod_info['sub'][0]}")
                 except Exception as exception:
                     logger.error('Exception:%s', exception)
                     logger.error(traceback.format_exc())
@@ -206,8 +243,14 @@ class ModuleBase(LogicModuleBase):
                 jinja2.FileSystemLoader(mod_dir_list),
             ])
             app.jinja_loader = my_loader
-            logger.warning(mod_dir_list)
 
+            from framework import get_menu_map
+            menu_map = get_menu_map()
+            for tmp in menu_map[-1]['list']:
+                if tmp['type'] == 'plugin' and tmp['plugin'] == 'mod':
+                    tmp['sub'] = P.menu['sub']
+                    tmp['sub2'] = P.menu['sub2']
+                    break
         except Exception as exception:
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())

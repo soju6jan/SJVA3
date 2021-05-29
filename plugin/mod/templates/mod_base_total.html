@@ -67,6 +67,7 @@ function make_module_list(data) {
   current_data = data;
   str = '';
   for (i in data) {
+    console.log(data[i]);
     str += m_row_start();
     str += m_col(2, data[i].name);
     str += m_col(1, data[i].version);
@@ -74,7 +75,7 @@ function make_module_list(data) {
     is_installed = (data[i].install == null) ? false : true;
     tmp = is_installed ? "설치" : "미설치";
     if (is_installed) {
-      tmp += (data[i].version == data[i].install.version) ? '\n최신버전' : "업데이트 필요";
+      tmp += (data[i].version == data[i].install.version) ? '<br>최신버전' : "<br>업데이트 필요";
     }
     str += m_col(2, tmp);
 

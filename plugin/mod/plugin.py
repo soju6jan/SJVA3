@@ -27,7 +27,7 @@ class P(object):
         ], 
         'sub2' : {
             'base' : [
-                ['install', '설치된 모듈'], ['total', '전체 모듈 목록'],
+                ['setting', '설정'], ['total', '모듈 목록'],
             ],
         }
     }  

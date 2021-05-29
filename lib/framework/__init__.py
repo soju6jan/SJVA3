@@ -26,7 +26,7 @@ from .init_args import args
 from .py_version_func import *
 from framework.class_scheduler import Scheduler
 from framework.logger import get_logger
-from .menu import init_menu
+from .menu import init_menu, get_menu_map
 from .user import User
 from .init_web import jinja_initialize
 from .init_etc import check_api, make_default_dir, pip_install, config_initialize

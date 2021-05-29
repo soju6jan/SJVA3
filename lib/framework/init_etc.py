@@ -10,9 +10,9 @@ def check_api(original_function):
     @wraps(original_function)
     def wrapper_function(*args, **kwargs):  #1
         from framework import logger
-        logger.debug('CHECK API... {} '.format(original_function.__module__))
-        logger.warning(request.url)
-        logger.warning(request.form)
+        #logger.debug('CHECK API... {} '.format(original_function.__module__))
+        #logger.warning(request.url)
+        #logger.warning(request.form)
         try:
             from system import ModelSetting as SystemModelSetting
             if SystemModelSetting.get_bool('auth_use_apikey'):

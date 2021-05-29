@@ -165,6 +165,8 @@ def plugin_init():
                     t = threading.Thread(target=func, args=(mod, key))
                     t.setDaemon(True)
                     t.start()
+                    #if key == 'mod':
+                    #    t.join()
             except Exception as exception:
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())
