@@ -7,7 +7,7 @@
 
 ##### <span style="color:red">■ 0.2.21.0 (2021-05-29)</span> #####
   - 시스템 - 모듈 기능 추가<br>
-  - sjva.me VOD, Movie 게시판 웹 재생 기능 추가<br>
+  - sjva.me VOD, S-Movie 게시판 웹 재생 기능 추가<br>
   - sjva2 사용 종료<br>
 
 ##### ■ 0.2.20.9 (2021-05-14) #####
