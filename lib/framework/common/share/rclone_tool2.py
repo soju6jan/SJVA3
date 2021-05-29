@@ -253,7 +253,7 @@ class RcloneTool2(object):
             else:
                 emit('폴더 ID : %s\n\n' % ret['folder_id'])
             command = [rclone_path, '--config', config_path, 'move' if is_move else 'copy', remote_path, upload_remote, '--drive-server-side-across-configs=true', '-v']
-            return_log = SystemLogicCommand2('업로드', [
+            return_log = SystemLogicCommand2('업로드', [ 
                 ['msg', '5. Rclone 명령'],
                 command,
                 ['msg', 'Rclone 명령을 완료하였습니다.'],

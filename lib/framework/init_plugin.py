@@ -45,10 +45,9 @@ def plugin_init():
         #plugins = os.listdir(plugin_path)
         try:
             from . import SystemModelSetting
-            plugins = ['command']
+            plugins = ['command', 'mod']
             for plugin in os.listdir(plugin_path):
-                if SystemModelSetting.get_bool('use_plugin_{}'.format(plugin)):
-                    plugins.append(plugin)
+                plugins.append(plugin)
         except:
             plugins = os.listdir(plugin_path)
 

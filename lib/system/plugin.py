@@ -459,10 +459,26 @@ def first_api(sub):
             import system
             system.restart()
             return jsonify({'ret':'success'})
+        elif sub == 'gds':
+            url = f"https://sjva.me/sjva/gds.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
+            data = requests.get(url).json()['data']
+            req_headers = dict(request.headers)
+            headers = {}
+
+            if 'Range' not in req_headers or req_headers['Range'].startswith('bytes=0-'):
+                headers['Range'] = "bytes=0-1048576"
+            else:
+                headers['Range'] = req_headers['Range']
+            headers['Authorization'] = f"Bearer {data['token']}"
+            headers['Connection'] = 'keep-alive'
+
+            r = requests.get(data['url'], headers=headers, stream=True)
+            rv = Response(r.iter_content(chunk_size=1048576), r.status_code, content_type=r.headers['Content-Type'], direct_passthrough=True)
+            rv.headers.add('Content-Range', r.headers.get('Content-Range'))
+            return rv
     except Exception as exception: 
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
-
 
 
 @blueprint.route('/api/<sub>/<sub2>', methods=['GET', 'POST'])
@@ -480,3 +496,12 @@ def second_api(sub, sub2):
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
 
+
+@blueprint.route("/videojs", methods=['GET', 'POST'])
+def videojs():
+    data = {}
+    data['play_title'] = request.form['play_title']
+    data['play_source_src'] = request.form['play_source_src']
+    data['play_source_type'] = request.form['play_source_type']
+    #logger.warning(data)
+    return render_template('videojs.html', data=data)

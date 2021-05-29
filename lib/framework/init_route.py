@@ -100,6 +100,8 @@ def hls_play():
     logger.debug('hls url : %s', url)
     return render_template('hls_player3.html', url=url)
 
+
+
 @app.route("/iframe/<sub>")
 @login_required
 def iframe(sub):

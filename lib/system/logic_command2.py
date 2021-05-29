@@ -47,6 +47,7 @@ class SystemLogicCommand2(object):
             if self.show_modal:
                 if self.clear:
                     socketio.emit("command_modal_clear", None, namespace='/framework', broadcast=True)
+                
             self.thread = threading.Thread(target=self.execute_thread_function, args=())
             self.thread.setDaemon(True)
             self.thread.start()
@@ -63,7 +64,9 @@ class SystemLogicCommand2(object):
         try:
             #if wait:
             if self.show_modal:
+                socketio.emit("command_modal_show", self.title, namespace='/framework', broadcast=True)
                 socketio.emit("loading_hide", None, namespace='/framework', broadcast=True)
+                
             for command in self.commands:
                 if command[0] == 'msg':
                     if self.show_modal:

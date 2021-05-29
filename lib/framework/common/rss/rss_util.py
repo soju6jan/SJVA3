@@ -7,7 +7,7 @@ import logging
 import urllib
 import xml.etree.ElementTree as ET
 # third-party
-
+import requests
 # sjva 공용
 from framework import logger, py_urllib2
 
@@ -21,12 +21,20 @@ class RssUtil(object):
     def get_rss(url):
         try:
             logger.debug('get_rss : %s', url)
+            """
             req = py_urllib2.Request(url)
             req.add_header('user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36')
             resp = py_urllib2.urlopen(req)
 
             tree = ET.ElementTree(file=resp)
-            root = tree.getroot()
+            """
+            text = requests.get(url, headers={'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36'}).text
+
+            #logger.warning(text)
+
+            root = ET.fromstring(text)
+            #logger.warning(tree)
+            #root = tree.getroot()
             item_list = root.find('channel').findall('item')
             logger.debug('xml item count:%s', len(item_list))
             ret = []
