@@ -21,7 +21,7 @@ class P(object):
     blueprint = Blueprint(package_name, package_name, url_prefix=f"/{package_name}", template_folder=os.path.join(os.path.dirname(__file__), 'templates'), static_folder=os.path.join(os.path.dirname(__file__), 'static'))
     menu = {
         'category' : 'system',
-        'main' : [package_name, '모듈'],
+        'main' : [package_name, '모듈(개발중)'],
         'sub' : [
             ['base', u'모듈 설정'], ['log', '로그']
         ], 

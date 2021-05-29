@@ -165,7 +165,7 @@ MENU_MAP = [
             #{'type':'direct', 'name' : u'설정', 'link':'/system/setting'},
             #{'type':'direct', 'name' : u'플러그인', 'link':'/system/plugin'},
             #{'type':'direct', 'name' : u'정보', 'link':'/system/information'},
-            {'type':'plugin', 'plugin' : 'mod', 'name' : u'모듈(개발중)'},
+            {'type':'plugin', 'plugin' : 'mod', 'name' : u'모듈'},
             {'type':'plugin', 'plugin' : 'command', 'name' : u'Command'},
             {'type':'direct', 'name' : u'파일 매니저', 'link':'/iframe/file_manager'},
             {'type':'divider'},
