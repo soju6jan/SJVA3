@@ -212,7 +212,7 @@ class SystemLogic(object):
             import requests
             url = 'https://server.sjva.me/version'
             if ModelSetting.get('ddns') == 'https://server.sjva.me':
-                url = 'https://sjva-dev.soju6jan.com/version'
+                url = 'https://dev.soju6jan.com/version'
             SystemLogic.recent_version = requests.get(url).text
             return True
         except Exception as exception: 
