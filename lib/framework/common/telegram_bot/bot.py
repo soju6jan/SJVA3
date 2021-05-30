@@ -22,8 +22,8 @@ class TelegramBot(object):
 
     #SUPER_TOKEN = ToolAESCipher.decrypt('inhrfSBer4mneqKmSzf60MUHPSZS5aT4YkZZKzeVftRCHC5awGEIWlu5qVxIYMfphuvW/8MQZNrgD9fehuvmTA==')
 
-    SUPER_TOKEN = ToolAESCipher.decrypt('gyGqcYaMYfKNqutj6uETk2WHdjt3EiltpvCs9aC45upbx/UV1lTfmeH2a9nIDRin/ogO106xDJvpYjhmuDeW3Q==')
-    ADMIN_TOKEN = ToolAESCipher.decrypt('AemiErWy5XT2Q08WAH78qpP0B0NHPGSRiwyANuruFaxGTnTavdtN2QP6ZqV0LUV6Sb0TouMZcyHXAqa5HUFr/w==')
+    SUPER_TOKEN = ToolAESCipher.decrypt('gyGqcYaMYfKNqutj6uETk2WHdjt3EiltpvCs9aC45upbx/UV1lTfmeH2a9nIDRin/ogO106xDJvpYjhmuDeW3Q==').decode('utf-8')
+    ADMIN_TOKEN = ToolAESCipher.decrypt('AemiErWy5XT2Q08WAH78qpP0B0NHPGSRiwyANuruFaxGTnTavdtN2QP6ZqV0LUV6Sb0TouMZcyHXAqa5HUFr/w==').decode('utf-8')
     SUPER_BOT= None
     ADMIN_BOT = None
 
