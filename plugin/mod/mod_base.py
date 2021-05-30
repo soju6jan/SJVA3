@@ -144,7 +144,7 @@ class ModuleBase(LogicModuleBase):
                     new = []
                     for tmp in mod_order:
                         if module_name != tmp:
-                            new.append(tmp)
+                            new.append(tmp) 
                     ModelSetting.set(f"{name}_mod_order", ','.join(new))
                 return_log = SystemLogicCommand2(f"{module_name} 모듈 삭제", [
                     ['msg', '재시작 후 적용됩니다.'],
