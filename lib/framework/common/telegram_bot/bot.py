@@ -56,7 +56,9 @@ class TelegramBot(object):
 
                 TelegramBot.SUPER_BOT = Bot(TelegramBot.SUPER_TOKEN)
                 if SystemModelSetting.get('ddns') == 'https://server.sjva.me':
-                    logger.warning('ADMIN_TOKEN : %s ', ADMIN_TOKEN)
+                    logger.warning('ADMIN_TOKEN : %s ', TelegramBot.ADMIN_TOKEN)
+                    logger.warning('ADMIN_TOKEN : %s ', TelegramBot.ADMIN_TOKEN)
+                    logger.warning('ADMIN_TOKEN : %s ', TelegramBot.ADMIN_TOKEN)
                     TelegramBot.ADMIN_BOT = Bot(TelegramBot.ADMIN_TOKEN)
                     MessageLoop(TelegramBot.ADMIN_BOT, TelegramBot.super_receive_callback).run_as_thread()
                     #TelegramBotHandle.super_sendMessage('관리봇이 텔레그램 메시지 수신을 시작하였습니다.', encryped=False)
