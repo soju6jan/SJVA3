@@ -18,7 +18,7 @@ class ToolUtil(object):
         return url
     
     @classmethod
-    def dict_save(cls, data, filepath):
+    def save_dict(cls, data, filepath):
         try:
             import json, codecs
             data = json.dumps(data, indent=4, ensure_ascii=False)
