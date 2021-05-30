@@ -22,8 +22,8 @@ class ToolUtil(object):
         try:
             import json, codecs
             data = json.dumps(data, indent=4, ensure_ascii=False)
-            ofp = codecs.open(filename, 'w', encoding='utf8')
-            ofp.write(s)
+            ofp = codecs.open(filepath, 'w', encoding='utf8')
+            ofp.write(data)
             ofp.close()
         except Exception as exception:
             logger.debug('Exception:%s', exception)

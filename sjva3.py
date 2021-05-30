@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-#########################################################
 import os, sys, platform, traceback, shutil
-if sys.version_info[0] == 2:
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
-
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 print('[SJVA3] sys.path : %s' % sys.path)
 print('[SJVA3] sys.argv : %s' % sys.argv)
@@ -18,9 +12,14 @@ def prepare_starting():
     ######################################
 
     try:
-        av_agent = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', 'av_agent')
-        if os.path.exists(av_agent):
-            shutil.rmtree(av_agent)
+        remove_plugins = ['av_agent', 'aria2', 'kthoom', 'synoindex', 'nginx', 'launcher_calibre_web', 'launcher_gateone', 'launcher_greentunnel', 'launcher_guacamole', 'launcher_ivViewer', 'launcher_tautulli', 'launcher_torrssen2', 'launcher_xteve']
+        for plugin in remove_plugins:
+            plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', plugin)
+            plugin_db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'db', f"{plugin}.db")
+            if os.path.exists(plugin_path):
+                shutil.rmtree(plugin_path)
+            if os.path.exists(plugin_db_path):
+                os.remove(plugin_db_path)
     except Exception as exception:
         print('Exception:%s' % exception)
         print(traceback.format_exc())
