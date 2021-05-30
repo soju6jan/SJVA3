@@ -12,3 +12,4 @@ false/
 *.log
 *.db
 *.txt
+*.code-workspace
