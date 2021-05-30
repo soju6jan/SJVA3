@@ -37,18 +37,7 @@ class LogicModuleBase(object):
     
     def plugin_unload(self):
         pass
-
-    def get_scheduler_interval(self):
-        if self.P is not None and self.P.ModelSetting is not None and self.name is not None:
-            return self.P.ModelSetting.get('{module_name}_interval'.format(module_name=self.name))
-
-    def get_scheduler_desc(self):
-        return self.scheduler_desc 
-
-    # 첫번째 메뉴
-    def get_first_menu(self):
-        return self.first_menu
-
+    
     def setting_save_after(self):
         pass
 
@@ -58,6 +47,17 @@ class LogicModuleBase(object):
     def migration(self):
         pass
     
+    #################################################################
+    def get_scheduler_desc(self):
+        return self.scheduler_desc 
+
+    def get_scheduler_interval(self):
+        if self.P is not None and self.P.ModelSetting is not None and self.name is not None:
+            return self.P.ModelSetting.get('{module_name}_interval'.format(module_name=self.name))
+
+    def get_first_menu(self):
+        return self.first_menu
+
     def get_scheduler_name(self):
         return '%s_%s' % (self.P.package_name, self.name)
 
