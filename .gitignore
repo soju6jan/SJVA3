@@ -13,3 +13,4 @@ false/
 *.db
 *.txt
 *.code-workspace
+*.pem
