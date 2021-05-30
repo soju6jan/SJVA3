@@ -16,3 +16,15 @@ class ToolUtil(object):
                 url += '&'
             url += 'apikey=%s' % SystemModelSetting.get('auth_apikey')
         return url
+    
+    @classmethod
+    def dict_save(cls, data, filepath):
+        try:
+            import json, codecs
+            data = json.dumps(data, indent=4, ensure_ascii=False)
+            ofp = codecs.open(filename, 'w', encoding='utf8')
+            ofp.write(s)
+            ofp.close()
+        except Exception as exception:
+            logger.debug('Exception:%s', exception)
+            logger.debug(traceback.format_exc())
