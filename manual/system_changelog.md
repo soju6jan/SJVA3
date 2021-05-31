@@ -5,7 +5,7 @@
   - rclone_expand : import error 문제 수정<br>
   - no_celery and bind=True function call bug<br>
 
-##### <span style="color:red">■ 0.2.21.0 (2021-05-29)</span> #####
+##### <span style="color:red">■ 0.2.21.1 (2021-05-31)</span> #####
   - 시스템 - 모듈 기능 추가<br>
   - sjva.me VOD, S-Movie 게시판 웹 재생 기능 추가<br>
   - sjva2 사용 종료<br>
