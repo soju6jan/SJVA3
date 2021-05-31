@@ -186,7 +186,7 @@ class ModuleBase(LogicModuleBase):
         ret = []
         try:
             mod_root_path = ModelSetting.get(f'{name}_mod_root_path')
-            if not os.path.exists(mod_root_path):
+            if mod_root_path and not os.path.exists(mod_root_path):
                 return
             mod_list = os.listdir(mod_root_path)
             sys.path.insert(0, mod_root_path)

@@ -70,6 +70,9 @@ class ToolRclone(object):
             if option is not None:
                 command += option
             ret = ToolSubprocess.execute_command_return(command, format='json')
+            for key, value in ret.items():
+                if 'token' in value and value['token'].startswith('{'):
+                    value['token'] = json.loads(value['token'])
             return ret
         except Exception as exception: 
             logger.error('Exception:%s', exception)
