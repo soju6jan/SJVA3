@@ -62,6 +62,18 @@ class ToolRclone(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
 
+    @classmethod
+    def purge(cls, remote_path, rclone_path='rclone', config_path=os.path.join(path_data, 'db', 'rclone.conf'), option=None):
+        try:
+            command = [rclone_path, '--config', config_path, 'purge', remote_path, '-vv']#, '--drive-use-trash=false', '-vv']
+            if option is not None:
+                command += option
+            ret = ToolSubprocess.execute_command_return(command)
+            return ret
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+
 
     @classmethod
     def config_list(cls, rclone_path='rclone', config_path=os.path.join(path_data, 'db', 'rclone.conf'), option=None):
