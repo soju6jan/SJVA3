@@ -100,8 +100,8 @@ def streaming(contenttype, contentid, quality, action='hls', ishevc='y', isabr='
         data = response.json()
 
         if response.status_code == 200:
-            logger.debug(url)
-            logger.debug(data)
+            #logger.debug(url)
+            #logger.debug(data)
             try:
                 if data['playurl'].startswith('https://event.pca.wavve.com'):
                     logger.debug('playurl startswith https://event.pca.wavve.com!!!!!')

@@ -147,6 +147,15 @@ def plugin_init():
                 logger.error(traceback.format_exc())
                 logger.debug('db.create_all error')
         if not app.config['config']['run_by_real']:
+            # 2021-06-03 
+            # 모듈의 로직에 있는 celery 함수는 등록해주어야한다.
+            try:
+                logger.warning('module plugin_load in celery ')
+                plugin_instance_list['mod'].plugin_load()
+            except Exception as exception:
+                logger.error('module plugin_load error')
+                logger.error('Exception:%s', exception)
+                logger.error(traceback.format_exc())
             return
         
         for key, mod in plugin_instance_list.items():

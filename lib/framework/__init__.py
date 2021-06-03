@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-version = '0.2.21.2'
+version = '0.2.21.3'
 #########################################################
 # python
 import os
@@ -115,10 +115,6 @@ try:
     system.plugin_load()
     flag_system_loading = True # 로그레벨에서 사용. 필요한가??
 
-    if app.config['config']['run_by_init_db']:
-        logger.debug('================================================')
-        logger.debug('Run by init db.. exit')
-        sys.exit()
     
     app.register_blueprint(system.blueprint)
 
