@@ -10,7 +10,7 @@ import json
 
 # third-party
 import requests
-from flask import Blueprint, request, Response, send_file, render_template, redirect, jsonify
+from flask import Blueprint, request, Response, send_file, render_template, redirect, jsonify, stream_with_context
 
 # sjva 공용
 from framework.logger import get_logger
@@ -476,6 +476,39 @@ def first_api(sub):
             r = requests.get(data['url'], headers=headers, stream=True)
             rv = Response(r.iter_content(chunk_size=1048576), r.status_code, content_type=r.headers['Content-Type'], direct_passthrough=True)
             rv.headers.add('Content-Range', r.headers.get('Content-Range'))
+            return rv
+        elif sub == 'gds2':
+            url = f"https://sjva.me/sjva/gds.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
+            data = requests.get(url).json()['data']
+            logger.debug(data)
+            req_headers = dict(request.headers)
+            headers = {}
+
+            headers['Range'] = f"bytes={request.args.get('range')}"
+            headers['Authorization'] = f"Bearer {data['token']}"
+            headers['Connection'] = 'keep-alive'
+            logger.warning(headers)
+            """
+            response = redirect(data['url'])
+            headers = dict(response.headers)
+            headers.update({'Authorization': f"Bearer {data['token']}"})
+            response.headers = headers
+            return response
+
+            response.headers.add('Authorization', headers['Authorization'])
+            #response.headers['Location'] = data['url']
+            return response
+            """
+
+            r = requests.get(data['url'], headers=headers, stream=True)
+            logger.warning(r.history)
+            #rv = Response(r.iter_content(chunk_size=10485760), r.status_code, content_type=r.headers['Content-Type'], direct_passthrough=True)
+            #rv.headers.add('Content-Range', r.headers.get('Content-Range'))
+
+            rv = Response(r.iter_content(chunk_size=1048576), r.status_code, content_type=r.headers['Content-Type'], direct_passthrough=True)
+            rv.headers.add('Content-Range', r.headers.get('Content-Range'))
+
+            logger.debug(rv.headers)
             return rv
     except Exception as exception: 
         logger.error('Exception:%s', exception)

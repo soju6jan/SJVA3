@@ -97,41 +97,9 @@ class Util(object):
     # list형태
     @staticmethod
     def execute_command(command):
-        try:
-            logger.debug('COMMAND RUN START : %s', command)
-            
-            if platform.system() == 'Windows':
-                new_command = []
-                for c in command:
-                    new_command.append(c.encode('cp949'))
-                command = new_command
-            ret = []
-            if app.config['config']['is_py2']:
-                p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
-                with p.stdout:
-                    for line in iter(p.stdout.readline, b''):
-                        try:
-                            line = line.decode('utf-8')
-                        except Exception as exception: 
-                            try:
-                                line = line.decode('cp949')
-                            except Exception as exception: 
-                                pass
-                        #logger.debug(line)
-                        ret.append(line.strip())
-                    p.wait() # wait for the subprocess to exit
-            else:
-                p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-                with p.stdout:
-                    for line in iter(p.stdout.readline, ''):
-                        ret.append(line.strip())
-                    p.wait() # wait for the subprocess to exit
-
-            logger.debug('COMMAND RUN END : %s', command)
-            return ret
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
-            logger.error(traceback.format_exc())  
+        from tool_base import ToolSubprocess
+        return ToolSubprocess.execute_command_return(command)
+        
 
     
     @staticmethod
