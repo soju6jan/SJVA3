@@ -24,10 +24,13 @@ class ToolSubprocess(object):
                 ret = []
                 with process.stdout:
                     if platform.system() == 'Windows':
-                        for line in iter(process.stdout.readline.decode('cp949'), ''):
-                            ret.append(line.strip())
-                            if force_log:
-                                logger.debug(ret[-1])
+                        try:
+                            for line in iter(process.stdout.readline, ''):
+                                ret.append(line.strip())
+                                if force_log:
+                                    logger.debug(ret[-1])
+                        except:
+                            pass
                     else:
                         for line in iter(process.stdout.readline, ''):
                             ret.append(line.strip())
