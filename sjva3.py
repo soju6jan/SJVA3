@@ -7,6 +7,7 @@ def prepare_starting():
     try:
         from gevent import monkey;monkey.patch_all()
         print('[SJVA3] gevent mokey patch!!')
+        sys.getfilesystemencoding = lambda: 'UTF-8'
     except:
         print('[SJVA3] gevent not installed!!')
     ######################################
