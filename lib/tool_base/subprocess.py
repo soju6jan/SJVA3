@@ -23,10 +23,16 @@ class ToolSubprocess(object):
                 process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
                 ret = []
                 with process.stdout:
-                    for line in iter(process.stdout.readline, ''):
-                        ret.append(line.strip())
-                        if force_log:
-                            logger.debug(ret[-1])
+                    if platform.system() == 'Windows':
+                        for line in iter(process.stdout.readline.decode('cp949'), ''):
+                            ret.append(line.strip())
+                            if force_log:
+                                logger.debug(ret[-1])
+                    else:
+                        for line in iter(process.stdout.readline, ''):
+                            ret.append(line.strip())
+                            if force_log:
+                                logger.debug(ret[-1])
                     process.wait() # wait for the subprocess to exit
 
 
