@@ -109,4 +109,13 @@ class ToolRclone(object):
             logger.error(traceback.format_exc())
     
 
+    
+    @classmethod
+    def get_config(cls, remote_name, rclone_path='rclone', config_path=os.path.join(path_data, 'db', 'rclone.conf'), option=None):
+        try:
+            data = cls.config_list(rclone_path=rclone_path, config_path=config_path, option=option)
+            return data.get(remote_name, None)
             
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
