@@ -104,12 +104,8 @@ class Util(object):
     
     @staticmethod
     def change_text_for_use_filename(text):
-        try:
-            import re
-            return re.sub('[\\/:*?\"<>|]', '', text).strip()
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
-            logger.error(traceback.format_exc())  
+        from tool_base import ToolBaseFile
+        return ToolBaseFile.text_for_filename(text)
 
 
     # 토렌트 인포에서 최대 크기 파일과 폴더명을 리턴한다

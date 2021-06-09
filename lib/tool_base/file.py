@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 #########################################################
-import os
-import traceback
-import io
-
+import os, traceback, io, re
 from . import logger
 
 class ToolBaseFile(object):
@@ -51,3 +48,8 @@ class ToolBaseFile(object):
             logger.debug('Exception:%s', exception)
             logger.debug(traceback.format_exc())
         return False
+
+
+    @staticmethod
+    def text_for_filename(text):
+        return re.sub('[\\/:*?\"<>|]', '', text).strip()
