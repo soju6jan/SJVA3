@@ -52,4 +52,7 @@ class ToolBaseFile(object):
 
     @staticmethod
     def text_for_filename(text):
-        return re.sub('[\\/:*?\"<>|]', '', text).strip()
+        text = re.sub('[\\/:*?\"<>|]', '', text).strip()
+        text = re.sub("\s{2,}", ' ', text)
+        return text
+        
