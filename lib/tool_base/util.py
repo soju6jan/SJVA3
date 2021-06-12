@@ -1,4 +1,4 @@
-import os, sys, traceback
+import os, sys, traceback, json
 
 from . import logger
 
@@ -28,3 +28,12 @@ class ToolUtil(object):
         except Exception as exception:
             logger.debug('Exception:%s', exception)
             logger.debug(traceback.format_exc())
+
+
+    @classmethod
+    def dump(cls, data):
+        if type(data) in [type({}), type([])]:
+            import json
+            return '\n' + json.dumps(data, indent=4, ensure_ascii=False)
+        else:
+            return str(data)
