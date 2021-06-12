@@ -129,7 +129,20 @@ class Logic(object):
             self.P.logger.error(traceback.format_exc())
             ret = 'fail'
         return ret
-  
+    
+    def immediately_execute(self, sub):
+        self.P.logger.debug('immediately_execute :%s', sub)
+        try:
+            def func():
+                self.scheduler_function(sub)
+            threading.Thread(target=func, args=()).start()
+            ret = {'ret':'success', 'msg':'실행합니다.'}
+        except Exception as exception: 
+            self.P.logger.error('Exception:%s', exception)
+            self.P.logger.error(traceback.format_exc())
+            ret = {'ret' : 'danger', 'msg':str(exception)}
+        return ret
+
     def get_module(self, sub):
         try:
             for module in self.P.module_list:

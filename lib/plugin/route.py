@@ -87,6 +87,10 @@ def default_route(P):
                 sub = request.form['sub']
                 ret = P.logic.one_execute(sub)
                 return jsonify(ret)
+            elif sub == 'immediately_execute':
+                sub = request.form['sub']
+                ret = P.logic.immediately_execute(sub)
+                return jsonify(ret)
         except Exception as exception: 
             P.logger.error('Exception:%s', exception)
             P.logger.error(traceback.format_exc())  

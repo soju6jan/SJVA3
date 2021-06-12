@@ -430,7 +430,21 @@ $("#global_one_execute_sub_btn").click(function(e) {
     }
   });
 });
-  
+
+$("body").on('click', '#global_immediately_execute_sub_btn', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: '/' + package_name + '/ajax/immediately_execute',
+    type: "POST", 
+    cache: false,
+    data: {sub:sub},
+    dataType: "json",
+    success: function (ret) {
+      if (ret.msg != null) notify(ret.msg, ret.ret);
+    }
+  });
+});
+
 $("body").on('click', '#global_reset_db_btn', function(e){
   e.preventDefault();
   document.getElementById("confirm_title").innerHTML = "DB 삭제";
