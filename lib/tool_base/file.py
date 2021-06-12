@@ -50,9 +50,21 @@ class ToolBaseFile(object):
         return False
 
 
-    @staticmethod
-    def text_for_filename(text):
+    @classmethod
+    def text_for_filename(cls, text):
+        text = text.replace('/', '')
         text = re.sub('[\\/:*?\"<>|]', '', text).strip()
         text = re.sub("\s{2,}", ' ', text)
         return text
-        
+
+
+    @classmethod
+    def size(self, start_path = '.'):
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(start_path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                if not os.path.islink(fp):
+                    total_size += os.path.getsize(fp)
+        return total_size
+
