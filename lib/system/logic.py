@@ -122,6 +122,8 @@ class SystemLogic(object):
         'tool_crypt_user_key' : '',
         'tool_crypt_encrypt_word' : '',
         'tool_crypt_decrypt_word' : '',
+        
+        'use_beta' : 'False',
     }
 
 

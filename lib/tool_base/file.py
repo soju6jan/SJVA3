@@ -59,7 +59,7 @@ class ToolBaseFile(object):
 
 
     @classmethod
-    def size(self, start_path = '.'):
+    def size(cls, start_path = '.'):
         total_size = 0
         for dirpath, dirnames, filenames in os.walk(start_path):
             for f in filenames:
@@ -68,3 +68,20 @@ class ToolBaseFile(object):
                     total_size += os.path.getsize(fp)
         return total_size
 
+    @classmethod
+    def file_move(cls, source_path, target_dir, target_filename):
+        try:
+            import time, shutil
+            if os.path.exists(target_dir) == False:
+                os.makedirs(target_dir)
+            target_path = os.path.join(target_dir, target_filename)
+            if source_path != target_path:
+                if os.path.exists(target_path):
+                    tmp = os.path.splitext(target_filename)
+                    new_target_filename = f"{tmp[0]} {str(time.time()).split('.')[0]}{tmp[1]}"
+                    target_path = os.path.join(target_dir, new_target_filename)
+                shutil.move(source_path, target_path)
+        except Exception as exception:
+            logger.debug('Exception:%s', exception)
+            logger.debug(traceback.format_exc())
+        

@@ -134,6 +134,7 @@ class Logic(object):
         self.P.logger.debug('immediately_execute :%s', sub)
         try:
             def func():
+                time.sleep(1)
                 self.scheduler_function(sub)
             threading.Thread(target=func, args=()).start()
             ret = {'ret':'success', 'msg':'실행합니다.'}

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-version = '0.2.21.4'
+version = '0.2.21.5'
 #########################################################
 # python
 import os
@@ -174,21 +174,8 @@ except Exception as exception:
     logger.error('Exception:%s', exception)
     logger.error(traceback.format_exc())
 
+
 # 반드시 마지막에 
 #import init_route
 from .init_route import *
 
-
-from .util import Util
-try:
-    from tool_expand import TorrentProcess
-    TorrentProcess.server_process(None, category='None')
-except:
-    pass
-"""
-try:
-    from lib_metadata import *
-    
-except:
-    pass
-"""

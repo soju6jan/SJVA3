@@ -83,15 +83,8 @@ class Util(object):
 
     @staticmethod
     def save_from_dict_to_json(d, filename):
-        try:
-            import codecs
-            s = json.dumps(d)
-            ofp = codecs.open(filename, 'w', encoding='utf8')
-            ofp.write(s)
-            ofp.close()
-        except Exception as exception:
-            logger.debug('Exception:%s', exception)
-            logger.debug(traceback.format_exc())
+        from tool_base import ToolUtil
+        ToolUtil.save_dict(d, filename)
 
 
     # list형태

@@ -30,118 +30,9 @@ logger = get_logger(package_name)
 
 class LogicPlugin(object):
     plugin_loading = False
-    """
-    custom_plugin_list = [
-        {
-            'name' : 'torrent_info',
-            'plugin_name' : 'torrent_info_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/wiserain/torrent_info_sjva/master/info.json',
-            'git' : 'https://github.com/wiserain/torrent_info_sjva.git',
-        },
-        {
-            'name' : 'hdhomerun',
-            'plugin_name' : 'hdhomerun_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/hdhomerun_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/hdhomerun_sjva.git',
-        },
-        {
-            'name' : 'nsearch',
-            'plugin_name' : 'nsearch_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/starbuck15/nsearch_sjva/master/info.json',
-            'git' : 'https://github.com/starbuck15/nsearch_sjva.git',
-        },
-        {
-            'name' : 'tving',
-            'plugin_name' : 'tving_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/tving_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/tving_sjva.git',
-        },
-        {
-            'name' : 'wavve',
-            'plugin_name' : 'wavve_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/wavve_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/wavve_sjva.git',
-        },
-        {
-            'name' : 'ani24',
-            'plugin_name' : 'ani24_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/ani24_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/ani24_sjva.git',
-        },
-        {
-            'name' : 'telegram_receiver',
-            'plugin_name' : 'telegram_receiver_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/telegram_receiver_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/telegram_receiver_sjva.git',
-        },
-        {
-            'name' : 'launcher_guacamole',
-            'plugin_name' : 'launcher_guacamole_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_guacamole_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_guacamole_sjva.git',
-            'running_type' : ['docker']
-        },
-        {
-            'name' : 'launcher_greentunnel',
-            'plugin_name' : 'launcher_greentunnel_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_greentunnel_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_greentunnel_sjva.git',
-            'running_type' : ['docker']
-        },
-        {
-            'name' : 'launcher_torrssen2',
-            'plugin_name' : 'launcher_torrssen2_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_torrssen2_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_torrssen2_sjva.git',
-        },
-        {
-            'name' : 'launcher_gateone',
-            'plugin_name' : 'launcher_gateone_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_gateone_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_gateone_sjva.git',
-            'platform' : ['Linux', 'Darwin']
-        },
-        {
-            'name' : 'launcher_tautulli',
-            'plugin_name' : 'launcher_tautulli_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_tautulli_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_tautulli_sjva.git'
-        },
-        {
-            'name' : 'launcher_calibre_web',
-            'plugin_name' : 'launcher_calibre_web_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_calibre_web_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_calibre_web_sjva.git'
-        },
-        {
-            'name' : 'launcher_xteve',
-            'plugin_name' : 'launcher_xteve_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/launcher_xteve_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/launcher_xteve_sjva.git'
-        },
-        {
-            'name' : 'manamoa',
-            'plugin_name' : 'manamoa_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/manamoa_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/manamoa_sjva.git'
-        },
-        {
-            'name' : 'vnStat',
-            'plugin_name' : 'vnStat_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/wiserain/vnStat_sjva/master/info.json',
-            'git' : 'https://github.com/wiserain/vnStat_sjva.git'
-        },
-        {
-            'name' : 'Synoindex',
-            'plugin_name' : 'synoindex_sjva',
-            'json_url' : 'https://raw.githubusercontent.com/soju6jan/synoindex_sjva/master/info.json',
-            'git' : 'https://github.com/soju6jan/synoindex_sjva.git'
-        }
-    ]
-    """
-    custom_plugin_list = [
-        
-    ]
+    
+    custom_plugin_list = []
+    
     @staticmethod
     def loading():
         try:
@@ -153,45 +44,15 @@ class LogicPlugin(object):
                     p = {}
                     p['name'] = name
                     p['plugin_name'] = name
-                    
                     mod = __import__('%s' % (p['plugin_name']), fromlist=[])
                     p['local_info'] = getattr(mod, 'plugin_info')
-                    #if p['info']['version'] == p['local_info']['version']:
-                    #    p['status'] = 'latest'
-                    #else:
-                    #    p['status'] = 'no_latest'
                     p['status'] = 'latest'
                     LogicPlugin.custom_plugin_list.append(p)
                 except Exception as exception: 
                     logger.error('NO Exception:%s', exception)
-                    #logger.error(traceback.format_exc())
                     logger.debug('plunin not import : %s', p['plugin_name'])
                     p['local_info'] = None
                     p['status'] = 'no'         
-
-            """
-            for p in LogicPlugin.custom_plugin_list:
-                try:
-                    content = requests.get(p['json_url'])
-                    data = content.json()
-                    logger.debug(data)
-                    p['info'] = data
-                    
-                    mod = __import__('%s' % (p['plugin_name']), fromlist=[])
-                    p['local_info'] = getattr(mod, 'plugin_info')
-                    if p['info']['version'] == p['local_info']['version']:
-                        p['status'] = 'latest'
-                    else:
-                        p['status'] = 'no_latest'
-                except Exception as exception: 
-                    logger.error('NO Exception:%s', exception)
-                    #logger.error(traceback.format_exc())
-                    logger.debug('plunin not import : %s', p['plugin_name'])
-                    p['local_info'] = None
-                    p['status'] = 'no'
-            #logger.debug(LogicPlugin.custom_plugin_list)
-            """
-
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -242,6 +103,7 @@ class LogicPlugin(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
 
+
     @staticmethod
     def plugin_uninstall(plugin_name):
         logger.debug('plugin_name : %s', plugin_name)
@@ -275,29 +137,7 @@ class LogicPlugin(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
 
-    
-    
 
-    
-
-    """
-    @staticmethod
-    def auto_update():
-        try:
-            logger.debug('auto_update')
-            flag = False
-            for p in LogicPlugin.get_plugin_list():
-                if p['local_info'] is not None:
-                    logger.debug('%s %s %s', p['plugin_name'],p['info']['version'], p['local_info']['version'])
-                    if p['info']['version'] != p['local_info']['version']:
-                        logger.debug('auto_update')
-                        flag = True
-                        LogicPlugin.plungin_install(p['plugin_name'], True)
-            return flag
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
-            logger.error(traceback.format_exc())
-    """
     @staticmethod
     def custom_plugin_update():
         try:
@@ -330,10 +170,6 @@ class LogicPlugin(object):
         logger.debug('plugin_name : %s', plugin_git)
         ret = {}
         try:
-            #https://github.com/soju6jan/synoindex
-            #https://github.com/soju6jan/synoindex.git
-            #https://raw.githubusercontent.com/soju6jan/synoindex_sjva/master/info.json
-            
             name = plugin_git.split('/')[-1]
             
             custom_path = os.path.join(path_data, 'custom')
@@ -351,9 +187,6 @@ class LogicPlugin(object):
                             break
                     except:
                         pass
-
-                logger.debug(plugin_info)
-
                 flag = True
                 if 'platform' in plugin_info:
                     if platform.system() not in plugin_info['platform']:
@@ -378,3 +211,4 @@ class LogicPlugin(object):
             ret['ret'] = 'exception'
             ret['log'] = str(exception)
         return ret
+        

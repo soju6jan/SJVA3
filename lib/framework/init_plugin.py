@@ -2,7 +2,6 @@
 #########################################################
 # python
 import os, sys, traceback, threading
-
 from framework import app, db, logger, plugin_instance_list, plugin_menu
 import system
 
@@ -17,54 +16,33 @@ def is_include_menu(plugin_name):
             return True
         elif system.SystemLogic.get_setting_value('use_plugin_%s' % plugin_name) == 'False':
             return False
-        #return True
-        #####################################################
-        # 2019-08-30 : 메뉴 
-        # 로딩 False 인 것은 아예 로딩하지 않는다. 그러나 타 모듈에서 로딩하는 것은 어쩔수 없다
-        # 그런 것은 메뉴 구성할때 한번 더 거른다.
-        #####################################################
-        #menu_json = {'plugin_use_pooq':'True'}
-        #if 'plugin_use_%s' % plugin_name in menu_json and menu_json['plugin_use_%s' % plugin_name] == 'True':
-        #    return True
-        #return False
     except Exception as exception:
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())  
     return True
 
+
 def plugin_init():
     try:
         if not app.config['config']['auth_status']:
             return
-
         import inspect
         plugin_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'plugin')
         sys.path.insert(0, plugin_path)
 
-        # 2020-10-23
-        #plugins = os.listdir(plugin_path)
         try:
             from . import SystemModelSetting
             plugins = ['command', 'mod']
             for plugin in os.listdir(plugin_path):
                 plugins.append(plugin)
+            
+            
         except:
             plugins = os.listdir(plugin_path)
 
         
         pass_include = []
-        #except_plugin_list = ['rss2']
         except_plugin_list = []
-
-        #logger.debug('CONFIG_SERVER : %s', app.config['config'])
-        #2019-05-24
-        
-        if app.config['config']['is_server'] or app.config['config']['is_debug']:
-            server_plugin_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'server')
-            if os.path.exists(server_plugin_path):
-                sys.path.insert(0, server_plugin_path)
-                plugins = plugins + os.listdir(server_plugin_path)
-                pass_include = pass_include + os.listdir(server_plugin_path)
 
         #2019-07-17
         try:
@@ -75,9 +53,6 @@ def plugin_init():
             for t in tmps:
                 if not t.startswith('_'):
                     add_plugin_list.append(t)
-            #logger.debug(add_plugin_list)
-            #plugins = plugins + os.listdir(server_plugin_path)
-            #pass_include = pass_include + os.listdir(server_plugin_path)
             plugins = plugins + add_plugin_list
             pass_include = pass_include + add_plugin_list
         except Exception as exception:
@@ -97,7 +72,6 @@ def plugin_init():
                             add_plugin_list.append(t)
                             if app.config['config']['level'] < 4:
                                 break
-                    #logger.debug(add_plugin_list)
                     plugins = plugins + add_plugin_list
                     pass_include = pass_include + add_plugin_list
         except Exception as exception:
@@ -124,6 +98,9 @@ def plugin_init():
                             continue
                     if 'policy_level' in mod_plugin_info:
                         if mod_plugin_info['policy_level'] > app.config['config']['level']:
+                            continue
+                    if 'category' in mod_plugin_info and mod_plugin_info['category'] == 'beta':
+                        if SystemModelSetting.get_bool('use_beta') == False:
                             continue
                 except:
                     logger.debug('no plugin_info : %s', plugin_name)

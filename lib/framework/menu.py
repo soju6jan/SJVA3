@@ -125,7 +125,7 @@ MENU_MAP = [
         'count' : 0,
     },
     {
-        'category' : u'Beta',
+        'category' : u'베타',
         'name' : 'beta',
         'type' : 'plugin',
         'position' : 'left',

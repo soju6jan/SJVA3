@@ -7,6 +7,7 @@ from .subprocess import ToolSubprocess
 from .rclone import ToolRclone
 from .ffmpeg import ToolFfmpeg
 from .util import ToolUtil
+from .hangul import ToolHangul
 
 
 def d(data):
