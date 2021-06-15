@@ -80,8 +80,9 @@ class LogicKtvBasic(LogicModuleBase):
         logger.warning(arg)
 
     def plugin_load(self):
-        Task.start()
+        #Task.start()
         #load_yaml()
+        pass
 
 
     #########################################################
