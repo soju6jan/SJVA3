@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-version = '0.2.21.5'
+version = '0.2.22.0'
 #########################################################
 # python
 import os
@@ -77,6 +77,11 @@ try:
 
     from flask_cors import CORS
     CORS(app)
+
+    from flaskext.markdown import Markdown
+    Markdown(app)
+
+
     
     login_manager = LoginManager()
     login_manager.init_app(app)

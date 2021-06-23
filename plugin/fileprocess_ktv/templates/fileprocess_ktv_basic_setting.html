@@ -2,13 +2,12 @@
 {% block content %}
 
 <div>
-  {{ macros.m_button_group([['global_setting_save_btn', '설정 저장'], ['global_one_execute_sub_btn', '1회 실행'], ['global_immediately_execute_sub_btn', '바로 실행'], ['global_reset_db_sub_btn', 'DB 초기화']])}}
+  {{ macros.m_button_group([['global_setting_save_btn', '설정 저장'], ['global_one_execute_sub_btn', '1회 실행'], ['global_immediately_execute_sub_btn', '바로 실행'] ])}}
   {{ macros.m_row_start('5') }}
   {{ macros.m_row_end() }}
   <nav>
     {{ macros.m_tab_head_start() }}
-      {{ macros.m_tab_head2('normal', '기본 설정', true) }}
-      {{ macros.m_tab_head2('advanced', '고급 설정', false) }}
+      {{ macros.m_tab_head2('normal', '설정', true) }}
       {{ macros.m_tab_head2('auto', '자동 & 기타', false) }}
     {{ macros.m_tab_head_end() }}
   </nav>
@@ -16,38 +15,29 @@
   <div class="tab-content" id="nav-tabContent">
     {{ macros.m_tab_content_start('normal', true) }}
       {{ macros.setting_input_text_and_buttons('basic_path_source', '소스 폴더', [['select_basic_path_source_btn', '경로 선택']], desc=['영상이 있는 폴더'], value=arg['basic_path_source']) }}
-      
       {{ macros.setting_input_text_and_buttons('basic_path_target', '타겟 폴더', [['select_basic_path_target_btn', '경로 선택']], desc=['파일이 이동할 폴더'], value=arg['basic_path_target']) }}
-
-
-      {{ macros.setting_input_text_and_buttons('basic_path_error', '실패파일 이동 폴더', [['select_basic_path_error_btn', '경로 선택']], desc=['빈값이면 동작하지 않음.'], value=arg['basic_path_error']) }}
-      
-      {{ macros.m_hr() }}
-
+      {{ macros.setting_input_text_and_buttons('basic_path_error', '에러 폴더', [['select_basic_path_error_btn', '경로 선택']], desc=['빈값이면 동작하지 않음.'], value=arg['basic_path_error']) }}
+       {{ macros.m_hr() }}
       {{ macros.setting_input_text('basic_folder_format', '타겟 폴더 구조', desc=['예) {genre}/{title} : 예능/무한도전', '예) {genre}/{title} ({year}) [{studio}-{release}] : 드라마/마인 (2021) [tvN-ST]', '', '사용 가능 : {title} {year} {studio} {genre} {release}'], value=arg['basic_folder_format']) }}
-      
+      {{ macros.setting_input_text_and_buttons('basic_path_config', '설정 파일', [['edit_path_config_btn', '편집']], value=arg['basic_path_config']) }}
     {{ macros.m_tab_content_end() }}  
-
 
     {{ macros.m_tab_content_start('auto', false) }}
       {{ macros.setting_global_scheduler_sub_button(arg['scheduler'], arg['is_running']) }}
       {{ macros.setting_input_text('basic_interval', '스케쥴링 실행 정보', value=arg['basic_interval'], col='3', desc=['Inverval(minute 단위)이나 Cron 설정']) }}
       {{ macros.setting_checkbox('basic_auto_start', '시작시 자동실행', value=arg['basic_auto_start'], desc='On : 시작시 자동으로 스케쥴러에 등록됩니다.') }}
     {{ macros.m_tab_content_end() }}
-
   </div><!--tab-content-->
   </form>
 </div> <!--전체-->
 
 
-
 <script type="text/javascript">
 var package_name = "{{arg['package_name'] }}";
 var sub = "{{arg['sub'] }}";
+var path_app_root = "{{arg['path_app_root']}}";
 
 $(document).ready(function(){
-  //use_collapse("jav_censored_include_original_filename");
-  //use_meta(parseInt("{{arg['jav_censored_use_meta']}}"));
 });
 
 
@@ -73,12 +63,16 @@ $("body").on('click', '#select_basic_path_error_btn', function(e){
   e.preventDefault();
   var path = $('#basic_path_error').val().trim();
   if (path == '') path = '/'
-  m_select_local_file_modal("타겟 폴더", path, true, function(result){
+  m_select_local_file_modal("에러 폴더", path, true, function(result){
     $('#basic_path_error').val(result);
   });
 });
 
-
-
+$("body").on('click', '#edit_path_config_btn', function(e){
+  e.preventDefault();
+  var config_path = $('#basic_path_config').val().trim();
+  url = "/flaskcode" + config_path.replace(path_app_root, '');
+  window.location.href = url;
+});
 </script>    
 {% endblock %}

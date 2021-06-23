@@ -131,11 +131,11 @@
   {{ setting_top(left) }}
     <div style="padding-left:20px; padding-top:-5px;">
       <span id={{id}}><a href="{{value}}" target="_blank">{{value}}</a></span>
+      <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
       {% for b in buttons %}
-        <span class='text-left' style="padding-left:5px; padding-top:0px">
-          <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
-        </span>  
+        <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
       {% endfor %}
+      </div>
     </div>
   {{ setting_bottom(desc, padding_top='-5') }}
 {% endmacro %}
@@ -145,11 +145,11 @@
   {{ setting_top(left) }}
     <div style="padding-left:20px; padding-top:-5px;">
       <span id={{id}}>{{value}}</span>
-      {% for b in buttons %}
-        <span class='text-left' style="padding-left:5px; padding-top:0px">
+      <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+        {% for b in buttons %}
           <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
-        </span>  
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
 
   {{ setting_bottom(desc, padding_top='-5') }}
@@ -168,13 +168,11 @@
           disabled
         {% endif %}
         >
-        
+        <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
           {% for b in buttons %}
-          <span class='text-left' style="padding-left:5px; padding-top:0px">
             <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
-          </span>  
           {% endfor %}
-
+        </div>
       </div>
   {{ setting_bottom(desc) }}
 {% endmacro %}
@@ -282,11 +280,11 @@
             
       {% endfor %}
     </select>
-    {% for b in buttons %}
-      <span class='text-left' style="padding-left:5px; padding-top:0px">
+    <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+      {% for b in buttons %}
         <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
-      </span>  
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
   {{ setting_bottom(desc) }}
 {% endmacro %}
@@ -355,11 +353,11 @@
         disabled
       {% endif %}
     >{{ value }}</textarea>
-    {% for b in buttons %}
-    <span class='text-left' style="padding-left:5px; padding-top:0px">
-      <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
-    </span>  
-    {% endfor %}
+    <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+      {% for b in buttons %}
+        <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
+      {% endfor %}
+    </div>
   </div>
   {{ setting_bottom(desc) }}
 {% endmacro %}
@@ -598,4 +596,48 @@
   <span class='col-md-{{width}} set-left' style='padding-top: {{padding}}px; padding-bottom:{{padding}}px; align-items: center;'>
     <strong>{{ text }}</strong>
   </span>
+{% endmacro %}
+
+<!-- 텍스트 + 버튼 -->
+{% macro input_text_and_buttons(id, left, buttons, value='', col1='1', col2='9', col3='2', placeholder='', desc='', type='text', disabled=False) %}
+  <div class='row' style="padding-top: 0px; padding-bottom:0px; align-items: left;">
+    <div class="col-sm-{{col1}}" style="padding-top: 5px; text-align:right;">
+      {% if left != '' %}
+        <span><strong>{{ left }}</strong></span>
+      {% endif %}
+    </div>
+    <div class="col-sm-{{ col2 }}">
+      <input id="{{ id }}" name="{{ id }}" type="{{ type }}" class="form-control form-control-sm" 
+        {% if placeholder != '' %}
+          placeholder="{{ placeholder }}" 
+        {% endif %}
+        value="{{ value }}"
+        {% if disabled %}
+          disabled
+        {% endif %}
+      >
+    </div>
+    <div class="col-sm-{{ col3 }}">
+      <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+      {% for b in buttons %}
+          <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
+      {% endfor %}
+      </div>
+    </div>
+
+      {% if desc is not none %}
+        <div style="padding-left:20px; padding-top:{{padding_top}}}px;">
+        <em>
+        {% if desc is string %}
+          {{ desc }}      
+        {% elif desc is iterable %}
+          {% for d in desc %}
+            {{ d }}<br>
+          {% endfor %}
+        {% endif %}
+        </em>
+        </div>
+      {% endif %}
+
+  </div>
 {% endmacro %}

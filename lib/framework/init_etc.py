@@ -67,9 +67,9 @@ def pip_install():
         except: pass
 
     try:
-        from flask_cors import CORS
+        from flaskext.markdown import Markdown
     except:
-        try: os.system("{} install flask-cors".format(app.config['config']['pip']))
+        try: os.system("{} install Flask-Markdown".format(app.config['config']['pip']))
         except: pass
 
         

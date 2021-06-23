@@ -6,6 +6,10 @@ import re
 from flask_login import current_user
 
 def get_menu(full_query):
+    match = re.compile(r'\/(?P<menu>.*?)\/manual\/(?P<sub2>.*?)($|\?)').match(full_query)
+    if match:
+        return match.group('menu'), 'manual', match.group('sub2')
+
     match = re.compile(r'\/(?P<menu>.*?)\/(?P<sub>.*?)\/(?P<sub2>.*?)($|\/|\?)').match(full_query)
     if match:
         return match.group('menu'), match.group('sub'), match.group('sub2')
@@ -36,7 +40,9 @@ def get_theme():
         'Lux' : 88,
         'Materia' : 80,
         'Minty' : 56,
+        'Morph' : 56,
         'Pulse' : 75,
+        'Quartz' : 92,
         'Sandstone' : 53,
         'Simplex' : 67,
         'Sketchy' : 56,
@@ -45,7 +51,9 @@ def get_theme():
         'Spacelab' : 58,
         'Superhero' : 48,
         'United' : 56,
+        'Vapor' : 56,
         'Yeti' : 54,
+        'Zephyr' : 68,
     }
     from system.model import ModelSetting as SystemModelSetting
     theme = SystemModelSetting.get('theme')

@@ -397,6 +397,18 @@ $("body").on('click', '#job_log_show_btn', function(e){
   });
 });
 
+function baseName(str)
+{
+    let li = Math.max(str.lastIndexOf('/'), str.lastIndexOf('\\'));
+    return new String(str).substring(li + 1);
+}
+
+$("body").on('click', '#job_file_edit_btn', function(e){
+  filename = $(this).data('filename');
+  url = '/flaskcode/data/command/' + baseName(filename);
+  window.location = url;
+});
+/*
 $("body").on('click', '#job_file_edit_btn', function(e){
   e.preventDefault();
   job_id = $(this).data('id');
@@ -418,7 +430,7 @@ $("body").on('click', '#job_file_edit_btn', function(e){
     }
   });
 });
-
+*/
 
 $("body").on('click', '#file_save_btn', function(e){
   e.preventDefault();
@@ -467,7 +479,8 @@ function make_list(data) {
     tmp2 += m_button('job_input_btn', 'Command에 입력', [{'key':'id', 'value':data[i].id}]);
     tmp2 += m_button('job_edit_btn', '설정 편집', [{'key':'id', 'value':data[i].id}]);
     if (data[i].filename != null) {
-      tmp2 += m_button('job_file_edit_btn', '파일 수정', [{'key':'id', 'value':data[i].id}]);
+      //tmp2 += m_button('job_file_edit_btn', '파일 수정', [{'key':'id', 'value':data[i].id}]);
+      tmp2 += m_button('job_file_edit_btn', '파일 수정', [{'key':'filename', 'value':data[i].filename}]);
     }
     if (data[i].process_id != null) {
       tmp2 += m_button('job_process_close_btn', '프로세스 끝내기', [{'key':'id', 'value':data[i].id}]);

@@ -36,3 +36,28 @@ class ToolUtil(object):
             return '\n' + json.dumps(data, indent=4, ensure_ascii=False)
         else:
             return str(data)
+
+
+
+    @classmethod
+    def sizeof_fmt(cls, num, suffix='B'):
+        for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.2f%s%s" % (num, 'Y', suffix)
+
+    @classmethod
+    def sizeof_fmt(cls, num, suffix='B'):
+        for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
+            if abs(num) < 1024.0:
+                return "%3.1f%s%s" % (num, unit, suffix)
+            num /= 1024.0
+        return "%.2f%s%s" % (num, 'Y', suffix)
+
+    @classmethod
+    def timestamp_to_datestr(cls, stamp, format='%Y-%m-%d %H:%M:%S'):
+        from datetime import datetime
+        tmp = datetime.fromtimestamp(stamp)
+        return tmp.strftime(format)
+        

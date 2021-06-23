@@ -47,6 +47,7 @@
 <script type="text/javascript">
 var package_name = 'system';
 var current_data;
+var install = "{{arg['install']}}";
 
 $(document).ready(function(){
   $.ajax({
@@ -58,6 +59,10 @@ $(document).ready(function(){
     success: function (data) {
       current_data = data
       make_plugin_list();
+      if (install != '') {
+        $('#plugin_git').val(install);
+        //notify('플러그인이 설치되어 있지 않습니다.', 'danger');
+      }
     }
   });
 });
@@ -167,6 +172,7 @@ $("body").on('click', '#plugin_uninstall_btn', function(e){
     }
   });  
 });
+
 
 
 

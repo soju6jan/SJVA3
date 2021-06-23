@@ -202,8 +202,7 @@ class LogicPlugin(object):
                     command = ['git', '-C', custom_path, 'clone', plugin_git + '.git', '--depth', '1']
                     log = Util.execute_command(command)
                     ret['ret'] = 'success'
-                    ret['log'] = [u'정상적으로 설치하였습니다. 재시작시 적용됩니다.']
-                    ret['log'] += log
+                    ret['log'] = [u'정상적으로 설치하였습니다. 재시작시 적용됩니다.', log]
                     ret['log'] = '<br>'.join(ret['log'])
         except Exception as exception: 
             logger.error('Exception:%s', exception)

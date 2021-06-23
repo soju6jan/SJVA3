@@ -20,26 +20,22 @@ from .plugin import P
 logger = P.logger
 package_name = P.package_name
 ModelSetting = P.ModelSetting
-name = 'basic'
+name = 'yaml'
 from .task_for_download import Task
 
 #########################################################
-class LogicKtvBasic(LogicModuleBase):
+class LogicKtvYaml(LogicModuleBase):
     db_default = {
         f'{name}_db_version' : '1',
         f'{name}_interval' : '30',
         f'{name}_auto_start' : 'False',
-        f'{name}_path_source' : '',
-        f'{name}_path_target' : '',
-        f'{name}_path_error' : '',
-        f'{name}_folder_format' : '{genre}/{title}',
-        f'{name}_path_config' : os.path.join(path_data, 'db', f"{package_name}_{name}.yaml"),
+        f'{name}_path_config' : '',
         f'{name}_task_stop_flag' : 'False',
         f'{name}_dry_task_stop_flag' : 'False',
     }
 
     def __init__(self, P):
-        super(LogicKtvBasic, self).__init__(P, 'setting', scheduler_desc='국내TV 파일처리 - 기본')
+        super(LogicKtvYaml, self).__init__(P, 'setting', scheduler_desc='국내TV 파일처리 - yaml')
         self.name = name
         self.data = {
             'data' : [],
@@ -77,8 +73,8 @@ class LogicKtvBasic(LogicModuleBase):
                     ret = {'ret':'success', 'msg':'곧 실행됩니다.'}
                 elif command == 'dry_run_stop':
                     if self.data['is_working'] == 'run':
-                        ModelSetting.set(f'{name}_dry_task_stop_flag', 'True')
                         ModelSetting.set(f'{name}_task_stop_flag', 'True')
+                        ModelSetting.set(f'{name}_dry_task_stop_flag', 'True')
                         ret = {'ret':'success', 'msg':'잠시 후 중지됩니다.'}
                     else:
                         ret = {'ret':'warning', 'msg':'대기중입니다.'}
@@ -92,14 +88,10 @@ class LogicKtvBasic(LogicModuleBase):
         self.call_task()
     
     def call_task(self, is_dry=False):
-        config = self.load_basic_config()
+        config = self.load_config()
         self.data['data'] = []
         self.data['is_working'] = 'run'
         self.refresh_data()
-        config[0]['소스 폴더'] = ModelSetting.get(f"{name}_path_source")
-        config[0]['타겟 폴더'] = ModelSetting.get(f"{name}_path_target")
-        config[0]['에러 폴더'] = ModelSetting.get(f"{name}_path_error")
-        config[0]['타겟 폴더 구조'] = ModelSetting.get(f"{name}_folder_format")
         call_module = name
         if is_dry:
             call_module += '_dry'
@@ -116,12 +108,8 @@ class LogicKtvBasic(LogicModuleBase):
         self.data['is_working'] = ret
         self.refresh_data()   
 
-    def plugin_load(self):
-        if os.path.exists(ModelSetting.get(f'{name}_path_config')) == False:
-            shutil.copyfile(os.path.join(os.path.dirname(__file__), 'file', f'config_{name}.yaml'), ModelSetting.get(f'{name}_path_config'))
-
     #########################################################
-    def load_basic_config(self):
+    def load_config(self):
         with open(ModelSetting.get(f'{name}_path_config')) as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config

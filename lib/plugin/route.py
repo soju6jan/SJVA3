@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # python
-import traceback
+import traceback, os
 import json
 
 # third-party
@@ -35,7 +35,24 @@ def default_route(P):
                     return redirect('/{package_name}/{sub}/{first_menu}'.format(package_name=P.package_name, sub=sub, first_menu=module.get_first_menu()))
             if sub == 'log':
                 return render_template('log.html', package=P.package_name)
+            elif sub == 'manual':
+                return redirect(f"/{P.package_name}/manual/{P.menu['sub2']['manual'][0][0]}")
             return render_template('sample.html', title='%s - %s' % (P.package_name, sub))
+        except Exception as exception:
+            P.logger.error('Exception:%s', exception)
+            P.logger.error(traceback.format_exc())
+    
+    @P.blueprint.route('/manual/<path:path>', methods=['GET', 'POST'])
+    @login_required
+    def manual(path):
+        try:
+            P.logger.warning(path)
+            plugin_root = os.path.dirname(P.blueprint.template_folder)
+            filepath = os.path.join(plugin_root,  *path.split('/'))
+            P.logger.warning(filepath)
+            from tool_base import ToolBaseFile
+            data = ToolBaseFile.read(filepath)
+            return render_template('manual.html', data=data)
         except Exception as exception:
             P.logger.error('Exception:%s', exception)
             P.logger.error(traceback.format_exc())

@@ -84,4 +84,45 @@ class ToolBaseFile(object):
         except Exception as exception:
             logger.debug('Exception:%s', exception)
             logger.debug(traceback.format_exc())
-        
+
+
+    @classmethod
+    def makezip(cls, zip_path, zip_folder=None, zip_extension='zip', remove_folder=False):
+        import zipfile
+        try:
+            zip_path = zip_path.rstrip('/')
+            if zip_folder is None:
+                zip_folder = os.path.dirname(zip_path)
+            elif zip_folder == 'tmp':
+                from framework import path_data
+                zip_folder = os.path.join(path_data, 'tmp')
+            if os.path.isdir(zip_path):
+                zipfilepath = os.path.join(zip_folder, f"{os.path.basename(zip_path)}.{zip_extension}")
+                fantasy_zip = zipfile.ZipFile(zipfilepath, 'w')
+                for f in os.listdir(zip_path):
+                    src = os.path.join(zip_path, f)
+                    fantasy_zip.write(src, os.path.basename(src), compress_type = zipfile.ZIP_DEFLATED)
+                fantasy_zip.close()
+            if remove_folder:
+                import shutil
+                shutil.rmtree(zip_path)
+            return zipfilepath
+        except Exception as exception:
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+        return
+
+    @classmethod
+    def rmtree(cls, folderpath):
+        import shutil
+        try:
+            shutil.rmtree(folderpath)
+            return True
+        except:
+            try:
+                os.system("rm -rf '{folderpath}'")
+                return True
+            except:
+                return False
+                
+            

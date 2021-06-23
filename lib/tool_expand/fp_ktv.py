@@ -30,13 +30,15 @@ REGEXS = [
 
 class EntityKtv(object):
     meta_cache = {}
-    def __init__(self, filename, dirname=None, meta=False):
+    def __init__(self, filename, dirname=None, meta=False, is_title=False, config=None):
         self.data = {
             'filename' : {
                 'original' : filename, 
                 'dirname' : dirname, 
                 'is_matched' : False,
                 'match_index' : -1,
+                'name' : '',
+                'original_name': '',
             },
             'meta' : {
                 'find':False,
@@ -46,14 +48,25 @@ class EntityKtv(object):
                 'status':''
             }
         }
-        self.analyze()
+        if is_title == False:
+            self.analyze()
+            self.data['filename']['original_name'] = self.data['filename']['name']
+            if self.data['filename']['name'] != '' and config is not None:
+                rule = config.get('검색어 변경', None)
+                if rule is not None:
+                    self.change_name(rule)
+        else:
+            self.data['filename']['name'] = filename
+            self.data['filename']['is_matched'] = True
+            self.data['filename']['match_index'] = -1
+            self.data['filename']['date'] = ''
+
 
         search_try = False
         if meta and self.data['filename']['is_matched']:
             if self.data['filename']['match_index'] in [3, 4]:
                 from tool_base import ToolHangul
                 info = ToolHangul.language_info(self.data['filename']['name'])
-                logger.warning(f"language : {info}")
                 if info[0] == 0:
                     search_try = True
                     self.find_meta_tmdb()
@@ -62,8 +75,9 @@ class EntityKtv(object):
                 self.find_meta()
 
             if self.data['meta']['find']:
+                self.find_meta_season()
                 try:
-                    logger.warning(f"찾은 메타 : {self.data['meta']['info']['title']} {self.data['meta']['info']['code']}")
+                    #logger.warning(f"찾은 메타 : {self.data['meta']['info']['title']} {self.data['meta']['info']['code']}")
                     if self.data['filename']['date'] == '':
                         self.data['process_info']['status'] = 'no_date'
                     else:
@@ -104,37 +118,44 @@ class EntityKtv(object):
             self.data['filename']['release'] = get(md, 'release')
             self.data['filename']['more'] = get(md, 'more')
             
-            logger.warning(d(self.data['filename']))
+            #logger.warning(d(self.data['filename']))
             break
         
+    
+    def change_name(self, rules):
+        name = self.data['filename']['name']
+        for rule in rules:
+            try:
+                name = re.sub(rule['source'], rule['target'], name, flags=re.I).strip()
+            except Exception as e: 
+                P.logger.error(f"Exception:{e}")
+                P.logger.error(traceback.format_exc())
+        self.data['filename']['name'] = name
+
 
 
     def check_episode_no(self):
-        logger.warning(self.data['filename']['original'])
-        logger.warning(f"방송일 : {self.data['filename']['date']} / 번호 : {self.data['filename']['no']}")
-        #if self.data['meta']['info']['extra_info']['episodes'].keys()
-        #if self.data['filename']['no'] == -1:
-
-
         if self.data['filename']['no'] > 0 and self.data['filename']['no'] in self.data['meta']['info']['extra_info']['episodes']:
-            logger.warning(f"에피소드 정보 있음")
-            logger.warning(self.data['meta']['info']['extra_info']['episodes'][self.data['filename']['no']])
+            #logger.warning(f"에피소드 정보 있음")
+            #logger.warning(self.data['meta']['info']['extra_info']['episodes'][self.data['filename']['no']])
             tmp = self.data['meta']['info']['extra_info']['episodes'][self.data['filename']['no']]
             # daum만 체크
             if 'daum' in tmp:
                 value = tmp['daum']
                 tmp2 = value['premiered']
                 if self.data['filename']['date'] == tmp2.replace('-', '')[2:]:
-                    logger.warning("메타와 방송일, 번호 일치")
                     self.data['process_info']['status'] = 'number_and_date_match'
+                    self.data['process_info']['episode'] = value
+                    self.data['process_info']['episode']['no'] = self.data['filename']['no']
                     return
                 else:
-                    logger.warning("날짜가 맞지 않음.")
                     #하루차이는 매칭시킴
                     if abs(int(self.data['filename']['date']) - int(tmp2.replace('-', '')[2:])) in [1, 70, 71, 72, 73, 8870]:
                         self.data['process_info']['status'] = 'number_and_date_match'
                         self.data['process_info']['rebuild'] += 'change_date'
                         self.data['process_info']['change_date'] = tmp2.replace('-', '')[2:]
+                        self.data['process_info']['episode'] = value
+                        self.data['process_info']['episode']['no'] = self.data['filename']['no']
                         return
 
         # 맞는 에피소드 몾찾음
@@ -144,18 +165,18 @@ class EntityKtv(object):
             return
 
         # 방송일에 맞는 에피 번호 찾기
-        logger.warning(f"에피소드 목록")
+        #logger.warning(f"에피소드 목록")
 
         for epi_no, value in self.data['meta']['info']['extra_info']['episodes'].items():
             if 'daum' in value:
                 site_info = value['daum']
                 tmp2 = site_info['premiered']
                 if self.data['filename']['date'] == tmp2.replace('-', '')[2:]:
-                    logger.warning(f"다음에서 새로운 에피소드 번호 찾음 : {epi_no}")
-                    logger.warning(d(site_info))
                     self.data['process_info']['status'] = 'number_and_date_match'
                     self.data['process_info']['rebuild'] += 'change_epi_number'
                     self.data['process_info']['change_epi_number'] = epi_no
+                    self.data['process_info']['episode'] = value['daum']
+                    self.data['process_info']['episode']['no'] = epi_no
                     return
         
         # 다음에서 몾찾았지만 티빙 웨이브에 있다면 그대로 유지해야함.
@@ -172,23 +193,24 @@ class EntityKtv(object):
                         continue
                     tmp2 = site_info['premiered']
                     if self.data['filename']['date'] == tmp2.replace('-', '')[2:]:
-                        logger.warning(f"다음에서 새로운 에피소드 번호 찾음 : {epi_no}")
-                        logger.warning(d(site_info))
                         self.data['process_info']['status'] = 'number_and_date_match_ott'
                         self.data['process_info']['rebuild'] += 'change_epi_number'
                         self.data['process_info']['change_epi_number'] = epi_no
+                        self.data['process_info']['episode'] = site_info
+                        self.data['process_info']['episode']['no'] = epi_no
+                        
                         return
 
 
-        logger.error("에피소드 목록이 있지만 맞는 메타를 찾지 못함")
-        logger.error(f"에피소드 번호 {epi_no}")
-        logger.error(f"에피소드 번호 {self.data['filename']['original']}")
-        logger.warning(d(self.data['meta']['info']['extra_info']['episodes']))
+        #logger.error("에피소드 목록이 있지만 맞는 메타를 찾지 못함")
+        #logger.error(f"에피소드 번호 {epi_no}")
+        #logger.error(f"에피소드 번호 {self.data['filename']['original']}")
+        #logger.warning(d(self.data['meta']['info']['extra_info']['episodes']))
+        #logger.debug("티빙, 웨이브에서 찾음")
 
-        logger.debug("티빙, 웨이브에서 찾음")
         if self.data['filename']['no'] > 0 and self.data['filename']['no'] in self.data['meta']['info']['extra_info']['episodes']:
-            logger.warning(f"에피소드 정보 있음 22")
-            logger.warning(self.data['meta']['info']['extra_info']['episodes'][self.data['filename']['no']])
+            #logger.warning(f"에피소드 정보 있음 22")
+            #logger.warning(self.data['meta']['info']['extra_info']['episodes'][self.data['filename']['no']])
             tmp = self.data['meta']['info']['extra_info']['episodes'][self.data['filename']['no']]
             # daum만 체크
             for site, value in tmp.items():
@@ -196,30 +218,33 @@ class EntityKtv(object):
                     continue
                 tmp2 = value['premiered']
                 if self.data['filename']['date'] == tmp2.replace('-', '')[2:]:
-                    logger.warning(f"메타와 방송일, 번호 일치 {site}")
                     self.data['process_info']['status'] = 'number_and_date_match'
+                    self.data['process_info']['episode'] = value
+                    self.data['process_info']['episode']['no'] = self.data['filename']['no']
                     return
                 else:
-                    logger.warning("날짜가 맞지 않음.")
                     #하루차이는 매칭시킴
                     if abs(int(self.data['filename']['date']) - int(tmp2.replace('-', '')[2:])) in [1, 70, 71, 72, 73, 8870]:
                         self.data['process_info']['status'] = 'number_and_date_match'
                         self.data['process_info']['rebuild'] += 'change_date'
                         self.data['process_info']['change_date'] = tmp2.replace('-', '')[2:]
+                        self.data['process_info']['episode'] = value
+                        self.data['process_info']['episode']['no'] = self.data['filename']['no']
                         return
 
-        logger.debug("에피소드 목록중 티빙, 웨이브에서 찾음 ")
         for epi_no, value in self.data['meta']['info']['extra_info']['episodes'].items():
             for site, site_info in value.items(): 
                 if site == 'daum':
                     continue
                 tmp2 = site_info['premiered']
                 if self.data['filename']['date'] == tmp2.replace('-', '')[2:]:
-                    logger.warning(f"2222 다음에서 새로운 에피소드 번호 찾음 : {epi_no}")
-                    logger.warning(d(site_info))
+                    #logger.warning(f"2222 다음에서 새로운 에피소드 번호 찾음 : {epi_no}")
+                    #logger.warning(d(site_info))
                     self.data['process_info']['status'] = 'number_and_date_match'
                     self.data['process_info']['rebuild'] += 'change_epi_number'
                     self.data['process_info']['change_epi_number'] = epi_no
+                    self.data['process_info']['episode'] = site_info
+                    self.data['process_info']['episode']['no'] = epi_no
                     return
 
         if epi_no < self.data['filename']['no']:
@@ -244,7 +269,6 @@ class EntityKtv(object):
         
         for site, site_class in module_map:
             try:
-                logger.warning(f"{site} {self.data['filename']['name']}")
                 if self.data['filename']['name'] in EntityKtv.meta_cache and site in EntityKtv.meta_cache[self.data['filename']['name']]:
                     self.data['meta'] = EntityKtv.meta_cache[self.data['filename']['name']][site]
                     # 없는 것도 저장하여 중복검색 방지
@@ -256,12 +280,15 @@ class EntityKtv(object):
                     if site == 'daum':
                         self.data['meta']['search'] = site_data['data']
                         self.data['meta']['info'] = site_class.info(self.data['meta']['search']['code'], self.data['meta']['search']['title'])['data']
-                        if self.data['meta']['info']['genre'][0] != '드라마' and self.data['meta']['info']['genre'][0].find('드라마') != -1 and self.data['filename']['release']in ['ST', 'SW']:
+                        if self.data['meta']['info']['genre'][0] != '드라마' and self.data['meta']['info']['genre'][0].find('드라마') != -1 and self.data['filename'].get('release', '') in ['ST', 'SW']:
                             continue
 
                         SiteTvingTv.apply_tv_by_search(self.data['meta']['info'], force_search_title=self.data['filename']['name'])
                         SiteWavveTv.apply_tv_by_search(self.data['meta']['info'], force_search_title=self.data['filename']['name'])
+                        if self.data['meta']['info']['episode'] == -1:
+                            self.data['meta']['info']['episode'] = len(self.data['meta']['info']['extra_info']['episodes'].keys())
                         self.data['meta']['find'] = True
+                        
                     else:
                         if len(site_data['data']) > 0 and site_data['data'][0]['score'] > 90:
                             self.data['meta']['search'] = site_data['data'][0]
@@ -274,49 +301,36 @@ class EntityKtv(object):
                     if self.data['filename']['name'] not in EntityKtv.meta_cache:
                         EntityKtv.meta_cache[self.data['filename']['name']] = {}
                     EntityKtv.meta_cache[self.data['filename']['name']][site] = self.data['meta']
-                    logger.error('11111111111111111111')
                     return
                 else:
-                    logger.error('222222222222222222')
                     if self.data['filename']['name'] not in EntityKtv.meta_cache:
                         EntityKtv.meta_cache[self.data['filename']['name']] = {}
                     EntityKtv.meta_cache[self.data['filename']['name']][site] = self.data['meta']
             except Exception as exception:
-                logger.debug('Exception:%s', exception)
-                logger.debug(traceback.format_exc())
+                logger.error('Exception:%s', exception)
+                logger.error(traceback.format_exc())
 
 
     def get_newfilename(self):
         if self.data['filename']['match_index'] == 2:
            self.data['process_info']['rebuild'] += f"match_{self.data['filename']['match_index']}"
 
-        logger.error(self.data['process_info']['rebuild'])
         if self.data['process_info']['rebuild'] in ['', 'match_2', 'meta_epi_not_find', 'match_3']:
             return self.data['filename']['original']
 
         elif self.data['process_info']['rebuild'] == 'remove_episode':
-            logger.error(self.data['filename']['original'])
             return re.sub('\.[eE].*?\.', '.', self.data['filename']['original'])
         elif self.data['process_info']['rebuild'] == 'remove_episodechange_epi_number' and self.data['process_info']['change_epi_number'] == 0:
-            logger.error(self.data['filename']['original'])
             return re.sub('\.[eE].*?\.', '.', self.data['filename']['original'])   
         
-        elif self.data['process_info']['rebuild'].startswith('match_'):
-            logger.error(f"match_ {self.data['filename']['original']}")
-            time.sleep(100)
         elif self.data['process_info']['rebuild'] == 'change_epi_number':
-            logger.error('change_epi_number')
             return re.sub('\.[eE].*?\.', f".E{str(self.data['process_info']['change_epi_number']).zfill(2)}.", self.data['filename']['original'])
-            time.sleep(100)
         elif self.data['process_info']['rebuild'] == 'change_epi_numbermatch_2':
             # 날짜만 있는 원본 에피소드 삽입
-            logger.error('change_epi_numbermatch_2')
             return self.data['filename']['original'].replace(f".{self.data['filename']['date']}.", f".E{str(self.data['process_info']['change_epi_number']).zfill(2)}.{self.data['filename']['date']}.")
         elif self.data['process_info']['rebuild'] == 'change_date':
-            logger.error('change_date')
             return self.data['filename']['original'].replace(f".{self.data['filename']['date']}.", f".{self.data['process_info']['change_date']}.")
             time.sleep(100)
-         
         else:
             pass
 
@@ -329,14 +343,13 @@ class EntityKtv(object):
         
         for site, site_class in module_map:
             try:
-                logger.warning(f"{site} {self.data['filename']['name']}")
                 if self.data['filename']['name'] in EntityKtv.meta_cache and site in EntityKtv.meta_cache[self.data['filename']['name']]:
                     self.data['meta'] = EntityKtv.meta_cache[self.data['filename']['name']][site]
                     # 없는 것도 저장하여 중복검색 방지
                     if self.data['meta']['find']:
                         return
                 site_data = site_class.search(self.data['filename']['name'])
-                logger.warning(f"{site} {d(site_data)}")
+                #logger.warning(f"{site} {d(site_data)}")
                 if site_data['ret'] == 'success':
                     if len(site_data['data']) > 0 and site_data['data'][0]['score'] >= 80:
                         self.data['filename']['name'] = site_data['data'][0]['title']
@@ -347,5 +360,16 @@ class EntityKtv(object):
                             self.data['process_info']['ftv_year'] = site_data['data'][0]['year']
                         return
             except Exception as exception:
-                logger.debug('Exception:%s', exception)
-                logger.debug(traceback.format_exc())
+                logger.error('Exception:%s', exception)
+                logger.error(traceback.format_exc())
+
+
+    def find_meta_season(self):
+        if self.data['meta']['info']['code'][1] == 'D':
+            for idx, season in enumerate(self.data['meta']['search']['series']):
+                if self.data['meta']['info']['code'] == season['code']:
+                    self.data['meta']['info']['season'] = idx + 1
+                    return
+        else:
+            self.data['meta']['info']['season'] = -1
+

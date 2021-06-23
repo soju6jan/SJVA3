@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  {{ macros.m_button_group([['global_setting_save_btn', '설정 저장']])}}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_row_end() }}
+  <nav>
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head2('normal', '기본 설정', true) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+  <form id='setting' name='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    {{ macros.m_tab_content_start('normal', true) }}
+      {{ macros.setting_input_text_and_buttons('analysis_path_source', '분석 폴더', [['select_analysis_path_source_btn', '경로 선택']], value=arg['analysis_path_source']) }}
+      
+      {{ macros.setting_input_text_and_buttons('analysis_path_finish', '종영 폴더', [['select_analysis_path_finish_btn', '경로 선택']], value=arg['analysis_path_finish']) }}
+
+      {{ macros.setting_input_text_and_buttons('analysis_path_incomplete', '미완성 폴더', [['select_analysis_path_incomplete_btn', '경로 선택']], value=arg['analysis_path_incomplete']) }}
+
+      {{ macros.setting_checkbox('analysis_remove_empty_folder', '빈 폴더 삭제', value=arg['analysis_remove_empty_folder']) }}
+    {{ macros.m_tab_content_end() }}  
+</div><!--tab-content-->
+</form>
+</div> <!--전체-->
+
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub']}}";
+var current_data = null;
+
+$(document).ready(function(){
+});
+
+$("body").on('click', '#select_analysis_path_source_btn', function(e){
+  e.preventDefault();
+  var path = $('#analysis_path_source').val().trim();
+  if (path == '') path = '/'
+  m_select_local_file_modal("소스 폴더 선택", path, true, function(result){
+    $('#analysis_path_source').val(result);
+  });
+});
+
+$("body").on('click', '#select_analysis_path_finish_btn', function(e){
+  e.preventDefault();
+  var path = $('#analysis_path_finish').val().trim();
+  if (path == '') path = '/'
+  m_select_local_file_modal("종영 폴더 선택", path, true, function(result){
+    $('#analysis_path_finish').val(result);
+  });
+});
+
+$("body").on('click', '#select_analysis_path_incomplete_btn', function(e){
+  e.preventDefault();
+  var path = $('#analysis_path_incomplete').val().trim();
+  if (path == '') path = '/'
+  m_select_local_file_modal("미완성 폴더 선택", path, true, function(result){
+    $('#analysis_path_incomplete').val(result);
+  });
+});
+
+
+</script> 
+
+{% endblock %}

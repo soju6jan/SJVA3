@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+
+{% filter markdown %}
+{{ data }}
+{% endfilter %}
+
+
 <style type="text/css">
 img{
 
@@ -17,37 +23,7 @@ margin-right: auto;
 
 <script type="text/javascript">
 $(document).ready(function(){
-  manual_menu_url = $('#md_div').data('url');
-  $.ajax({
-    url: '/manual/menu',
-    type: "POST", 
-    cache: false,
-    data:{url:manual_menu_url},
-    dataType: "json",
-    success: function (data) {
-      str = `
-        <nav>
-          <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      `
-      for (i in data.menu) {
-        str += m_tab_head(data.menu[i].title, (data.menu[i].active));
-      }
-      str += `
-          </div>
-        </nav>
-      `
-      str += `
-        <div class="tab-content" id="nav-tabContent">
-      `
-      for (i in data.menu) {
-        str += m_tab_content(data.menu[i].title, data.menu[i].content, (data.menu[i].active));
-      }
-      str += `
-        </div>
-      `
-      document.getElementById('content_div').innerHTML = str
-    }
-  });
+  $('#main_container').attr('class', 'container-fluid');  
 });
 </script>    
 {% endblock %}

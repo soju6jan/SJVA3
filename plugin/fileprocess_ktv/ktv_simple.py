@@ -20,11 +20,10 @@ from .plugin import P
 logger = P.logger
 package_name = P.package_name
 ModelSetting = P.ModelSetting
-name = 'basic'
-from .task_for_download import Task
+name = 'simple'
 
 #########################################################
-class LogicKtvBasic(LogicModuleBase):
+class LogicKtvSimple(LogicModuleBase):
     db_default = {
         f'{name}_db_version' : '1',
         f'{name}_interval' : '30',
@@ -32,14 +31,13 @@ class LogicKtvBasic(LogicModuleBase):
         f'{name}_path_source' : '',
         f'{name}_path_target' : '',
         f'{name}_path_error' : '',
-        f'{name}_folder_format' : '{genre}/{title}',
         f'{name}_path_config' : os.path.join(path_data, 'db', f"{package_name}_{name}.yaml"),
         f'{name}_task_stop_flag' : 'False',
         f'{name}_dry_task_stop_flag' : 'False',
     }
 
     def __init__(self, P):
-        super(LogicKtvBasic, self).__init__(P, 'setting', scheduler_desc='국내TV 파일처리 - 기본')
+        super(LogicKtvSimple, self).__init__(P, 'setting', scheduler_desc='국내TV 파일처리 - Simple')
         self.name = name
         self.data = {
             'data' : [],
@@ -96,10 +94,6 @@ class LogicKtvBasic(LogicModuleBase):
         self.data['data'] = []
         self.data['is_working'] = 'run'
         self.refresh_data()
-        config[0]['소스 폴더'] = ModelSetting.get(f"{name}_path_source")
-        config[0]['타겟 폴더'] = ModelSetting.get(f"{name}_path_target")
-        config[0]['에러 폴더'] = ModelSetting.get(f"{name}_path_error")
-        config[0]['타겟 폴더 구조'] = ModelSetting.get(f"{name}_folder_format")
         call_module = name
         if is_dry:
             call_module += '_dry'
@@ -119,13 +113,16 @@ class LogicKtvBasic(LogicModuleBase):
     def plugin_load(self):
         if os.path.exists(ModelSetting.get(f'{name}_path_config')) == False:
             shutil.copyfile(os.path.join(os.path.dirname(__file__), 'file', f'config_{name}.yaml'), ModelSetting.get(f'{name}_path_config'))
+        #Task.start()
+        #load_yaml()
+        pass
+
 
     #########################################################
     def load_basic_config(self):
         with open(ModelSetting.get(f'{name}_path_config')) as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
-
 
     def refresh_data(self, index=-1):
         if index == -1:
@@ -148,3 +145,73 @@ class LogicKtvBasic(LogicModuleBase):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
+
+
+from .task_for_download import Task as DownloadProcessTask
+class Task(object):
+    @staticmethod
+    @celery.task(bind=True)
+    def start(self, config, call_module):
+        logger.warning(f"Simple Task.start")
+
+        is_dry = True if call_module.find('_dry') != -1 else False
+        source = ModelSetting.get(f'{name}_path_source')
+        target = ModelSetting.get(f'{name}_path_target')
+        error = ModelSetting.get(f'{name}_path_error')
+
+        logger.debug(f"소스 : {source}")
+        logger.debug(f"target : {target}")
+        logger.debug(f"error : {error}")
+        for base, dirs, files in os.walk(source):
+            logger.warning("BASE : {base}")
+            for idx, original_filename in enumerate(files):
+                if ModelSetting.get_bool(f"{call_module}_task_stop_flag"):
+                    logger.warning("사용자 중지")
+                    return 'stop'
+                try:
+                    data = {'filename':original_filename, 'foldername':base, 'log':[]}
+                    filename = original_filename
+                    logger.warning(f"{idx} / {len(files)} : {filename}")
+                    filename = DownloadProcessTask.process_pre(config, base, filename, is_dry, data)
+                    data['filename_pre'] = filename
+                    if filename is None:
+                        continue
+                    entity = EntityKtv(filename, dirname=base, meta=False, config=config)
+                    data['entity'] = entity.data
+                    if entity.data['filename']['is_matched']:
+                        data['result_folder']  = os.path.join(target, entity.data['filename']['name'])
+                        data['result_filename'] = entity.data['filename']['original']
+                        if is_dry == False:
+                            ToolBaseFile.file_move(os.path.join(base, original_filename), data['result_folder'], data['result_filename'])
+                    else:
+                        data['result_folder'] = error
+                        data['result_filename'] = original_filename
+                        if is_dry == False:
+                            ToolBaseFile.file_move(os.path.join(base, original_filename), data['result_folder'], data['result_filename'])
+                except Exception as e: 
+                    P.logger.error(f"Exception:{e}")
+                    P.logger.error(traceback.format_exc())
+                finally:
+                    if app.config['config']['use_celery']:
+                        self.update_state(state='PROGRESS', meta=data)
+                    else:
+                        P.logic.get_module(call_module.replace('_dry', '')).receive_from_task(data, celery=False)
+                    
+            if base != source and len(os.listdir(base)) == 0 :
+                try:
+                    if is_dry == False:
+                        os.rmdir(base)
+                except Exception as e: 
+                    P.logger.error(f"Exception:{e}")
+                    P.logger.error(traceback.format_exc())
+        for base, dirs, files in os.walk(source):
+            if base != source and len(dirs) == 0 and len(files) == 0:
+                try:
+                    if is_dry == False:
+                        os.rmdir(base)
+                except Exception as e: 
+                    P.logger.error(f"Exception:{e}")
+                    P.logger.error(traceback.format_exc())
+        
+        logger.error(f"종료")
+        return 'wait'

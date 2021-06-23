@@ -103,6 +103,24 @@ def first_menu(sub):
         return redirect('/%s/%s/crypt' % (package_name, sub))
     elif sub == 'plugin':
         arg = ModelSetting.to_dict()
+        arg['install'] = request.args.get('install', '')
+        if arg['install'] == 'flaskfilemanager':
+            arg['install'] = 'https://github.com/soju6jan/' + arg['install']
+            try:
+                import flaskfilemanager
+                arg['install'] = ''
+            except:
+                pass
+        elif arg['install'] == 'flaskcode':
+            arg['install'] = 'https://github.com/soju6jan/' + arg['install']
+            try:
+                import flaskcode
+                arg['install'] = ''
+            except:
+                pass
+        
+
+        
         return render_template('system_plugin.html', arg=arg)
     elif sub == 'information':
         return render_template('manual.html', sub=sub, arg='system.json')

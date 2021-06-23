@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="{{ url_for('.static', filename='base.js') }}"></script>
+
+{{ macros.m_button_group([['dry_run_start_btn', 'Dry Run 시작'], ['dry_run_stop_btn', '중지']])}}
+{{ macros.m_row_start('0') }}
+{{ macros.m_row_end() }}
+
+{{ macros.m_hr_head_top() }}
+{{ macros.m_row_start('0') }}
+{{ macros.m_col(12,  macros.m_strong('Log')) }}
+{{ macros.m_row_end() }}
+{{ macros.m_hr_head_bottom() }}
+<div id="list_div"></div>
+
+<script type="text/javascript">
+
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub']}}";
+var current_data = null;
+var apikey = "{{arg['apikey']}}";
+
+$(document).ready(function(){
+  socket_init(package_name, sub);
+});
+
+
+function make_one(data) {
+  console.log(data);
+
+  row = m_row_start_hover();
+  row += make_log("경로", data.foldername);
+  row += make_log("파일명", data.filename);
+  if (data.filename_pre == null) {
+    if (data.result_folder == 'REMOVE') {
+      row += make_log('전처리', color("전처리로 삭제"));
+    } else {
+      row += make_log('전처리', color("전처리로 이동"));
+    }
+  } else {
+    if (data.filename != data.filename_pre) {
+      row += make_log("전처리 후 파일명", color(data.filename_pre));
+    }
+  }
+
+  if (data.filename_pre != null) {
+    if (data.entity.filename.is_matched) {
+        tmp = data.entity.filename.original_name;
+      if (data.entity.filename.original_name != data.entity.filename.name) {
+        tmp += ' / 검색용 : ' + color(data.entity.filename.name, 'blue');
+      }
+      tmp += ' / 회차 : ' + data.entity.filename.no;
+      tmp += ' / 날짜 : ' + data.entity.filename.date;
+      tmp += ' / 화질 : ' + data.entity.filename.quality;
+      tmp += ' / 릴 : ' + data.entity.filename.release;
+      tmp += ' / ETC : ' + data.entity.filename.etc;
+      tmp += ' / MORE : ' + data.entity.filename.more;
+      row += make_log('파일명에서 추출한 정보', tmp);
+    } else {
+      row += make_log('파일명', color('TV 파일 형식이 아님'));
+    }
+    row += make_log("최종 경로", data.result_folder);
+    if (data.filename == data.result_filename) {
+      tmp = '<span style="color:blue; font-weight:bold">' + data.result_filename + '</span>' 
+    } else {
+      tmp = '<span style="color:red; font-weight:bold">' + data.result_filename + '</span>';
+    }
+    row += make_log("최종 파일명", tmp);
+  }
+  row += m_row_end();
+  return row
+}
+
+</script> 
+{% endblock %}
