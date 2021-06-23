@@ -46,10 +46,8 @@ def default_route(P):
     @login_required
     def manual(path):
         try:
-            P.logger.warning(path)
             plugin_root = os.path.dirname(P.blueprint.template_folder)
             filepath = os.path.join(plugin_root,  *path.split('/'))
-            P.logger.warning(filepath)
             from tool_base import ToolBaseFile
             data = ToolBaseFile.read(filepath)
             return render_template('manual.html', data=data)
