@@ -233,6 +233,8 @@ class EntityKtv(object):
                         return
 
         for epi_no, value in self.data['meta']['info']['extra_info']['episodes'].items():
+            if epi_no == 0:
+                continue
             for site, site_info in value.items(): 
                 if site == 'daum':
                     continue
