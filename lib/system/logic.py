@@ -98,6 +98,7 @@ class SystemLogic(object):
         'site_daum_auto_start' : 'False',
         'site_daum_cookie' : 'TIARA=gaXEIPluo-wWAFlwZN6l8gN3yzhkoo_piP.Kymhuy.6QBt4Q6.cRtxbKDaWpWajcyteRHzrlTVpJRxLjwLoMvyYLVi_7xJ1L',
         'site_daum_test' : u'나쁜 녀석들',
+        'site_daum_proxy' : '',
 
         'site_wavve_id' : '',
         'site_wavve_pw' : '',
