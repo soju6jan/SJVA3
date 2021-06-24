@@ -153,7 +153,12 @@ function make_one(data) {
   row += make_log("최소 날짜", m_row_start('0') + m_col(1, data.min_date.value) + ' ' + m_col(8, data.min_date.file) + m_row_end());
   row += make_log("최대 에피", m_row_start('0') + m_col(1, data.max_no.value) + ' ' + m_col(8, data.max_no.file) + m_row_end());
   row += make_log("최대 날짜", m_row_start('0') + m_col(1, data.max_date.value) + ' ' + m_col(8, data.max_date.file) + m_row_end());
-  row += make_log("지난 일 수", data.day_delta + '일');
+  if (data.day_delta > 30) {
+    tmp = color(data.day_delta);
+  } else {
+    tmp = data.day_delta;
+  }
+  row += make_log("지난 일 수", tmp + '일');
   row += make_log("에피소드 목록", data.episode_keys.join(', '));
   row += make_log("빠진 에피소드", color(data.episode_keys_empty.join(', ')));
   if (data.target_fodler != '') {
@@ -315,20 +320,6 @@ $("body").on('click', '#insert_season_btn', function(e){
   var index = $(this).data('index');
   global_send_command2('insert_season', index);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 </script> 

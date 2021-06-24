@@ -119,3 +119,17 @@ class ToolRclone(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
+
+
+    @classmethod
+    def copy_server_side(cls, source, target, rclone_path='rclone', config_path=os.path.join(path_data, 'db', 'rclone.conf'), option=None):
+        try:
+            command = [rclone_path, '--config', config_path, 'copy', source, target, '--drive-server-side-across-configs=true', '--drive-stop-on-upload-limit', '-vv']
+            if option is not None:
+                command += option
+            logger.debug(' '.join(command))
+            ret = ToolSubprocess.execute_command_return(command)
+            return ret
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
