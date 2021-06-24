@@ -20,26 +20,11 @@ class TelegramBot(object):
     bot = None
     message_loop = None
 
-    #SUPER_TOKEN = ToolAESCipher.decrypt('inhrfSBer4mneqKmSzf60MUHPSZS5aT4YkZZKzeVftRCHC5awGEIWlu5qVxIYMfphuvW/8MQZNrgD9fehuvmTA==')
-
-    SUPER_TOKEN = ToolAESCipher.decrypt('gyGqcYaMYfKNqutj6uETk2WHdjt3EiltpvCs9aC45upbx/UV1lTfmeH2a9nIDRin/ogO106xDJvpYjhmuDeW3Q==').decode('utf-8')
-    ADMIN_TOKEN = ToolAESCipher.decrypt('AemiErWy5XT2Q08WAH78qpP0B0NHPGSRiwyANuruFaxGTnTavdtN2QP6ZqV0LUV6Sb0TouMZcyHXAqa5HUFr/w==').decode('utf-8')
+    SUPER_TOKEN = ToolAESCipher.decrypt(app.config['DEFINE']['SUPER_BOT_TOKEN']).decode('utf-8')
+    ADMIN_TOKEN = ToolAESCipher.decrypt(app.config['DEFINE']['ADMIN_BOT_TOKEN']).decode('utf-8')
     SUPER_BOT= None
     ADMIN_BOT = None
-
-    #2020-05-27 23번방부터 32번방 삭제
-    #2020-08-31 29, 30, 31번 삭제
-    SJVA_BOT_CHANNEL_CHAT_ID = [       
-        '-1001424350090',
-        '-1001290967798', '-1001428878939', '-1001478260118', '-1001276582768', '-1001287732044', 
-        '-1001185127926', '-1001236433271', '-1001241700529', '-1001231080344', '-1001176084443', 
-        '-1001338380585', '-1001107581425', '-1001374760690', '-1001195790611', '-1001239823262', 
-        '-1001300536937', '-1001417416651', '-1001411726438', '-1001312832402', '-1001473554220',
-        '-1001214198736', '-1001366983815', '-1001336003806', '-1001229313654', '-1001403657137', 
-        #'-1001368328507', '-1001197617982', #'-1001480443355', '-1001479557293', ,  
-        #'-1001322329802', # 31번방 - 중복봇
-        #'-1001256559181', # 32번방 - 대답안하는것들
-        '-1001202840141']
+    SJVA_BOT_CHANNEL_CHAT_ID = app.config['DEFINE']['SJVA_BOT_CHANNEL_CHAT_ID']
 
     @staticmethod
     def start(bot_token):
@@ -55,7 +40,7 @@ class TelegramBot(object):
                 ToolBaseNotify.send_message('텔레그램 메시지 수신을 시작합니다. %s' % (datetime.datetime.now()))
 
                 TelegramBot.SUPER_BOT = Bot(TelegramBot.SUPER_TOKEN)
-                if SystemModelSetting.get('ddns') == 'https://server.sjva.me':
+                if SystemModelSetting.get('ddns') == app.config['DEFINE']['MAIN_SERVER_URL']:
                     logger.warning('ADMIN_TOKEN : %s ', TelegramBot.ADMIN_TOKEN)
                     logger.warning('ADMIN_TOKEN : %s ', TelegramBot.ADMIN_TOKEN)
                     logger.warning('ADMIN_TOKEN : %s ', TelegramBot.ADMIN_TOKEN)

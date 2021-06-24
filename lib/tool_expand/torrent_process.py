@@ -19,8 +19,6 @@ logger = get_logger('torrent_process')
 class TorrentProcess(object):
     @classmethod
     def is_broadcast_member(cls):
-        #if SystemModelSetting.get('ddns') == 'https://server.sjva.me':
-        #    return True
         if app.config['config']['is_server'] or app.config['config']['is_debug']:
             return True
         return False

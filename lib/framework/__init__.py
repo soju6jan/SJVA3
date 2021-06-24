@@ -49,6 +49,7 @@ try:
     logger.debug('Platform : %s', platform.system())
 
     app = Flask('sjva')
+
     #try:
     #    from flask_restful import Api
     #    api = Api(app)

@@ -84,8 +84,8 @@ def config_initialize(action):
     from . import logger, app
 
     if action == 'start':
-        app.config['config']['server_url'] = 'https://server.sjva.me'
-        app.config['config']['rss_subtitle_webhook'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
+        init_define()
+        
 
         app.config['config']['run_by_real'] = True if sys.argv[0] == 'sjva.py' or sys.argv[0] == 'sjva3.py' else False
         #app.config['config']['run_by_migration'] = True if sys.argv[-2] == 'db' else False
@@ -133,7 +133,7 @@ def config_initialize(action):
     
     elif action == 'system_loading_after':
         from . import SystemModelSetting
-        try: app.config['config']['is_server'] = (SystemModelSetting.get('ddns') == app.config['config']['server_url'])
+        try: app.config['config']['is_server'] = (SystemModelSetting.get('ddns') == app.config['DEFINE']['MAIN_SERVER_URL'])
         except: app.config['config']['is_server'] = False
         
         if app.config['config']['is_server'] or app.config['config']['is_debug']:
@@ -151,4 +151,57 @@ def config_initialize(action):
                 app.config['config']['running_type'] = 'windows'
 
 
+def init_define():
+    from . import logger, app
+    app.config['DEFINE'] = {}
+    # 이건 필요 없음
+    app.config['DEFINE']['MAIN_SERVER_URL'] = 'https://server.sjva.me'
 
+
+    app.config['DEFINE']['METADATA_SERVER_URL'] = 'https://meta.sjva.me'
+
+    app.config['DEFINE']['RSS_SUBTITLE_UPLOAD_WEBHOOK'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
+
+    app.config['DEFINE']['WEBHOOK_LIST_FOR_IMAGE_PROXY'] = [
+        'https://discord.com/api/webhooks/810372911872344114/7yLzAhRnBUcsbCB-dIG16tCEEw3Z7QkBSa9eKw7J7o7fQhF8M2o4L-e-WIXOYznxnFNO',
+        'https://discord.com/api/webhooks/810373137225089035/twZOBuMzJlxyiV87e0Ubers8yTeKd7a71mjGiBTMube7WbN5S3PlxlZYVa2ee3XeQjn3',
+        'https://discord.com/api/webhooks/810373216547766282/GFAS8enTYSoc58vqd7j3_ehrCT8odat8J1LuuAzluTtjxlAOLCNBQtsx7mhiMVC7BTqk',
+        'https://discord.com/api/webhooks/810373281127333928/Jpmrq9VUp9pQZLgD3RdDIxN-xP_ZuHUSqoWYUgpYIxeTBpS0HVhdotX9tepYDlMQmnMi',
+        'https://discord.com/api/webhooks/810373348776476683/h_uJLBBlHzD0w_CG0nUajFO-XEh3fvy-vQofQt1_8TMD7zHiR7a28t3jF-xBCP6EVlow',
+        'https://discord.com/api/webhooks/810373405508501534/wovhf-1pqcxW5h9xy7iwkYaf8KMDjHU49cMWuLKtBWjAnj-tzS1_j8RJ7tsMyViDbZCE',
+        'https://discord.com/api/webhooks/796558388326039552/k2VV356S1gKQa9ht-JuAs5Dqw5eVkxgZsLUzFoxmFG5lW6jqKl7zCBbbKVhs3pcLOetm',
+        'https://discord.com/api/webhooks/810373566452858920/Qf2V8BoLOy2kQzlZGHy5HZ1nTj7lK72ol_UFrR3_eHKEOK5fyR_fQ8Yw8YzVh9EQG54o',
+        'https://discord.com/api/webhooks/810373654411739157/SGgdO49OCkTNIlc_BSMSy7IXQwwXVonG3DsVfvBVE6luTCwvgCqEBpEk30WBeMMieCyI',
+        'https://discord.com/api/webhooks/810373722341900288/FwcRJ4YxYjpyHpnRwF5f2an0ltEm8JPqcWeZqQi3Qz4QnhEY-kR2sjF9fo_n6stMGnf_',
+        
+        'https://discord.com/api/webhooks/810374116652744704/93MJfYgZSUF8M40Rnk_UoZEbLv0IbXdQjoZBDRJzHxbxq0YyOo9ngh2p6iJ6BjTkymQL',
+        'https://discord.com/api/webhooks/810374206168104960/Xv4p9xRH5W3Fmb7aqzDG22svg5oAc15jyMU-1iPR9yK7HmO4X9efqWclR48yf_lwX0HO',
+        'https://discord.com/api/webhooks/810374244222500864/4xbuvs5F9tpaIuXOSF41Io7hhE0GvNO-Di__vudmAU3TDyYL-PFmwfS4jVfkbrJzNgap',
+        'https://discord.com/api/webhooks/810374294416654346/T3-TEdKIg7rwMZeDzNr46KPDvO7ZF8pRdJ3lfl39lJw2XEZamAG8uACIXagbNMX_B0YN',
+        'https://discord.com/api/webhooks/810374337403289641/_esFkQXwlPlhxJWtlqDAdLg2Nujo-LjGPEG3mUmjiRZto69NQpkBJ0F2xtSNrCH4VAgb',
+        'https://discord.com/api/webhooks/810374384736534568/mH5-OkBVpi7XqJioaQ8Ma-NiL-bOx7B5nYJpL1gZ03JaJaUaIW4bCHeCt5O_VGLJwAtj',
+        'https://discord.com/api/webhooks/810374428604104724/Z1Tdxz3mb0ytWq5LHWi4rG5CeJnr9KWXy5aO_waeD0NcImQnhRXe7h7ra7UrIDRQ2jOg',
+        'https://discord.com/api/webhooks/810374475773509643/QCPPN4djNzhuOmbS3DlrGBunK0SVR5Py9vMyCiPL-0T2VPgitFZS4YM6GCLfM2fkrn4-',
+        'https://discord.com/api/webhooks/810374527652855819/5ypaKI_r-hYzwmdDlVmgAU6xNgU833L9tFlPnf3nw4ZDaPMSppjt77aYOiFks4KLGQk8',
+        'https://discord.com/api/webhooks/810374587917402162/lHrG7CEysGUM_41DMnrxL2Q8eh1-xPjJXstYE68WWfLQbuUAV3rOfsNB9adncJzinYKi',
+    ]
+    
+    #2020-05-27 23번방부터 32번방 삭제
+    #2020-08-31 29, 30, 31번 삭제
+    app.config['DEFINE']['SJVA_BOT_CHANNEL_CHAT_ID'] = [       
+        '-1001424350090',
+        '-1001290967798', '-1001428878939', '-1001478260118', '-1001276582768', '-1001287732044', 
+        '-1001185127926', '-1001236433271', '-1001241700529', '-1001231080344', '-1001176084443', 
+        '-1001338380585', '-1001107581425', '-1001374760690', '-1001195790611', '-1001239823262', 
+        '-1001300536937', '-1001417416651', '-1001411726438', '-1001312832402', '-1001473554220',
+        '-1001214198736', '-1001366983815', '-1001336003806', '-1001229313654', '-1001403657137', 
+        #'-1001368328507', '-1001197617982', #'-1001480443355', '-1001479557293', ,  
+        #'-1001322329802', # 31번방 - 중복봇
+        #'-1001256559181', # 32번방 - 대답안하는것들
+        '-1001202840141']
+
+    # 방송하는 봇
+    app.config['DEFINE']['SUPER_BOT_TOKEN'] = 'gyGqcYaMYfKNqutj6uETk2WHdjt3EiltpvCs9aC45upbx/UV1lTfmeH2a9nIDRin/ogO106xDJvpYjhmuDeW3Q=='
+
+    # 참석방 찾아주는 봇
+    app.config['DEFINE']['ADMIN_BOT_TOKEN'] = 'AemiErWy5XT2Q08WAH78qpP0B0NHPGSRiwyANuruFaxGTnTavdtN2QP6ZqV0LUV6Sb0TouMZcyHXAqa5HUFr/w=='
