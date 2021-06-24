@@ -117,6 +117,18 @@ class EntityKtv(object):
             self.data['filename']['quality'] = get(md, 'quality')
             self.data['filename']['release'] = get(md, 'release')
             self.data['filename']['more'] = get(md, 'more')
+            if self.data['filename']['date'] != '':
+                today = datetime.now()
+                try:
+                    tmp = str(self.data['filename']['date'])
+                    if tmp[0] in ['8', '9']:
+                        tmp = '19' + tmp
+                    else:
+                        tmp = '20' + tmp
+                    max_date = datetime.strptime(tmp, '%Y%m%d')
+                except:
+                    max_date = today
+                self.data['filename']['day_delta'] = (today - max_date).days
             
             #logger.warning(d(self.data['filename']))
             break
