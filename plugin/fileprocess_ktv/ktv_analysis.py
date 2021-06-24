@@ -314,28 +314,6 @@ class LogicKtvAnalysis(LogicModuleBase):
         return ret
 
   
-    def folder_remove(self, index):
-        folder = self.data['data'][index]['folder_path']
-        def func():
-            time.sleep(1)
-            ret = ToolBaseFile.rmtree(folder)
-            self.data['data'][index] = new_data
-            self.refresh_data(index=index)
-
-        if os.path.exists(folder) == False:
-            ret = {'ret':'danger', 'msg':'폴더가 없습니다.'}
-        else:
-            th = threading.Thread(target=func, args=())
-            th.setDaemon(True)
-            th.start()
-            ret = {'ret':'success', 'msg':'폴더를 삭제합니다.'}
-        return ret
-
-
-
-
-
-
 
 
 
