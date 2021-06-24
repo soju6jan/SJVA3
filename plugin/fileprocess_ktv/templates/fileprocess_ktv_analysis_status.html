@@ -125,7 +125,8 @@ function make_one(data) {
   } else {
     tmp2 = ' / ' + color('시즌 : ' + data.entity.meta.info.season, 'blue');
   }
-  row += make_log("메타 제목", data.entity.meta.info.title + ' (' + tmp + ') / 메타 에피소드 수 : ' + data.entity.meta.info.episode + '개 / Code : ' + data.entity.meta.info.code + tmp2);
+  console.log(data.entity.meta.info)
+  row += make_log("메타 제목", '<a href="'+data.entity.meta.info.home+'" target="_blank">' + data.entity.meta.info.title + '</a>' + ' (' + tmp + ') / 메타 에피소드 수 : ' + data.entity.meta.info.episode + '개 / Code : ' + data.entity.meta.info.code + tmp2);
   row += make_log("폴더내", '파일 : ' + Object.keys(data.files).length + '개 / 폴더 : ' + Object.keys(data.folders).length + '개');
   
   tmp = '<table id="result_table" class="table table-sm  tableRowHover "  ><thead class="thead-dark"><tr><th style="width:70%">파일명</th><th style="width:5%; text-align:center;">No</th><th style="width:10%; text-align:center;">크기</th><th style="width:15%; text-align:center;">Time</th></tr></thead><tbody id="list">';
