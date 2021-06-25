@@ -297,6 +297,7 @@ class EntityKtv(object):
                     if site == 'daum':
                         self.data['meta']['search'] = site_data['data']
                         self.data['meta']['info'] = site_class.info(self.data['meta']['search']['code'], self.data['meta']['search']['title'])['data']
+                        # Daum이 미국드라마, 일본드라마 등의 외국 드라마 장르이면서 ST SW 릴이면 Daum보다는 OTT 메타를 사용하도록 함
                         if self.data['meta']['info']['genre'][0] != '드라마' and self.data['meta']['info']['genre'][0].find('드라마') != -1 and self.data['filename'].get('release', '') in ['ST', 'SW']:
                             continue
 
