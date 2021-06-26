@@ -141,13 +141,8 @@ class MovieSearch(object):
     @staticmethod
     def get_movie_info_from_home(url):
         try:
-            from framework.common.daum import headers, session
-            from system.logic_site import SystemLogicSite
-            res = session.get(url, headers=headers, cookies=SystemLogicSite.get_daum_cookies())
-            data = res.text
-
-            #html = lxml.html.document_fromstring(requests.get(url).text)
-            html = lxml.html.document_fromstring(data)
+            from lib_metadata import SiteUtil
+            html = SiteUtil.get_tree_daum(url)
             movie = None
             try:
                 movie = html.get_element_by_id('movieEColl')
@@ -220,10 +215,8 @@ class MovieSearch(object):
             #movie_list = []
             url = 'https://suggest-bar.daum.net/suggest?id=movie&cate=movie&multiple=1&mod=json&code=utf_in_out&q=%s' % (py_urllib.quote(movie_name.encode('utf8')))
 
-            from framework.common.daum import headers, session
-            from system.logic_site import SystemLogicSite
-            res = session.get(url, headers=headers, cookies=SystemLogicSite.get_daum_cookies())
-            data = res.json()
+            from lib_metadata import SiteUtil
+            data = SiteUtil.get_response_daum(url).json()
 
             #data = requests.get(url).json()
             

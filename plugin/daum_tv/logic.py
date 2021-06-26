@@ -114,12 +114,8 @@ class Logic(object):
     @staticmethod
     def get_lxml_by_url(url):
         try:
-            from framework.common.daum import headers, session
-            from system.logic_site import SystemLogicSite
-            res = session.get(url, headers=headers, cookies=SystemLogicSite.get_daum_cookies())
-            data = res.text
-            root = lxml.html.fromstring(data)
-            return root
+            from lib_metadata import SiteUtil
+            return SiteUtil.get_tree_daum(url)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -256,11 +252,11 @@ class Logic(object):
             else:
                 url = 'https://search.daum.net/search?w=tv&q=%s' % (py_urllib.quote(search_name.encode('utf8')))
 
-            from framework.common.daum import headers, session
-            from system.logic_site import SystemLogicSite
-            res = session.get(url, headers=headers, cookies=SystemLogicSite.get_daum_cookies())
-            data = res.text
+            from lib_metadata import SiteUtil
+            data = SiteUtil.get_text_daum(url)
 
+            #logger.debug(data)
+            logger.error(url)
 
             match = re.compile(r'irk\=(?P<id>\d+)').search(data)
             root = lxml.html.fromstring(data)
@@ -271,6 +267,7 @@ class Logic(object):
                     return entity
 
             items = root.xpath('//*[@id="tv_program"]/div[1]/div[2]/strong')
+            logger.error(items)
             if not items: 
                 return None
             if len(items) == 1:

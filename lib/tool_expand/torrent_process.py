@@ -19,6 +19,8 @@ logger = get_logger('torrent_process')
 class TorrentProcess(object):
     @classmethod
     def is_broadcast_member(cls):
+        #if SystemModelSetting.get('ddns') == 'https://server.sjva.me':
+        #    return True
         if app.config['config']['is_server'] or app.config['config']['is_debug']:
             return True
         return False
@@ -423,3 +425,11 @@ class TorrentProcess(object):
         except Exception as exception: 
             logger.error('Exxception:%s', exception)
             logger.error(traceback.format_exc())            
+
+
+"""
+import ktv
+entity = ktv.EntityShow('결혼작사 이혼작곡 시즌2 E05.210626.1080p.WEB-DL.x264.AAC-Deresisi.mp4', by='only_filename')
+logger.error(entity)
+logger.error(entity.daum_info)
+"""

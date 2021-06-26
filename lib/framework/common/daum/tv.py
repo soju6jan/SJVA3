@@ -83,9 +83,8 @@ class DaumTV:
     def get_html(url):
         try:
             from framework.common.daum import headers, session
-            from system.logic_site import SystemLogicSite
-            res = session.get(url, headers=headers, cookies=SystemLogicSite.get_daum_cookies())
-            data = res.text
+            from lib_metadata import SiteUtil
+            data = SiteUtil.get_text_daum(url)
             return data
 
         except Exception as exception: 
@@ -405,12 +404,8 @@ class DaumTV:
     @staticmethod
     def get_lxml_by_url(url):
         try:
-            from framework.common.daum import headers, session
-            from system.logic_site import SystemLogicSite
-            res = session.get(url, headers=headers, cookies=SystemLogicSite.get_daum_cookies())
-            data = res.text
-            root = lxml.html.fromstring(data)
-            return root
+            from lib_metadata import SiteUtil
+            return SiteUtil.get_tree_daum(url)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
