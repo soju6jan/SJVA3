@@ -70,7 +70,7 @@ class Status(enum.Enum):
 
 class Logic(object):
     db_default = { 
-        'temp_path' : os.path.join(path_data, 'download_tmp'),
+        'temp_path' : os.path.join(path_data, 'tmp'),
         'save_path' : os.path.join(path_data, 'download'),
         'max_pf_count' : '0',
         'if_fail_remove_tmp_file' : 'True', 

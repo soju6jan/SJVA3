@@ -47,7 +47,7 @@ def make_default_dir(path_data):
                 shutil.rmtree(tmp)
         except:
             pass
-        sub = ['db', 'log', 'download', 'bin', 'download_tmp', 'command', 'custom', 'output', 'upload', 'tmp']
+        sub = ['db', 'log', 'download', 'command', 'custom', 'output', 'tmp']
         for item in sub:
             tmp = os.path.join(path_data, item)
             if not os.path.exists(tmp):
