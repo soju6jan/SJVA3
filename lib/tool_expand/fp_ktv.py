@@ -15,7 +15,7 @@ from . import logger
 EXTENSION = 'mp4|avi|mkv|ts|wmv|m2ts|smi|srt|ass|m4v|flv|asf|mpg|ogm'
 
 REGEXS = [
-    r'^(?P<name>.*?)\.([sS](?P<sno>\d+))?[eE](?P<no>\d+)(\-E\d{1,4})?\.?(END\.)?(?P<date>\d{6})\.(?P<etc>.*?)(?P<quality>\d+)[p|P](\-?(?P<release>.*?))?(\.(.*?))?$',
+    r'^(?P<name>.*?)\.([sS](?P<sno>\d+))?[eE](?P<no>\d+)(\-E\d{1,4})?\.?(?P<a>.*?\.)?(?P<date>\d{6})\.(?P<etc>.*?)((?P<quality>\d+)[p|P])?(\-?(?P<release>.*?))?(\.(.*?))?$',
     r'^(?P<name>.*?)\s([sS](?P<sno>\d+))?[eE](?P<no>\d+)(\-E\d{1,4})?\.?(END\.)?(?P<date>\d{6})\.(?P<etc>.*?)(?P<quality>\d+)[p|P](?P<more>\..*?)(?P<ext>\.[\w|\d]{3})$',
     r'^(?P<name>.*?)\.([sS](?P<sno>\d+))?(E(?P<no>\d+)\.?)?(END\.)?(?P<date>\d{6})\.(?P<etc>.*?)(?P<quality>\d+)[p|P](\-?(?P<release>.*?))?(\.(.*?))?$',
     r'^(?P<name>.*?)([sS](?P<sno>\d+))?[eE](?P<no>\d+)', # 외국 릴
