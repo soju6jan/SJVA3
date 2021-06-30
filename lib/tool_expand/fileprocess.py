@@ -46,7 +46,7 @@ class ToolExpandFileProcess(object):
             if target is None: 
                 target = path
             if except_ext is None:
-                except_ext = ['.smi', '.srt', 'ass']
+                except_ext = ['.smi', '.srt', '.ass', '.sup']
             lists = os.listdir(path)
             for f in lists:
                 try:
@@ -100,7 +100,7 @@ class ToolExpandFileProcess(object):
         tmp = os.path.splitext(filename)
         if tmp[-1].lower() in ['.smi', '.ass', '.srt']:
             return filename.lower()
-            
+
         match = re.compile('\d{2}id', re.I).search(filename.lower())
         id_before = None
         if match:
