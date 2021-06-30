@@ -190,6 +190,7 @@ function make_one(data) {
   buttons += m_button('insert_season_btn', '일괄 시즌번호 삽입', [{'key':'index', 'value':data.index}]);
   buttons += m_button('folder_remove_btn', '폴더 삭제', [{'key':'index', 'value':data.index}]);
   buttons += m_button('series_btn', '시리즈 정보', [{'key':'index', 'value':data.index}]);
+  //buttons += m_button('all_rename_btn', '일괄 방송명 변경', [{'key':'index', 'value':data.index}]);
   buttons += m_button('json_btn', 'JSON', [{'key':'index', 'value':data.index}]);
   row += make_log("", m_button_group(buttons));
 
@@ -265,12 +266,7 @@ function cm_delete(index, filename) {
 }
 
 
-
-
-
-
 // 방송단위
-
 $("body").on('click', '#series_btn', function(e){
   e.preventDefault();
   m_modal(current_data.data[parseInt($(this).data('index'))].entity.meta.search.series, '시리즈 정보');

@@ -506,3 +506,24 @@ class Task(object):
 
 
 
+
+
+
+"""
+p = '/host/mnt/ktv1/정리/정리중/예능/0-Z/1박 2일 (2007) [KBS2]/2/예능/1박 2일 시즌3'
+dirs = os.listdir(p)
+for tmp in dirs:
+    print(tmp)
+    try:
+        os.rename(os.path.join(p, tmp), os.path.join(p, tmp.replace('해피선데이 - 1박2일', '해피선데이-1박 2일 시즌3')))
+    except Exception as exception: 
+        logger.error('Exception:%s', exception)
+        logger.error(traceback.format_exc())
+
+print('11111111111')
+print('11111111111')
+print('11111111111')
+print('11111111111')
+print('11111111111')
+print('11111111111')
+"""

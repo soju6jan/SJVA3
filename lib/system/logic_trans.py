@@ -190,12 +190,15 @@ class SystemLogicTrans(object):
     def trans_google_web(text, source='ja', target='ko'):
         if app.config['config']['is_py2']:
             return u'Python >=3.6'
+        """
         try:
             from google_trans_new import google_translator
         except:
             try: os.system("{} install google_trans_new".format(app.config['config']['pip']))
             except: pass
             from google_trans_new import google_translator
+        """
+        from google_trans_new_embed import google_translator
         try:
             translator = google_translator()  
             translate_text = translator.translate(text, lang_src=source, lang_tgt=target)
