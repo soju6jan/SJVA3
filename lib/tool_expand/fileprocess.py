@@ -98,7 +98,7 @@ class ToolExpandFileProcess(object):
         #24id
         # 2021-06-30
         tmp = os.path.splitext(filename)
-        if tmp[-1].lower() in ['.smi', '.ass', '.srt']:
+        if tmp[-1].lower() in ['.smi', '.ass', '.srt', '.sup']:
             return filename.lower()
 
         match = re.compile('\d{2}id', re.I).search(filename.lower())
