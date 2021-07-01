@@ -114,6 +114,21 @@ def plugin_init():
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())
                 logger.debug('no blueprint')
+        
+        # 2021-07-01 모듈에 있는 DB 테이블 생성이 안되는 문제
+        # 기존 구조 : db.create_all() => 모듈 plugin_load => celery task 등록 후 리턴
+        # 변경 구조 : 모듈 plugin_load => db.create_all() => celery인 경우 리턴
+
+        # plugin_load 를 해야 하위 로직에 있는 DB가 로딩된다.
+        # plugin_load 에 db는 사용하는 코드가 있으면 안된다. (테이블도 없을 때 에러발생)
+        try:
+            logger.warning('module plugin_load in celery ')
+            plugin_instance_list['mod'].plugin_load()
+        except Exception as exception:
+            logger.error('module plugin_load error')
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+
         # import가 끝나면 DB를 만든다.
         # 플러그인 로드시 DB 초기화를 할 수 있다.
         if not app.config['config']['run_by_worker']:
@@ -123,20 +138,26 @@ def plugin_init():
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())
                 logger.debug('db.create_all error')
+
         if not app.config['config']['run_by_real']:
             # 2021-06-03 
             # 모듈의 로직에 있는 celery 함수는 등록해주어야한다.
-            try:
-                logger.warning('module plugin_load in celery ')
-                plugin_instance_list['mod'].plugin_load()
-            except Exception as exception:
-                logger.error('module plugin_load error')
-                logger.error('Exception:%s', exception)
-                logger.error(traceback.format_exc())
+            #try:
+            #    logger.warning('module plugin_load in celery ')
+            #    plugin_instance_list['mod'].plugin_load()
+            #except Exception as exception:
+            #    logger.error('module plugin_load error')
+            #    logger.error('Exception:%s', exception)
+            #    logger.error(traceback.format_exc())
+            # 2021-07-01
+            # db때문에 위에서 로딩함.
             return
         
         for key, mod in plugin_instance_list.items():
             try:
+                # mod는 위에서 로딩
+                if key == 'mod':
+                    continue
                 mod_plugin_load = getattr(mod, 'plugin_load')
                 if mod_plugin_load and (key in pass_include or is_include_menu(key)):
                     def func(mod, key):
