@@ -155,9 +155,6 @@ def plugin_init():
         
         for key, mod in plugin_instance_list.items():
             try:
-                # mod는 위에서 로딩
-                if key == 'mod':
-                    continue
                 mod_plugin_load = getattr(mod, 'plugin_load')
                 if mod_plugin_load and (key in pass_include or is_include_menu(key)):
                     def func(mod, key):
@@ -169,9 +166,11 @@ def plugin_init():
                             logger.error('### plugin_load exception : %s', key)
                             logger.error('Exception:%s', exception)
                             logger.error(traceback.format_exc())
-                    t = threading.Thread(target=func, args=(mod, key))
-                    t.setDaemon(True)
-                    t.start()
+                    # mod는 위에서 로딩
+                    if key != 'mod':
+                        t = threading.Thread(target=func, args=(mod, key))
+                        t.setDaemon(True)
+                        t.start()
                     #if key == 'mod':
                     #    t.join()
             except Exception as exception:
