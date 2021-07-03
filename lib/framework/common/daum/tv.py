@@ -173,7 +173,7 @@ class DaumTV:
 
             items = root.xpath('//*[@id="tv_program"]/div[1]/div[1]/a/img')
             if len(items) == 1:
-                entity['poster_url'] = 'https:%s' % items[0].attrib['src']
+                entity['poster_url'] = items[0].attrib['src'] if items[0].attrib['src'].startswith('http') else f"https:{items[0].attrib['src']}"
 
             items = root.xpath('//*[@id="clipDateList"]/li')
             entity['episode_list'] = {}
