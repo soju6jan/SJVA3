@@ -12,7 +12,7 @@ from framework.logger import get_logger
 from framework.util import Util
 logger = get_logger('tving_api')
 
-from .base import get_proxies, session
+from .base import get_proxies
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36',
