@@ -121,8 +121,10 @@ def get_episode_json_default(episode_code, quality):
         logger.debug('last decrypted_url : %s', decrypted_url)
         return data, decrypted_url
     except Exception as exception:
+        logger.error(r.text)
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
+
 
 
 
