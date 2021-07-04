@@ -12,7 +12,7 @@ from framework.logger import get_logger
 from framework.util import Util
 logger = get_logger('tving_api')
 
-session = requests.session()
+#session = requests.session()
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
@@ -52,7 +52,7 @@ def do_login(user_id, user_pw, login_type):
             'password' : user_pw,
             'loginType' : login_type_value
         }
-        res = session.post(url, data=params)
+        res = requests.post(url, data=params)
         cookie = res.headers['Set-Cookie']
         #logger.debug(res.text)
         #logger.debug(cookie)
@@ -93,9 +93,10 @@ def get_episode_json_default(episode_code, quality):
             url = 'http://api.tving.com/v2/media/stream/info?info=y%s&noCache=%s&mediaCode=%s&streamCode=%s&callingFrom=FLASH' % (config['default_param'], ts, episode_code, quality)
         
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
-        r = session.get(url, headers=headers, proxies=get_proxies())
-        data = r.json()
+        r = requests.get(url, headers=headers, proxies=get_proxies())
         logger.debug(url)
+        data = r.json()
+        
         #logger.debug(json.dumps(data, indent=4))
         logger.debug('json message : %s', data['body']['result']['message'])
         url = data['body']['stream']['broadcast']['broad_url']
@@ -108,7 +109,7 @@ def get_episode_json_default(episode_code, quality):
         #2020-06-12
         if decrypted_url.find('smil/playlist.m3u8') != -1 and decrypted_url.find('content_type=VOD') != -1 :
             tmps = decrypted_url.split('playlist.m3u8')
-            r = session.get(decrypted_url, headers=headers, proxies=get_proxies())
+            r = requests.get(decrypted_url, headers=headers, proxies=get_proxies())
             lines = r.text.split('\n')
             logger.debug(lines)
             i = -1
@@ -135,7 +136,7 @@ def get_episode_json_default_live(episode_code, quality, inc_quality=True):
             url = 'http://api.tving.com/v2/media/stream/info?info=y%s&noCache=%s&mediaCode=%s&callingFrom=FLASH' % (config['default_param'], ts, episode_code)
 
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
-        r = session.get(url, headers=headers, proxies=get_proxies())
+        r = requests.get(url, headers=headers, proxies=get_proxies())
         data = r.json()
 
         #logger.debug(url)
@@ -330,7 +331,7 @@ def get_movie_json(code):
 
         url += '&deviceId=%s' % SystemModelSetting.get('site_tving_deviceid')
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
-        r = session.get(url, headers=headers, proxies=get_proxies())
+        r = requests.get(url, headers=headers, proxies=get_proxies())
         data = r.json()
         
         #logger.debug(data)
@@ -358,7 +359,7 @@ def get_movie_json(code):
 
 def get_prefer_url(url):
     try:
-        response = session.get(url, headers=config['headers'])
+        response = requests.get(url, headers=config['headers'])
         data = response.text.strip()
         last_url = None
         for t in reversed(data.split('\n')):
@@ -474,7 +475,7 @@ def get_movie_json2(code, quality='stream50'):
         url = 'http://api.tving.com/v1/media/stream/info?info=y%s&noCache=%s&mediaCode=%s&streamCode=%s&callingFrom=FLASH' % (config['default_param'], ts, code, quality)
         url += '&deviceId=%s' % SystemModelSetting.get('site_tving_deviceid')
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
-        r = session.get(url, headers=headers, proxies=get_proxies())
+        r = requests.get(url, headers=headers, proxies=get_proxies())
         data = r.json()
         
         logger.debug(url)
@@ -518,7 +519,7 @@ def get_device_id(token):
         url = "http://api.tving.com/v1/user/device/list?"
         url += config['default_param'][1:]
         headers['Cookie'] = token
-        r = session.get(url, headers=headers)
+        r = requests.get(url, headers=headers)
         data = r.json()
         if data['header']['message'] != 'OK':
             return
@@ -534,7 +535,7 @@ def get_device_list(token):
         url = "http://api.tving.com/v1/user/device/list?"
         url += config['default_param'][1:]
         headers['Cookie'] = token
-        r = session.get(url, headers=headers)
+        r = requests.get(url, headers=headers)
         data = r.json()
         return data
     except Exception as exception:
