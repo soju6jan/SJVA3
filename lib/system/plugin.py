@@ -555,5 +555,5 @@ def videojs():
     data['play_title'] = request.form['play_title']
     data['play_source_src'] = request.form['play_source_src']
     data['play_source_type'] = request.form['play_source_type']
-    logger.warning(data)
+    #logger.warning(data)
     return render_template('videojs.html', data=data)
