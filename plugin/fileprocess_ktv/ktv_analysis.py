@@ -398,6 +398,8 @@ class Task(object):
                 else:
                     #data['files'][f] = {}
                     tmp_entity = EntityKtv(f)
+                    if tmp_entity.data['filename']['is_matched'] == False:
+                        continue
                     if tmp_entity.data['filename']['no'] not in data['episode_keys']:
                         data['episode_keys'].append(tmp_entity.data['filename']['no'])
                     #logger.warning(d(tmp.data))
