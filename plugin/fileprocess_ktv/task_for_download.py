@@ -184,7 +184,7 @@ class Task(object):
                 genre=genre,
                 release=entity.data['filename']['release'],
             )
-            tmps = program_folder.replace('()', '').replace('[]', '').strip()
+            tmps = program_folder.replace('(1900)', '').replace('()', '').replace('[]', '').strip()
             tmps = re.sub("\s{2,}", ' ', tmps) 
             tmps = re.sub("/{2,}", '/', tmps) 
             tmps = tmps.split('/')
