@@ -50,7 +50,7 @@ class EntityKtv(object):
             }
         }
         if is_title == False:
-            self.analyze()
+            self.analyze(config=config)
             self.data['filename']['original_name'] = self.data['filename']['name']
             if self.data['filename']['name'] != '' and config is not None:
                 rule = config.get('검색어 변경', None)
@@ -88,7 +88,7 @@ class EntityKtv(object):
                     logger.debug(traceback.format_exc())
 
 
-    def analyze(self):
+    def analyze(self, config=None):
         def get(md, field):
             if field in md and md[field] is not None:
                 return md[field]
@@ -135,7 +135,12 @@ class EntityKtv(object):
             
             #logger.warning(d(self.data['filename']))
             break
-        
+
+        if self.data['filename']['no'] == -1 and config is not None:
+            rule = config.get('에피소드 번호 삭제 목록', [])
+            if self.data['filename']['name'] in rule:
+                self.data['process_info']['rebuild'] += 'remove_episode_by_rule'
+                self.data['filename']['no'] = -1
     
     def change_name(self, rules):
         name = self.data['filename']['name']
@@ -336,7 +341,7 @@ class EntityKtv(object):
         if self.data['process_info']['rebuild'] in ['', 'match_2', 'meta_epi_not_find', 'match_3']:
             return self.data['filename']['original']
 
-        elif self.data['process_info']['rebuild'] == 'remove_episode':
+        elif self.data['process_info']['rebuild'] == 'remove_episode' or self.data['process_info']['rebuild'].find('remove_episode_by_rule') != -1:
             return re.sub('\.[eE].*?\.', '.', self.data['filename']['original'])
         elif self.data['process_info']['rebuild'] == 'remove_episodechange_epi_number' and self.data['process_info']['change_epi_number'] == 0:
             return re.sub('\.[eE].*?\.', '.', self.data['filename']['original'])   
