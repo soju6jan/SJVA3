@@ -136,11 +136,12 @@ class EntityKtv(object):
             #logger.warning(d(self.data['filename']))
             break
 
-        if self.data['filename']['no'] == -1 and config is not None:
+        if config is not None:
             rule = config.get('에피소드 번호 삭제 목록', [])
             if self.data['filename']['name'] in rule:
                 self.data['process_info']['rebuild'] += 'remove_episode_by_rule'
                 self.data['filename']['no'] = -1
+                
     
     def change_name(self, rules):
         name = self.data['filename']['name']
