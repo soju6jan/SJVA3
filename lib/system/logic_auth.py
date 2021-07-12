@@ -162,7 +162,12 @@ class SystemLogicAuth(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-            ModelSetting.set('auth_status', SystemLogicAuth.make_auth_status(0, 0))
+            ret['msg'] = '인증 실패'
+            ret['level'] = -1
+            ret['point'] = -1
+            ModelSetting.set('auth_status', SystemLogicAuth.make_auth_status(ret['level'], ret['point']))
+            
+            return ret
 
 
 
