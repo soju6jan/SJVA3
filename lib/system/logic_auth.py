@@ -145,8 +145,7 @@ class SystemLogicAuth(object):
             if user_id == '':
                 ret['msg'] = '홈페이지 ID가 없습니다.'
                 return ret
-
-            
+   
             data = requests.post('https://sjva.me/sjva/auth.php', data={'apikey':apikey,'user_id':user_id, 'sjva_id':ModelSetting.get('sjva_id')}).json()
             if data['result'] == 'success':
                 ret['ret'] = True
@@ -163,6 +162,7 @@ class SystemLogicAuth(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
+            ModelSetting.set('auth_status', SystemLogicAuth.make_auth_status(0, 0))
 
 
 
