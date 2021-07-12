@@ -123,7 +123,7 @@ def config_initialize(action):
         logger.debug('======================================')
     elif action == 'auth':
         from system.logic_auth import SystemLogicAuth
-        #SystemLogicAuth.do_auth()
+        SystemLogicAuth.do_auth()
         tmp = SystemLogicAuth.get_auth_status()
         app.config['config']['auth_status'] = tmp['ret']
         app.config['config']['auth_desc'] = tmp['desc']
