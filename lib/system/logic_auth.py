@@ -62,6 +62,8 @@ class SystemLogicAuth(object):
                 ret['desc'] = '미인증 - 너무 많은 SJVA를 사용중입니다.'
             elif value == 'wrong_apikey':
                 ret['desc'] = '미인증 - 홈페이지에 등록된 APIKEY와 다릅니다.'
+            elif value == 'auth_status':
+                ret['desc'] = '인증 실패'
             else:
                 status = SystemLogicAuth.check_auth_status(value)
                 if status is not None and status['ret']:
@@ -165,7 +167,7 @@ class SystemLogicAuth(object):
             ret['msg'] = '인증 실패'
             ret['level'] = -1
             ret['point'] = -1
-            ModelSetting.set('auth_status', SystemLogicAuth.make_auth_status(ret['level'], ret['point']))
+            ModelSetting.set('auth_status', 'auth_fail')
             
             return ret
 
