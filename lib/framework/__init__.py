@@ -60,6 +60,7 @@ try:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/db/sjva.db?check_same_thread=False'
     app.config['SQLALCHEMY_BINDS'] = {'sjva':'sqlite:///data/db/sjva.db'}
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['config'] = {}
     
     config_initialize('start')
