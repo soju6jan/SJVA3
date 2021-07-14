@@ -103,5 +103,6 @@ def jinja_initialize(app):
     app.jinja_env.filters['get_plugin_menu'] = get_plugin_menu
     app.jinja_env.filters['show_menu'] = show_menu
     app.jinja_env.filters['is_https'] = is_https
+    app.jinja_env.auto_reload = True
 
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
