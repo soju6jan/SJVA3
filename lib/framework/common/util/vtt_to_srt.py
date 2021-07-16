@@ -41,3 +41,10 @@ def _step1(fileContents):
     replacement = re.sub(r'::[\-\w]+\([\-.\w\d]+\)[ ]*{[.,:;\(\) \-\w\d]+\n }\n', '', replacement)
     replacement = re.sub(r'Style:\n##\n', '', replacement)
     return replacement
+
+def convert_srt_to_vtt(fileContents):
+    vtt_data = 'WEBVTT\n\n'
+    for line in fileContents.splitlines():
+        convline = re.sub(',(?! )', '.', line)
+        vtt_data = vtt_data + convline + '\n'
+    return vtt_data
