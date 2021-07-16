@@ -11,6 +11,55 @@
 </body>
 
 <script>
-var player = videojs('player');
+var subtitle_src = "{{data['play_subtitle_src']}}";
+let options = {
+    html5: {
+      nativeTextTracks: false
+    },
+    playbackRates: [.5, .75, 1, 1.5, 2],
+    controls: true,
+    preload: "auto",
+    controlBar: {
+        playToggle: false,
+        pictureInPictureToggle: false,
+        remainingTimeDisplay: true,
+        qualitySelector: true,
+    }
+};
+let player = videojs('player', options);
+
+player.ready(function(){
+  // set subtitle track
+  console.log(subtitle_src);
+  if (subtitle_src != "") {
+    var suburl = subtitle_src.replace(/&amp;/g, '&');
+    console.log(suburl);
+    let captionOption = {
+      kind: 'captions',
+      srclang: 'ko',
+      label: 'Korean',
+      src: suburl,
+      mode: 'showing'
+    };
+    player.addRemoteTextTrack(captionOption);
+
+    var settings = this.textTrackSettings;
+    settings.setValues({
+        "backgroundColor": "#000",
+        "backgroundOpacity": "0",
+        "edgeStyle": "uniform",
+    });
+    settings.updateDisplay();
+  }
+  else {
+    var tracks = player.textTracks();
+    console.log(tracks.length);
+    for (var i = 0; i < tracks.length; i++) {
+      var track = tracks[i];
+      console.log(track);
+    }
+  }
+});
+
 player.play();
 </script>

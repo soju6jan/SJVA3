@@ -528,6 +528,40 @@ def first_api(sub):
 
             logger.debug(rv.headers)
             return rv
+        elif sub == 'gds_subtitle':
+            url = f"https://sjva.me/sjva/gds2.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
+            data = requests.get(url).json()['data']
+            logger.debug(data)
+            req_headers = dict(request.headers)
+            headers = {}
+            headers['Range'] = f"bytes={request.args.get('range')}"
+            headers['Authorization'] = f"Bearer {data['token']}"
+            headers['Connection'] = 'keep-alive'
+            logger.warning(headers)
+            r = requests.get(data['url'], headers=headers, stream=True)
+            logger.warning(r.history)
+            if r.encoding != None:
+                if r.encoding == 'ISO-8859-1': # 한글자막 인코딩 예외처리
+                    try:
+                        text = r.content.decode('utf-8', "strict")
+                    except Exception as e:
+                        logger.error('Exception:%s', e)
+                        logger.error(traceback.format_exc())
+                        text = r.content.decode('utf-8', "ignore")
+                else:
+                    text = r.content.decode(r.encoding, "ignore")
+            else:
+                text = r.text
+            from framework.common.util import convert_srt_to_vtt as convSrt2Vtt
+            vtt = convSrt2Vtt(text)
+            r.headers['Content-Type'] = "text/vtt; charset=utf-8"
+            rv = Response(vtt, r.status_code, content_type=r.headers['Content-Type'])
+            rv.headers.add('Content-Disposition', 'inline; filename="subtitle.vtt"')
+            rv.headers.add('Content-Transfer-Encoding', 'binary')
+            logger.debug(rv.headers)
+            return rv
+
+
     except Exception as exception: 
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
@@ -555,5 +589,7 @@ def videojs():
     data['play_title'] = request.form['play_title']
     data['play_source_src'] = request.form['play_source_src']
     data['play_source_type'] = request.form['play_source_type']
+    if 'play_subtitle_src' in request.form:
+        data['play_subtitle_src'] = request.form['play_subtitle_src']
     #logger.warning(data)
     return render_template('videojs.html', data=data)
