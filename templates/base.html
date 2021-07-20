@@ -417,7 +417,7 @@ function global_send_command2(command, arg1, arg2, arg3, modal_title) {
     dataType: "json",
     success: function (ret) {
       if (ret.msg != null) notify(ret.msg, ret.ret);
-      if (ret.modal != null) m_modal(ret.modal, modal_title);
+      if (ret.modal != null) m_modal(ret.modal, modal_title, false);
     }
   });
 }
