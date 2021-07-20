@@ -9,8 +9,6 @@ headers = {
     'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
     'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
 }
-from .requests_util import get_json_with_auth_session
-
 
 def get_filename_from_cd(cd):
     import re
@@ -20,3 +18,6 @@ def get_filename_from_cd(cd):
     if len(fname) == 0:
         return None
     return fname[0].replace('"', '')
+
+def get_json_with_auth_session():
+    pass
