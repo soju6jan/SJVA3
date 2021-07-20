@@ -8,6 +8,7 @@ from .rclone import ToolRclone
 from .ffmpeg import ToolFfmpeg
 from .util import ToolUtil
 from .hangul import ToolHangul
+from .os_command import ToolOSCommand
 
 
 def d(data):
