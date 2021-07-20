@@ -408,7 +408,7 @@ function global_send_command(command, data={}) {
   });
 }
 
-function global_send_command2(command, arg1, arg2, arg3) {
+function global_send_command2(command, arg1, arg2, arg3, modal_title) {
   $.ajax({
     url: '/' + package_name + '/ajax/' + sub + '/command',
     type: "POST", 
@@ -417,6 +417,7 @@ function global_send_command2(command, arg1, arg2, arg3) {
     dataType: "json",
     success: function (ret) {
       if (ret.msg != null) notify(ret.msg, ret.ret);
+      if (ret.modal != null) m_modal(ret.modal, modal_title);
     }
   });
 }
