@@ -124,5 +124,17 @@ class ToolBaseFile(object):
                 return True
             except:
                 return False
-                
             
+                
+    @classmethod
+    def rmtree2(cls, folderpath):
+        import shutil
+        try:
+            for root, dirs, files in os.walk(folderpath):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    shutil.rmtree(os.path.join(root, name))
+        except:
+            return False
+          
