@@ -95,7 +95,7 @@ class LogicPMClearBundle(LogicSubModuleBase):
                 result = Task.start.apply_async(args)
                 ret = result.get(on_message=self.receive_from_task, propagate=True)
             else:
-                ret = Task.start(*args)
+                ret = Task.start(self, *args)
             self.data['status']['is_working'] = ret
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')

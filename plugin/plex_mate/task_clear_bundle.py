@@ -92,11 +92,11 @@ class Task(object):
                         status['remove_size'] += tmp
                         status['remove_count'] += 1
                         if dryrun == False:
-                            ToolBaseFile.rmtree(_path)
+                            ToolBaseFile.rmtree(bundle_path)
                     if app.config['config']['use_celery']:
                         self.update_state(state='PROGRESS', meta=data)
                     else:
-                        P.logic.get_module('clear').sub_list['bundle'].receive_from_task(data, celery=False)
+                        self.receive_from_task(data, celery=False)
                 except Exception as e: 
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())

@@ -42,9 +42,9 @@ class LogicPMTool(LogicModuleBase):
                 arg['library_list'] = PlexDBHandle.library_sections()
             #logger.error(d(arg))
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
-        except:
-            logger.error('Exception:%s', e)
-            logger.error(traceback.format_exc())
+        except Exception as e: 
+            P.logger.error(f'Exception:{str(e)}')
+            P.logger.error(traceback.format_exc())
             return render_template('sample.html', title=f"{package_name}/{name}/{sub}")
 
     def process_ajax(self, sub, req):

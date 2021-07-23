@@ -93,24 +93,28 @@ class LogicPMClearLibrary(LogicSubModuleBase):
         self.data['status']['is_working'] = 'run'
         self.refresh_data()
         ModelSetting.set(f'{self.parent.name}_{self.name}_task_stop_flag', 'False')
-
-        if library_section['section_type'] == 1:
-            func = TaskThumbMovie.start
-            config = TaskThumbMovie.load_config()
-        elif library_section['section_type'] == 2:
-            func = TaskThumbShow.start
         try:
-            self.list_max = config['웹페이지에 표시할 세부 정보 갯수']
-        except:
-            self.list_max = 200
-        #func(*args)
-        #return
-        if app.config['config']['use_celery']:
-            result = func.apply_async(args)
-            ret = result.get(on_message=self.receive_from_task, propagate=True)
-        else:
-            ret = func(*args)
-        self.data['status']['is_working'] = ret
+            if library_section['section_type'] == 1:
+                func = TaskThumbMovie.start
+                config = TaskThumbMovie.load_config()
+            elif library_section['section_type'] == 2:
+                func = TaskThumbShow.start
+            try:
+                self.list_max = config['웹페이지에 표시할 세부 정보 갯수']
+            except:
+                self.list_max = 200
+            #func(*args)
+            #return
+            if app.config['config']['use_celery']:
+                result = func.apply_async(args)
+                ret = result.get(on_message=self.receive_from_task, propagate=True)
+            else:
+                ret = func(self, *args)
+            self.data['status']['is_working'] = ret
+        except Exception as e: 
+            P.logger.error(f'Exception:{str(e)}')
+            P.logger.error(traceback.format_exc())
+            self.data['status']['is_working'] = 'wait'
         self.refresh_data()
 
 

@@ -38,7 +38,7 @@ class Task(object):
 
     @staticmethod
     def load_config():
-        with open(ModelSetting.get(f'clear_path_config')) as file:
+        with open(ModelSetting.get(f'clear_library_path_config_yaml'), encoding='utf8') as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
         return config
 
@@ -82,7 +82,7 @@ class Task(object):
             if app.config['config']['use_celery']:
                 self.update_state(state='PROGRESS', meta=data)
             else:
-                P.logic.get_module('clear').sub_list['library'].receive_from_task(data, celery=False)
+                self.receive_from_task(data, celery=False)
         logger.warning(f"종료")
         return 'wait'
 
@@ -264,6 +264,8 @@ class Task(object):
 
             for item in root.find(tag).findall('item'):
                 entity = {}
+                if 'url' not in item.attrib:
+                    continue
                 entity['url'] = item.attrib['url']
                 if 'preview' in item.attrib:
                     entity['filename'] = item.attrib['preview']
