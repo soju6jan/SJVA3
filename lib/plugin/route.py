@@ -248,3 +248,37 @@ def default_route_socketio(P, instance):
 
     instance.socketio_callback = socketio_callback
 
+def default_route_socketio_sub(P, instance, sub):
+    
+    if sub.socketio_list is None:
+        sub.socketio_list = []
+
+    @socketio.on('connect', namespace=f'/{P.package_name}/{instance.name}/{sub.name}')
+    def connect():
+        try:
+            P.logger.debug(f'socket_connect : {P.package_name}/{instance.name}/{sub.name}')
+            sub.socketio_list.append(request.sid)
+            socketio_callback('start', '')
+        except Exception as exception: 
+            P.logger.error(f'Exception:{str(exception)}', exception)
+            P.logger.error(traceback.format_exc())
+
+
+    @socketio.on('disconnect', namespace=f'/{P.package_name}/{instance.name}/{sub.name}')
+    def disconnect():
+        try:
+            P.logger.debug(f'socket_disconnect : {P.package_name}/{instance.name}/{sub.name}')
+            sub.socketio_list.remove(request.sid)
+        except Exception as exception: 
+            P.logger.error(f'Exception:{str(exception)}', exception)
+            P.logger.error(traceback.format_exc())
+
+
+    def socketio_callback(cmd, data, encoding=True):
+        if sub.socketio_list:
+            if encoding:
+                data = json.dumps(data, cls=AlchemyEncoder)
+                data = json.loads(data)
+            socketio.emit(cmd, data, namespace=f'/{P.package_name}/{instance.name}/{sub.name}', broadcast=True)
+
+    sub.socketio_callback = socketio_callback
