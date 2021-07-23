@@ -15,8 +15,8 @@
   <div class="tab-content" id="nav-tabContent">
     
     {{ macros.m_tab_content_start('normal', true) }}
-      {{ macros.setting_input_text_and_buttons('base_path_program', 'Plex 프로그램 경로', [['select_base_path_program_btn', '경로 선택']], value=arg['base_path_program'], desc=['Plex Media Server, Plex Media Scanner 등의 파일이 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/usr/lib/plexmediaserver']) }}
-      {{ macros.setting_input_text_and_buttons('base_path_data', 'Plex 데이터 경로', [['select_base_path_data_btn', '경로 선택'], ['data_folder_size_btn', '크기 확인']], value=arg['base_path_data'], desc=['Metadata, Logs, Plug-ins 등의 폴더가 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/var/lib/plexmediaserver/Library/Application Support/Plex Media Server']) }}
+      {{ macros.setting_input_text_and_buttons('base_path_program', 'Plex 프로그램 경로', [['select_base_path_program_btn', '경로 선택']], value=arg['base_path_program'], desc=['Plex Media Server, Plex Media Scanner 등의 파일이 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/usr/lib/plexmediaserver', 'Windows / Native / Native : C:\\Program Files (x86)\\Plex\\Plex Media Server']) }}
+      {{ macros.setting_input_text_and_buttons('base_path_data', 'Plex 데이터 경로', [['select_base_path_data_btn', '경로 선택'], ['data_folder_size_btn', '크기 확인']], value=arg['base_path_data'], desc=['Metadata, Logs, Plug-ins 등의 폴더가 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/var/lib/plexmediaserver/Library/Application Support/Plex Media Server', 'Windows / Native / Native : C:\\Users\\사용자\\AppData\\Local\\Plex Media Server']) }}
       {{ macros.setting_button([['plex_folder_test_btn', 'Plex 경로 테스트']], left='경로 테스트', desc=['테스트 버튼 클릭 후 아래 설정 값 변경'] ) }}
       {{ macros.m_hr() }}
       {{ macros.setting_input_text_and_buttons('base_bin_scanner', '실행파일 - 스캐너', [['execute_bin_scanner_btn', 'Help 보기']], value=arg['base_bin_scanner'], disabled=True) }}
