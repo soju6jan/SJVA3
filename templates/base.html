@@ -422,9 +422,9 @@ function global_send_command2(command, arg1, arg2, arg3, modal_title) {
   });
 }
 
-function global_send_command_sub(sub2, command, arg1, arg2, arg3, modal_title) {
+function global_send_command_sub(command, arg1, arg2, arg3, modal_title, callback) {
   $.ajax({
-    url: '/' + package_name + '/ajax/' + sub + '/' + sub2,
+    url: '/' + package_name + '/ajax/' + sub + '/' + sub2 + '/command',
     type: "POST", 
     cache: false,
     data:{command:command, arg1:arg1, arg2:arg2, arg3},
@@ -432,6 +432,7 @@ function global_send_command_sub(sub2, command, arg1, arg2, arg3, modal_title) {
     success: function (ret) {
       if (ret.msg != null) notify(ret.msg, ret.ret);
       if (ret.modal != null) m_modal(ret.modal, modal_title, false);
+      if (callback != null) callback(ret);
     }
   });
 }

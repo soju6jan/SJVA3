@@ -51,6 +51,12 @@ class Logic(object):
                     db.session.add(self.P.ModelSetting(key, value))
 
             for module in self.P.module_list:
+                if module.sub_list is not None:
+                    for name, sub_instance in module.sub_list.items():
+                        if sub_instance.db_default is not None:
+                            for key, value in sub_instance.db_default.items():
+                                if db.session.query(self.P.ModelSetting).filter_by(key=key).count() == 0:
+                                    db.session.add(self.P.ModelSetting(key, value))        
                 if module.db_default is not None:
                     for key, value in module.db_default.items():
                         if db.session.query(self.P.ModelSetting).filter_by(key=key).count() == 0:

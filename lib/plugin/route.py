@@ -121,6 +121,18 @@ def default_route(P):
             P.logger.error('Exception:%s', exception)
             P.logger.error(traceback.format_exc())
 
+    @P.blueprint.route('/ajax/<module_name>/<sub_name>/<command>', methods=['GET', 'POST'])
+    @login_required
+    def sub_ajax(module_name, sub_name, command):
+        try:
+            for module in P.module_list:
+                if module_name == module.name:
+                    P.logger.warning(module_name)
+                    if module.sub_list is not None and sub_name in module.sub_list:
+                        return module.sub_list[sub_name].process_ajax(command, request)
+        except Exception as exception: 
+            P.logger.error('Exception:%s', exception)
+            P.logger.error(traceback.format_exc())
 
     #########################################################
     # API - 외부
