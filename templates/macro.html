@@ -641,3 +641,15 @@
 
   </div>
 {% endmacro %}
+
+{% macro buttons(buttons, left='', desc='') %}
+  {{ setting_top(left) }}
+    <div class="input-group col-sm-9">
+      <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
+      {% for b in buttons %}
+        <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
+      {% endfor %}
+      </div>
+    </div> 
+  {{ setting_bottom(desc) }}
+{% endmacro %}
