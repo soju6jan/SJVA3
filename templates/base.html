@@ -422,6 +422,20 @@ function global_send_command2(command, arg1, arg2, arg3, modal_title) {
   });
 }
 
+function global_send_command_sub(sub2, command, arg1, arg2, arg3, modal_title) {
+  $.ajax({
+    url: '/' + package_name + '/ajax/' + sub + '/' + sub2,
+    type: "POST", 
+    cache: false,
+    data:{command:command, arg1:arg1, arg2:arg2, arg3},
+    dataType: "json",
+    success: function (ret) {
+      if (ret.msg != null) notify(ret.msg, ret.ret);
+      if (ret.modal != null) m_modal(ret.modal, modal_title, false);
+    }
+  });
+}
+
 function shutdown_confirm() {
   document.getElementById("confirm_title").innerHTML = "종료 확인";
   document.getElementById("confirm_body").innerHTML = "종료 하시겠습니까?";
