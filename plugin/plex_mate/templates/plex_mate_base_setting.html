@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  {{ macros.m_button_group([['setting_save_btn', '설정 저장']])}}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_row_end() }}
+  <nav>
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head2('normal', '일반', true) }}
+      {{ macros.m_tab_head2('etc', '기타', false) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+  <form id='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    
+    {{ macros.m_tab_content_start('normal', true) }}
+      {{ macros.setting_input_text_and_buttons('base_path_program', 'Plex 프로그램 경로', [['select_base_path_program_btn', '경로 선택']], value=arg['base_path_program'], desc=['Plex Media Server, Plex Media Scanner 등의 파일이 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/usr/lib/plexmediaserver']) }}
+      {{ macros.setting_input_text_and_buttons('base_path_data', 'Plex 데이터 경로', [['select_base_path_data_btn', '경로 선택'], ['data_folder_size_btn', '크기 확인']], value=arg['base_path_data'], desc=['Metadata, Logs, Plug-ins 등의 폴더가 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/var/lib/plexmediaserver/Library/Application Support/Plex Media Server']) }}
+      {{ macros.setting_button([['plex_folder_test_btn', 'Plex 경로 테스트']], left='경로 테스트', desc=['테스트 버튼 클릭 후 아래 설정 값 변경'] ) }}
+      {{ macros.m_hr() }}
+      {{ macros.setting_input_text_and_buttons('base_bin_scanner', '실행파일 - 스캐너', [['execute_bin_scanner_btn', 'Help 보기']], value=arg['base_bin_scanner'], disabled=True) }}
+      {{ macros.setting_input_text_and_buttons('base_bin_sqlite', '실행파일 - SQLite', [['execute_bin_sqlite_btn', '버전 확인']], value=arg['base_bin_sqlite'], disabled=True) }}
+      {{ macros.setting_input_text_and_buttons('base_path_db', 'DB 파일', [['get_size_db_btn', '크기 확인'], ['backup_db_btn', '백업'], ['db_test_btn', '섹션 확인']], value=arg['base_path_db'], disabled=True) }}
+      {{ macros.setting_input_text_and_buttons('base_path_metadata', '경로 - Metadata', [['get_size_metadata_btn', '크기 확인']], value=arg['base_path_metadata'], disabled=True) }}
+      {{ macros.setting_input_text_and_buttons('base_path_media', '경로 - Media', [['get_size_media_btn', '크기 확인']], value=arg['base_path_media'], disabled=True) }}
+      {{ macros.setting_input_text_and_buttons('base_path_phototranscoder', '경로 - PhotoTranscoder', [['get_size_phototranscoder_btn', '크기 확인'], ['clear_phototranscoder_btn', '비우기']], value=arg['base_path_phototranscoder'], disabled=True) }}
+      {{ macros.setting_input_text('base_token', 'Plex 토큰', value=arg['base_token'], disabled=True) }}
+      {{ macros.setting_input_text_and_buttons('base_url', 'Plex URL', [['plex_url_test_btn', '테스트'],['version_btn', 'Agent 버전']], value=arg['base_url'], desc=['보통은 http://localhost:32400 or http://172.17.0.1:32400']) }}
+    {{ macros.m_tab_content_end() }}  
+    {{ macros.m_tab_content_start('etc', false) }}
+      {{ macros.setting_checkbox('base_backup_location_mode', '백업 위치', value=arg['base_backup_location_mode'], desc=['On : 같은 폴더', 'Off : 지정 폴더']) }}
+      <div id="base_backup_location_mode_div" class="collapse">
+      {{ macros.setting_input_text_and_buttons('base_backup_location_manual', '백업 경로', [['select_base_backup_location_manual_btn', '경로 선택']], value=arg['base_backup_location_manual'], desc=['DB  파일 백업 폴더']) }}
+      </div>
+    {{ macros.m_tab_content_end() }}  
+    
+  </div>
+</form>
+</div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub'] }}";
+var current_data = null;
+
+$(function(){ 
+  use_collapse("base_backup_location_mode", true);
+});
+
+$('#base_backup_location_mode').change(function() {
+  use_collapse('base_backup_location_mode', true);
+});
+
+
+$("#setting_save_btn").click(function(e) {
+  e.preventDefault();
+  var formData = get_formdata('#setting');
+  formData += '&' + 'base_bin_scanner' + '=' + $('#base_bin_scanner').val().trim();
+  formData += '&' + 'base_bin_sqlite' + '=' + $('#base_bin_sqlite').val().trim();
+  formData += '&' + 'base_path_db' + '=' + $('#base_path_db').val().trim();
+  formData += '&' + 'base_path_metadata' + '=' + $('#base_path_metadata').val().trim();
+  formData += '&' + 'base_path_media' + '=' + $('#base_path_media').val().trim();
+  formData += '&' + 'base_path_phototranscoder' + '=' + $('#base_path_phototranscoder').val().trim();
+  formData += '&' + 'base_token' + '=' + $('#base_token').val().trim();
+  $.ajax({
+    url: '/'+package_name+'/ajax/setting_save',
+    type: "POST", 
+    cache: false,
+    data: formData,
+    dataType: "json",
+    success: function (ret) {
+      if (ret) notify('설정을 저장하였습니다.', 'success');
+      else notify('설정 저장에 실패하였습니다.', 'warning');
+    }
+  });
+});
+
+
+$("body").on('click', '#select_base_path_program_btn', function(e){
+  e.preventDefault();
+  var path = $('#base_path_program').val().trim();
+  if (path == '') path = '/'
+    m_select_local_file_modal("Plex 프로그램 폴더 선택", path, true, function(result){
+    $('#base_path_program').val(result);
+  });
+});
+
+$("body").on('click', '#select_base_path_data_btn', function(e){
+  e.preventDefault();
+  var path = $('#base_path_data').val().trim();
+  if (path == '') path = '/'
+    m_select_local_file_modal("Plex 데이터 폴더 선택", path, true, function(result){
+    $('#base_path_data').val(result);
+  });
+});
+
+
+$("body").on('click', '#data_folder_size_btn', function(e){
+  e.preventDefault();
+  global_send_command2('size', 'plex_data', $('#base_path_data').val().trim());
+});
+
+
+$("body").on('click', '#plex_folder_test_btn', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: '/' + package_name + '/ajax/' + sub + '/plex_folder_test',
+    type: "POST", 
+    cache: false,
+    data: {program_path:$('#base_path_program').val().trim(), data_path:$('#base_path_data').val().trim()},
+    dataType: "json",
+    success: function (ret) {
+      if (ret.msg != null) notify(ret.msg, ret.ret);
+      if (ret.data != null) {
+        console.log(ret.data);
+        $('#base_bin_scanner').val(ret.data.bin_scanner);
+        $('#base_bin_sqlite').val(ret.data.bin_sqlite);
+        $('#base_path_db').val(ret.data.path_db);
+        $('#base_path_metadata').val(ret.data.path_metadata);
+        $('#base_path_media').val(ret.data.path_media);
+        $('#base_path_phototranscoder').val(ret.data.path_phototranscoder);
+        $('#base_token').val(ret.data.token);
+      }
+    }
+  });
+});
+
+
+$("body").on('click', '#execute_bin_scanner_btn', function(e){
+  e.preventDefault();
+  global_send_command2('execute', 'scanner', $('#base_bin_scanner').val().trim(), '', 'Scanner Help');
+});
+
+$("body").on('click', '#execute_bin_sqlite_btn', function(e){
+  e.preventDefault();
+  global_send_command2('execute', 'sqlite', $('#base_bin_sqlite').val().trim(), '', 'SQLite Version');
+});
+
+$("body").on('click', '#get_size_db_btn', function(e){
+  e.preventDefault();
+  global_send_command2('size', 'plex_db', $('#base_path_db').val().trim());
+});
+
+$("body").on('click', '#backup_db_btn', function(e){
+  e.preventDefault();
+  global_send_command2('backup', 'plex_db', $('#base_path_db').val().trim());
+});
+
+$("body").on('click', '#select_base_backup_location_manual_btn', function(e){
+  e.preventDefault();
+  var path = $('#base_backup_location_manual').val().trim();
+  if (path == '') path = '/'
+    m_select_local_file_modal("백업 폴더 선택", path, true, function(result){
+    $('#base_backup_location_manual').val(result);
+  });
+});
+
+$("body").on('click', '#db_test_btn', function(e){
+  e.preventDefault();
+  global_send_command2('db', 'library_sections', $('#base_path_db').val().trim());
+});
+
+
+$("body").on('click', '#get_size_metadata_btn', function(e){
+  e.preventDefault();
+  global_send_command2('size', 'plex_metadata', $('#base_path_metadata').val().trim());
+});
+
+$("body").on('click', '#get_size_media_btn', function(e){
+  e.preventDefault();
+  global_send_command2('size', 'plex_media', $('#base_path_media').val().trim());
+});
+
+$("body").on('click', '#get_size_phototranscoder_btn', function(e){
+  e.preventDefault();
+  global_send_command2('size', 'plex_phototranscode', $('#base_path_phototranscoder').val().trim());
+});
+
+$("body").on('click', '#clear_phototranscoder_btn', function(e){
+  e.preventDefault();
+  global_send_command2('clear', 'plex_phototranscode', $('#base_path_phototranscoder').val().trim());
+});
+
+$("body").on('click', '#plex_url_test_btn', function(e){
+  e.preventDefault();
+  global_send_command2('system_agents', $('#base_url').val().trim(), $('#base_token').val().trim());
+});
+
+$("body").on('click', '#version_btn', function(e){
+  e.preventDefault();
+  global_send_command2('version', $('#base_url').val().trim(), $('#base_token').val().trim());
+});
+
+</script>    
+{% endblock %}

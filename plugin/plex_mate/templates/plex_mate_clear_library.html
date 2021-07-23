@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="{{ url_for('.static', filename='base.js') }}"></script>
+
+<div class='row' style="padding-top: 5px; padding-bottom:5px; align-items: center;">
+  <div class='col-sm-1 set-left'>
+    <strong>Library</strong>
+  </div>
+  <div class="input-group col-sm-3">
+    <select id="library_select" name="library_select" class="form-control form-control-sm">
+      {% for item in arg['library_list'] %}
+        {% if loop.counter == 0 %}
+        <option value="{{ item['id'] }}" selected>{{item['name']}}</option>
+        {% else %}
+        <option value="{{ item['id'] }}">{{item['name']}}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+  <div class='col-sm-1 set-left'>
+    <strong>DryRun</strong>
+  </div>
+  <div class="input-group col-sm-1">
+    <input id="dryrun" name="dryrun" class="form-control form-control-sm" type="checkbox" data-toggle="toggle" checked>
+  </div>
+  <div class="input-group col-sm-4" style="padding-left:0px; padding-top:5px">
+    <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+      <button id="movie_stop_btn" class="btn btn-sm btn-outline-info">중지</button>
+      <button id="movie_start1_btn" class="btn btn-sm btn-outline-info">1단계 시작</button>
+      <button id="movie_start2_btn" class="btn btn-sm btn-outline-info">2단계 시작</button>
+      <button id="movie_start3_btn" class="btn btn-sm btn-outline-info">3단계 시작</button>
+    </div>
+  </div>
+</div>
+
+<div class='row' style="padding-top: 5px; padding-bottom:0px; align-items: center;">
+  <div class='col-sm-1 set-left'>
+    <strong>상태</strong>
+  </div>
+  <div id='status_div' class="col-sm-11">
+    대기중
+  </div>
+</div>
+
+{{ macros.m_hr_head_top() }}
+{{ macros.m_row_start('0') }}
+{{ macros.m_col(12,  macros.m_strong('Log')) }}
+{{ macros.m_row_end() }}
+{{ macros.m_hr_head_bottom() }}
+<div id="list_div"></div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{ arg['sub'] }}";
+var sub2 = "{{ arg['sub2'] }}";
+var current_data = null;
+
+$(document).ready(function(){
+  //$('#main_container').attr('class', 'container-fluid');  
+  socket_init(package_name, sub, sub2);
+});
+
+$("body").on('click', '#movie_start0_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start0', $('#library_select').val());
+});
+
+$("body").on('click', '#movie_start1_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start1', $('#library_select').val(), $('#dryrun').is(":checked"));
+});
+
+$("body").on('click', '#movie_start2_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start2', $('#library_select').val(), $('#dryrun').is(":checked"));
+});
+
+$("body").on('click', '#movie_start3_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start3', $('#library_select').val(), $('#dryrun').is(":checked"));
+});
+
+$("body").on('click', '#movie_stop_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('stop');
+});
+
+
+
+
+function make_one(data) {
+  row = m_row_start_hover();
+  row += make_log("제목", data.db.title);
+  row += make_log("HASH / GUID", data.db.hash + ' - ' + data.db.guid);
+  str = "크기 : " + color(humanFileSize(data.meta.total), 'blue');
+  str += " / 삭제 : " + color(humanFileSize(data.meta.remove));
+  row += make_log("Metadata", str);
+  if (data.media != null) {
+    str = "크기 : " + color(humanFileSize(data.media.total), 'blue');
+    str += " / 삭제 : " + color(humanFileSize(data.media.remove));
+    row += make_log("Media", str);
+  }
+  row += make_log("thumb", data.db.user_thumb_url);
+  row += make_log("art", data.db.user_art_url);
+  row += m_row_end();
+  return row;
+}
+
+
+function make_status(data) {
+  //console.log(data);
+  
+  str = '';
+  if (data.is_working == 'run')  tmp = '실행중';
+  else if (data.is_working == 'wait')  tmp = '대기중';
+  else if (data.is_working == 'stop')  tmp = '사용자 중지';
+  if (data.count != null) tmp += '(' + data.current + '/' + data.count + ') ';
+  str += '<h4>' + tmp;
+  if (data.total_size != null && data.total_size != 0) {
+    str += ' / 전체크기 : ' + color(humanFileSize(data.total_size), 'blue');
+    str += ' / 삭제크기 : ' + color(humanFileSize(data.remove_size));
+  }
+    
+  str += '</h4>';
+  $('#status_div').html(str);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script> 
+
+{% endblock %}

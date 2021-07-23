@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  <nav>
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head2('update', '목록', true) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+  <form id='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    {{ macros.m_tab_content_start('update', true) }}
+      {{ macros.setting_button([['update_show_add_btn', '쇼 추가된 시간을 마지막 에피소드 추가된 날짜로 변경']], left='쇼 추가된날짜', desc=None ) }}
+      {{ macros.m_hr() }}
+      {{ macros.setting_top('컬렉션 삭제') }}
+      <div class="input-group col-sm-9">
+        <select id="remove_collection_section_id" name="remove_collection_section_id" class="form-control form-control-sm">
+          {% for item in arg['library_list'] %}
+            {% if item['section_type'] == 1 %}
+              {% if loop.counter == 0 %}
+              <option value="{{ item['id'] }}" selected>{{item['name']}}</option>
+              {% else %}
+              <option value="{{ item['id'] }}">{{item['name']}}</option>
+              {% endif %}
+            {% endif %}   
+          {% endfor %}
+        </select>
+        <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
+        {% set buttons = [['remove_collection_count_btn', '컬렉션 수 확인'], ['remove_collection_btn', '컬렉션 삭제']] %}
+        {% for b in buttons %}
+          <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
+        {% endfor %}
+        </div>
+      </div>
+      {{ macros.setting_bottom('') }}
+      {{ macros.m_hr() }}
+      {{ macros.buttons([['remove_sjva_extra_count_btn', '온라인 부가영상 수 확인'], ['remove_sjva_extra_btn', '온라인 부가영상 삭제'], ['update_sjva_extra_btn', '온라인 부가영상 재생에 사용하는 SJVA를 이 SJVA로 변경(GDS 전용)']], left='부가영상 삭제', desc=None ) }}
+      
+      {{ macros.m_hr() }}
+      {{ macros.setting_input_text_and_buttons('library_location_source', '라이브러리 경로 변경', [['library_location_source_btn', '데이터 확인']], value=arg['tool_simple_library_location_source'], desc=['파일 경로 변경 소스']) }}
+      {{ macros.setting_input_text_and_buttons('library_location_target', '', [['library_location_target_btn', '변경 실행']], value=arg['tool_simple_library_location_target'], desc=['파일 경로 변경 타겟']) }}
+      
+      {{ macros.m_hr() }}
+      {{ macros.buttons([['duplicate_list_btn', '동일파일이 동일메타에 중복되어 있는 경우 (정리 대상 목록)'], ['duplicate_remove_btn', '정리']], left='스캔에러 정리', desc=None ) }}
+      
+      
+
+
+    {{ macros.m_tab_content_end() }}  
+    
+  </div>
+</form>
+</div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub'] }}";
+var sub2 = "{{arg['sub2'] }}";
+var current_data = null;
+
+$(function(){ 
+});
+
+
+
+$("body").on('click', '#update_show_add_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('update_show_add');
+});
+
+$("body").on('click', '#remove_collection_count_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('remove_collection_count', $('#remove_collection_section_id').val());
+});
+
+$("body").on('click', '#remove_collection_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('remove_collection', $('#remove_collection_section_id').val());
+});
+
+$("body").on('click', '#remove_sjva_extra_count_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('remove_sjva_extra_count');
+});
+
+$("body").on('click', '#remove_sjva_extra_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('remove_sjva_extra');
+});
+
+$("body").on('click', '#update_sjva_extra_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('update_sjva_extra');
+});
+
+$("body").on('click', '#library_location_source_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('library_location_source', $('#library_location_source').val());
+});
+
+$("body").on('click', '#library_location_target_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('library_location_target', $('#library_location_source').val(), $('#library_location_target').val());
+});
+
+$("body").on('click', '#duplicate_list_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('duplicate_list', '', '', '', '목록');
+});
+
+$("body").on('click', '#duplicate_remove_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('duplicate_remove');
+});
+
+
+
+</script>    
+{% endblock %}
