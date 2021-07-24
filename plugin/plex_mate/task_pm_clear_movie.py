@@ -49,7 +49,7 @@ class Task(object):
         fetch = ce.fetchall()
         status = {'is_working':'run', 'total_size':0, 'remove_size':0, 'count':len(fetch), 'current':0}
         for movie in fetch:
-            if ModelSetting.get_bool('clear_library_task_stop_flag'):
+            if ModelSetting.get_bool('clear_movie_task_stop_flag'):
                 return 'stop'
             time.sleep(0.05)
             status['current'] += 1

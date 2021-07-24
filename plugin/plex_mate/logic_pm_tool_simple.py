@@ -17,7 +17,6 @@ package_name = P.package_name
 ModelSetting = P.ModelSetting
 
 
-from .task_pm_thumb_movie import Task as TaskThumbMovie
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 #########################################################

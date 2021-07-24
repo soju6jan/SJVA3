@@ -17,7 +17,7 @@ package_name = P.package_name
 ModelSetting = P.ModelSetting
 
 
-from .task_clear_bundle import Task
+from .task_pm_clear_bundle import Task
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 #########################################################

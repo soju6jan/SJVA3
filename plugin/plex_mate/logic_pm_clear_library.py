@@ -17,9 +17,11 @@ package_name = P.package_name
 ModelSetting = P.ModelSetting
 
 
-from .task_pm_thumb_movie import Task as TaskThumbMovie
+from .task_pm_clear_movie import Task as TaskMovie
+from .task_pm_clear_show import Task as TaskShow
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
+from .logic_pm_base import LogicPMBase
 #########################################################
 
 
@@ -31,7 +33,6 @@ class LogicPMClearLibrary(LogicSubModuleBase):
         self.db_default = {
             f'{self.parent.name}_{self.name}_db_version' : '1',
             f'{self.parent.name}_{self.name}_task_stop_flag' : 'False',
-            f'{self.parent.name}_{self.name}_path_config_yaml' : os.path.join(path_data, 'db', f'{package_name}_{self.parent.name}_{self.name}.yaml')
         }
         self.data = {
             'list' : [],
@@ -88,11 +89,12 @@ class LogicPMClearLibrary(LogicSubModuleBase):
         self.refresh_data()
         ModelSetting.set(f'{self.parent.name}_{self.name}_task_stop_flag', 'False')
         try:
+            config = LogicPMBase.load_config()
             if library_section['section_type'] == 1:
-                func = TaskThumbMovie.start
-                config = TaskThumbMovie.load_config()
+                func = TaskMovie.start
+                
             elif library_section['section_type'] == 2:
-                func = TaskThumbShow.start
+                func = TaskShow.start
             try:
                 self.list_max = config['웹페이지에 표시할 세부 정보 갯수']
             except:

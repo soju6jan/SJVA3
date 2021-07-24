@@ -17,7 +17,7 @@ package_name = P.package_name
 ModelSetting = P.ModelSetting
 name = 'clear'
 
-from .task_pm_thumb_movie import Task as TaskThumbMovie
+from .task_pm_clear_movie import Task as TaskThumbMovie
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 from .logic_pm_clear_library import LogicPMClearLibrary
@@ -31,6 +31,7 @@ class LogicPMClear(LogicModuleBase):
         self.name = name
         self.sub_list = {
             'movie' : LogicPMClearLibrary(P, self, 'movie'),
+            'show' : LogicPMClearLibrary(P, self, 'show'),
             'bundle' : LogicPMClearBundle(P, self, 'bundle')
         }
 
@@ -39,8 +40,10 @@ class LogicPMClear(LogicModuleBase):
         arg['sub'] = self.name
         arg['sub2'] = sub
         try:
-            if sub == 'library':
-                arg['library_list'] = PlexDBHandle.library_sections()
+            if sub == 'movie':
+                arg['library_list'] = PlexDBHandle.library_sections(section_type=1)
+            elif sub == 'show':
+                arg['library_list'] = PlexDBHandle.library_sections(section_type=2)
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e:
             logger.error(f'Exception:{str(e)}')
