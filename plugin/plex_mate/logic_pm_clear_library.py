@@ -66,12 +66,6 @@ class LogicPMClearLibrary(LogicSubModuleBase):
             P.logger.error(traceback.format_exc())
             return jsonify({'ret':'danger', 'msg':str(e)})
     
-    def plugin_load(self):
-        config_path = ModelSetting.get(f'{self.parent.name}_{self.name}_path_config_yaml')
-        logger.error(config_path)
-        if os.path.exists(config_path) == False:
-            shutil.copyfile(os.path.join(os.path.dirname(__file__), 'file', os.path.basename(config_path)), config_path)
-
     #########################################################
 
     def task_interface(self, *args):

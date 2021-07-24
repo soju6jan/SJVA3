@@ -4,10 +4,10 @@
 import os, sys, traceback, re, json, threading, time, shutil, platform
 from datetime import datetime
 # third-party
-import requests, xmltodict
+import requests, xmltodict, yaml
 from flask import request, render_template, jsonify, redirect
 # sjva 공용
-from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util
+from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util, path_app_root
 from plugin import LogicModuleBase, default_route_socketio
 from tool_base import ToolBaseFile, d, ToolSubprocess
 # 패키지
@@ -21,6 +21,8 @@ from .task_pm_base import Task
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 #########################################################
+
+
 
 class LogicPMBase(LogicModuleBase):
     db_default = {
@@ -37,21 +39,32 @@ class LogicPMBase(LogicModuleBase):
         f'{name}_url' : 'http://172.17.0.1:32400',
         f'{name}_backup_location_mode' : 'True',
         f'{name}_backup_location_manual' : '',
+        f'{name}_path_config' : os.path.join(path_data, 'db', f'{package_name}_config.yaml')
     }
+
+
 
     def __init__(self, P):
         super(LogicPMBase, self).__init__(P, 'setting')
         self.name = name
 
+    def plugin_load(self):
+        config_path = ModelSetting.get(f'{name}_path_config')
+        if os.path.exists(config_path) == False:
+            shutil.copyfile(os.path.join(os.path.dirname(__file__), 'file', os.path.basename(config_path)), config_path)
+
+
     def process_menu(self, sub, req):
         arg = P.ModelSetting.to_dict()
         arg['sub'] = self.name
+        arg['path_app_root'] = path_app_root
         try:
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
-        except:
-            logger.error('Exception:%s', e)
+        except Exception as e:
+            logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
             return render_template('sample.html', title=f"{package_name}/{name}/{sub}")
+
 
 
     def process_ajax(self, sub, req):
@@ -184,3 +197,10 @@ class LogicPMBase(LogicModuleBase):
         elif command == 'clear':
             noti_data = {'type':'info', 'msg' : f"경로 : {ret['target']}<br>크기 : {ret['sizeh']}"}
             socketio.emit("notify", noti_data, namespace='/framework', broadcast=True)    
+
+
+    @staticmethod
+    def load_config():
+        with open(ModelSetting.get(f'{name}_path_config'), encoding='utf8') as file:
+            config = yaml.load(file, Loader=yaml.FullLoader)
+        return config
