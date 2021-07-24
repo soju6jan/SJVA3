@@ -32,7 +32,7 @@ class P(object):
                 ['setting', '설정']
             ],
             'clear' : [
-                ['library', '라이브러리'], ['bundle', '번들제거'], ['cache', 'PhotoTranscoder'], 
+                ['movie', '영화 정리'], ['show', '쇼 정리'], ['bundle', '번들 삭제'], ['cache', '캐시(PhotoTranscoder) 삭제'], 
             ],
             'tool' : [
                 ['simple', '간단 명령'], ['show', '컬렉션 삭제'], ['cache', 'PhotoTranscoder'], ['bundle', '번들제거']

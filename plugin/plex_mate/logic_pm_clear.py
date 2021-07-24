@@ -27,10 +27,10 @@ from .logic_pm_clear_bundle import LogicPMClearBundle
 
 class LogicPMClear(LogicModuleBase):
     def __init__(self, P):
-        super(LogicPMClear, self).__init__(P, 'library')
+        super(LogicPMClear, self).__init__(P, 'movie')
         self.name = name
         self.sub_list = {
-            'library' : LogicPMClearLibrary(P, self, 'library'),
+            'movie' : LogicPMClearLibrary(P, self, 'movie'),
             'bundle' : LogicPMClearBundle(P, self, 'bundle')
         }
 
