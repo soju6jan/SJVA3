@@ -140,7 +140,8 @@ class Task(object):
                         if os.path.islink(img_path):
                             if os.path.realpath(img_path).find('_stored') == -1:
                                 # 저장된 파일에 대한 링크가 아니기 삭제
-                                if data['dryrun'] == False and os.path.exists(img_path) == True:
+                                # 먼저 에이전트 폴더들이 삭제될 수 있음.
+                                if data['dryrun'] == False:# and os.path.exists(img_path) == True:
                                     os.remove(img_path)
                         else: #윈도우
                             if img_file != data['process'][tag]['filename']:
@@ -250,6 +251,8 @@ class Task(object):
         data['info']['posters'] = []
         for tag in ['posters', 'art', 'banners']:
             data['info'][tag] = []
+            if root.find(tag) is None:
+                continue
 
             for item in root.find(tag).findall('item'):
                 entity = {}

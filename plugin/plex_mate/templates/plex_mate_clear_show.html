@@ -23,9 +23,10 @@
   <div class="input-group col-sm-1">
     <input id="dryrun" name="dryrun" class="form-control form-control-sm" type="checkbox" data-toggle="toggle" checked>
   </div>
-  <div class="input-group col-sm-4" style="padding-left:0px; padding-top:5px">
+  <div class="input-group col-sm-6" style="padding-left:0px; padding-top:5px">
     <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
       <button id="movie_stop_btn" class="btn btn-sm btn-outline-info">중지</button>
+      <button id="movie_start0_btn" class="btn btn-sm btn-outline-info">쇼별 메타 크기만 확인</button>
       <button id="movie_start1_btn" class="btn btn-sm btn-outline-info">1단계 시작</button>
       <button id="movie_start2_btn" class="btn btn-sm btn-outline-info">2단계 시작</button>
       <button id="movie_start3_btn" class="btn btn-sm btn-outline-info">3단계 시작</button>
@@ -62,7 +63,7 @@ $(document).ready(function(){
 
 $("body").on('click', '#movie_start0_btn', function(e){
   e.preventDefault();
-  global_send_command_sub('start0', $('#library_select').val());
+  global_send_command_sub('start0', $('#library_select').val(), $('#dryrun').is(":checked"));
 });
 
 $("body").on('click', '#movie_start1_btn', function(e){

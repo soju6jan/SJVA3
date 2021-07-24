@@ -48,21 +48,79 @@ class Task(object):
         ce.row_factory = dict_factory
         fetch = ce.fetchall()
         status = {'is_working':'run', 'total_size':0, 'remove_size':0, 'count':len(fetch), 'current':0}
+
         for show in fetch:
             if ModelSetting.get_bool('clear_show_task_stop_flag'):
                 return 'stop'
-            time.sleep(0.05)
+            #time.sleep(0.05)
             status['current'] += 1
             data = {'mode':'show', 'status':status, 'command':command, 'section_id':section_id, 'dryrun':dryrun, 'process':{}}
             data['db'] = show
-            #logger.warning(movie['title'])
-            
-            hash_value = show['hash']
-            metapath = os.path.join(ModelSetting.get('base_path_metadata'), 'TV Shows', data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
-            data['meta'] = {}
-            data['meta']['total'] = ToolBaseFile.size(start_path=metapath)
-            data['meta']['remove'] = 0
 
+            Task.show_process(data, con, cur)
+          
+            data['status']['total_size'] += data['meta']['total']
+            data['status']['remove_size'] += data['meta']['remove']
+            if 'media' in data:
+                data['status']['total_size'] += data['media']['total']
+                data['status']['remove_size'] += data['media']['remove']
+            #P.logic.get_module('clear').receive_from_task(data, celery=False)
+            #continue
+            if app.config['config']['use_celery']:
+                self.update_state(state='PROGRESS', meta=data)
+            else:
+                self.receive_from_task(data, celery=False)
+        logger.warning(f"종료")
+        return 'wait'
+
+
+        
+
+    @staticmethod
+    def xml_analysis(combined_xmlpath, data):
+        import xml.etree.ElementTree as ET
+        #text = ToolBaseFile.read(combined_xmlpath)
+        #logger.warning(text)
+        tree = ET.parse(combined_xmlpath)
+        root = tree.getroot()
+        data['info'] = {}
+        data['info']['posters'] = []
+        for tag in ['posters', 'art', 'banners']:
+            data['info'][tag] = []
+            if root.find(tag) is None:
+                continue
+
+            for item in root.find(tag).findall('item'):
+                entity = {}
+                if 'url' not in item.attrib:
+                    continue
+                entity['url'] = item.attrib['url']
+                if 'preview' in item.attrib:
+                    entity['filename'] = item.attrib['preview']
+                elif 'media' in item.attrib:
+                    entity['filename'] = item.attrib['media']
+                entity['provider'] = item.attrib['provider']
+                data['info'][tag].append(entity)
+
+
+
+    @staticmethod
+    def show_process(data, con, cur):
+        
+        data['meta'] = {}
+        data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'TV Shows', data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
+        data['meta']['total'] = ToolBaseFile.size(start_path=data['meta']['metapath'])
+        data['meta']['remove'] = 0
+
+        if data['command'] == 'start0':
+            return
+
+        Task.show_step1(data)
+
+        if data['command'] == 'start1':
+            return
+
+        if False:
             season_cs = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 3 and parent_id = ? ORDER BY "index"', (show['id'],))
             season_cs.row_factory = dict_factory
 
@@ -113,7 +171,7 @@ class Task(object):
                                     break
 
                     #logger.warning(d(episode_data))
-                    continue
+                    #continue
                     c_metapath = os.path.join(metapath, 'Contents')
                     for f in os.listdir(c_metapath):
                         _path = os.path.join(c_metapath, f)
@@ -187,45 +245,69 @@ class Task(object):
 
 
 
-            data['status']['total_size'] += data['meta']['total']
-            data['status']['remove_size'] += data['meta']['remove']
-            if 'media' in data:
-                data['status']['total_size'] += data['media']['total']
-                data['status']['remove_size'] += data['media']['remove']
-            #P.logic.get_module('clear').receive_from_task(data, celery=False)
-            #continue
-            if app.config['config']['use_celery']:
-                self.update_state(state='PROGRESS', meta=data)
-            else:
-                self.receive_from_task(data, celery=False)
-        logger.warning(f"종료")
-        return 'wait'
 
-
-        
 
     @staticmethod
-    def xml_analysis(combined_xmlpath, data):
-        import xml.etree.ElementTree as ET
-        #text = ToolBaseFile.read(combined_xmlpath)
-        #logger.warning(text)
-        tree = ET.parse(combined_xmlpath)
-        root = tree.getroot()
-        data['info'] = {}
-        data['info']['posters'] = []
-        for tag in ['posters', 'art', 'banners']:
-            data['info'][tag] = []
-            if root.find(tag) is None:
-                continue
+    def show_step1(data):
+        combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
+        if os.path.exists(combined_xmlpath) == False:
+            return
+        
+        Task.xml_analysis(combined_xmlpath, data)
+        data['process'] = {}
+        for tag, value in TAG.items():
+            data['process'][tag] = {
+                'db' : data['db'][f'user_{value[0]}_url'],
+                'db_type' : '', 
+                'url' : '',
+                'filename' : '',
+            }
 
-            for item in root.find(tag).findall('item'):
-                entity = {}
-                if 'url' not in item.attrib:
-                    continue
-                entity['url'] = item.attrib['url']
-                if 'preview' in item.attrib:
-                    entity['filename'] = item.attrib['preview']
-                elif 'media' in item.attrib:
-                    entity['filename'] = item.attrib['media']
-                entity['provider'] = item.attrib['provider']
-                data['info'][tag].append(entity)
+        # DB에 저장값과 일치한 로컬파일을 찾음. 상황별로 삭제 제외하기 위해
+        # 2단계 적용을 위한 로컬파일에 해당하는 URL을 구함
+        for tag, value in TAG.items():
+            if data['process'][tag]['db'] != '':
+                data['process'][tag]['db_type'] = data['process'][tag]['db'].split('//')[0]
+                data['process'][tag]['filename'] = data['process'][tag]['db'].split('/')[-1]
+                for item in data['info'][value[1]]:
+                    if data['process'][tag]['filename'] == item['filename']:
+                        data['process'][tag]['url'] = item['url']
+                        break
+        logger.warning(data['process'])
+        # 1단계 이상이기 때문에 무조건 타 에이전트 폴더 삭제 및 저장되어 있는 않는 폴더 삭제함.
+        # 그런데 선택한 이미지의 url을 알수 있나
+        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')
+        for f in os.listdir(c_metapath):
+            _path = os.path.join(c_metapath, f)
+            # 윈도우는 combined에 바로 데이터가 있어서 무조건 삭제?
+            if f == '_stored':
+                tmp = ToolBaseFile.size(start_path=_path)
+                data['meta']['stored'] = tmp
+                if platform.system() == 'Windows':
+                    data['meta']['remove'] += tmp
+                    if data['dryrun'] == False:
+                        ToolBaseFile.rmtree(_path)
+            elif f == '_combined':
+                for tag, value in TAG.items():
+                    tag_path = os.path.join(_path, value[1])
+                    #logger.warning(tag_path)
+                    if os.path.exists(tag_path) == False:
+                        continue
+                    for img_file in os.listdir(tag_path):
+                        img_path = os.path.join(tag_path, img_file)
+                        if os.path.islink(img_path):
+                            if os.path.realpath(img_path).find('_stored') == -1:
+                                # 저장된 파일에 대한 링크가 아니기 삭제
+                                if data['dryrun'] == False:# and os.path.exists(img_path) == True:
+                                    os.remove(img_path)
+                        else: #윈도우
+                            if img_file != data['process'][tag]['filename']:
+                                # 저장파일이 아니기 때문에 삭제
+                                data['meta']['remove'] += os.path.getsize(img_path)
+                                if data['dryrun'] == False and os.path.exists(img_path) == True:
+                                    os.remove(img_path)
+            else:
+                tmp = ToolBaseFile.size(start_path=_path)
+                data['meta']['remove'] += tmp
+                if data['dryrun'] == False:
+                    ToolBaseFile.rmtree(_path)
