@@ -1,5 +1,5 @@
 # python
-import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob
+import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob, platform
 from datetime import datetime, timedelta
 # third-party
 import requests, sqlite3
@@ -59,7 +59,12 @@ class PlexDBHandle(object):
             if sql_filepath is None:
                 sql_filepath = os.path.join(path_data, 'tmp', f"{str(time.time()).split('.')[0]}.sql")
             ToolBaseFile.write(sql, sql_filepath)
-            ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
+            if platform.system() == 'Windows':
+                tmp = sql_filepath.replace('\\', '\\\\')
+                cmd = f'"{ModelSetting.get("base_bin_sqlite")}" "{ModelSetting.get("base_path_db")}" ".read {tmp}"'
+                ToolSubprocess.execute_command_return(cmd)
+            else:
+                ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
             return True
         except Exception as exception: 
             logger.error('Exception:%s', exception)

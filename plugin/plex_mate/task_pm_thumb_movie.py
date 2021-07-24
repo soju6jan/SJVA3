@@ -233,6 +233,8 @@ class Task(object):
 
         for item in media_ce.fetchall():
             logger.warning(d(item))
+            if item['hash'] == '':
+                continue
             mediapath = os.path.join(ModelSetting.get('base_path_media'), 'localhost', item['hash'][0], f"{item['hash'][1:]}.bundle")
             data['media']['total'] += ToolBaseFile.size(start_path=mediapath)
             if item['user_thumb_url'].startswith('media') == False:
