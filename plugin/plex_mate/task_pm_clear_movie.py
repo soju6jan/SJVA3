@@ -78,14 +78,14 @@ class Task(object):
     @staticmethod
     def analysis(data, con, cur):
         #logger.warning(f"분석시작 : {data['db']['title']}")
-        foldername = None
-        if data['db']['metadata_type'] == 1:
-            foldername = 'Movies'
 
-        metapath = os.path.join(ModelSetting.get('base_path_metadata'), foldername, data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
+        
 
-        data['meta'] = {'total':ToolBaseFile.size(start_path=metapath), 'remove':0, 'agents' : 0}
-        combined_xmlpath = os.path.join(metapath, 'Contents', '_combined', 'Info.xml')
+        data['meta'] = {'remove':0, 'agents' : 0}
+        data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'Movies', data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
+        data['meta']['total'] = ToolBaseFile.size(start_path=data['meta']['metapath'])
+
+        combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
         if os.path.exists(combined_xmlpath) == False:
             return
         Task.xml_analysis(combined_xmlpath, data)
@@ -118,7 +118,7 @@ class Task(object):
 
         # 1단계.
         # _combined 에서 ..stored 
-        c_metapath = os.path.join(metapath, 'Contents')
+        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')
         for f in os.listdir(c_metapath):
             _path = os.path.join(c_metapath, f)
             # 윈도우는 combined에 바로 데이터가 있어서 무조건 삭제?
