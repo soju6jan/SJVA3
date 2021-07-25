@@ -58,9 +58,12 @@ class Task(object):
                     data['status']['remove_size'] += data['media']['remove']
                 #P.logic.get_module('clear').receive_from_task(data, celery=False)
                 #continue
-                del data['use_filepath']
-                del data['remove_filepath']
-                del data['seasons']
+                if 'use_filepath' in data:
+                    del data['use_filepath']
+                if 'remove_filepath' in data:
+                    del data['remove_filepath']
+                if 'seasons' in data:
+                    del data['seasons']
                 if app.config['config']['use_celery']:
                     self.update_state(state='PROGRESS', meta=data)
                 else:
