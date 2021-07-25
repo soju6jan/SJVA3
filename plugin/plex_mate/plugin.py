@@ -38,7 +38,7 @@ class P(object):
                 ['simple', '간단 명령'], ['select', 'DB Select'],
             ],
             'manual' : [
-                ['README.md', 'README']
+                ['README.md', 'README'], ['file/파일정리.md', '파일정리']
             ],
         }
     }  
@@ -52,7 +52,7 @@ class P(object):
         'description' : u'PLEX Mate',
         'home' : 'https://github.com/soju6jan/%s' % package_name,
         'more' : '',
-        'policy_level' : 10,
+        #'policy_level' : 10,
     }
     ModelSetting = get_model_setting(package_name, logger)
     logic = None
