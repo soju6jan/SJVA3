@@ -46,7 +46,7 @@ class P(object):
     plugin_info = {
         'version' : '0.2.0.0',
         'name' : package_name,
-        'category_name' : 'beta',
+        'category' : menu['category'],
         'icon' : '',
         'developer' : u'soju6jan',
         'description' : u'Plex Mate',
