@@ -149,8 +149,8 @@ class LogicPMBase(LogicModuleBase):
                         ret['data']['bin_sqlite'] += '.exe'
                     for key, value in ret['data'].items():
                         if key != 'token':
-                            if os.path.exists(ret['data'][key]) == False:
-                                ret = {'ret':'fail', 'msg':'올바른 경로가 아닙니다.'}
+                            if os.path.exists(value) == False:
+                                ret = {'ret':'fail', 'msg':'올바른 경로가 아닙니다.<br>' + value}
                                 return jsonify(ret)
                     ret['ret'] = 'success'
                     ret['msg'] = '설정을 저장하세요.'
