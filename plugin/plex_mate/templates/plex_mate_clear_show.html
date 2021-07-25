@@ -28,7 +28,8 @@
       <button id="movie_stop_btn" class="btn btn-sm btn-outline-info">중지</button>
       <button id="movie_start0_btn" class="btn btn-sm btn-outline-info">쇼별 메타 크기만 확인</button>
       <button id="movie_start1_btn" class="btn btn-sm btn-outline-info">1단계 시작</button>
-      <button id="movie_start2_btn" class="btn btn-sm btn-outline-info">2단계 시작</button>
+      <button id="movie_start21_btn" class="btn btn-sm btn-outline-info">2-1단계 시작</button>
+      <button id="movie_start22_btn" class="btn btn-sm btn-outline-info">2-2단계 시작</button>
       <button id="movie_start3_btn" class="btn btn-sm btn-outline-info">3단계 시작</button>
     </div>
   </div>
@@ -71,9 +72,13 @@ $("body").on('click', '#movie_start1_btn', function(e){
   global_send_command_sub('start1', $('#library_select').val(), $('#dryrun').is(":checked"));
 });
 
-$("body").on('click', '#movie_start2_btn', function(e){
+$("body").on('click', '#movie_start21_btn', function(e){
   e.preventDefault();
-  global_send_command_sub('start2', $('#library_select').val(), $('#dryrun').is(":checked"));
+  global_send_command_sub('start21', $('#library_select').val(), $('#dryrun').is(":checked"));
+});
+$("body").on('click', '#movie_start22_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start22', $('#library_select').val(), $('#dryrun').is(":checked"));
 });
 
 $("body").on('click', '#movie_start3_btn', function(e){
@@ -103,6 +108,17 @@ function make_one(data) {
   }
   row += make_log("thumb", data.db.user_thumb_url);
   row += make_log("art", data.db.user_art_url);
+  if (data.db.user_music_url != null)
+    row += make_log("theme", data.db.user_music_url);
+  if (data.file_count != 0) {
+    row += make_log("파일", '전체 파일 : ' + data.file_count + ' / 삭제 파일 : ' + data.remove_count);
+  }
+  if (data.use_filepath != null) {
+    row += make_log("사용파일", '<pre>' + data.use_filepath.join('\n') + '</pre>');
+  }
+  if (data.remove_filepath != null) {
+    row += make_log("삭제파일", '<pre>' + data.remove_filepath.join('\n') + '</pre>');
+  }
   row += m_row_end();
   return row;
 }

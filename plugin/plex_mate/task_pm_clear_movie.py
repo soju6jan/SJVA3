@@ -23,7 +23,8 @@ from .plex_db import PlexDBHandle, dict_factory
 TAG = {
     'poster' : ['thumb', 'posters'],
     'art' : ['art', 'art'],
-    'banner' : ['banner', 'banners']
+    'banner' : ['banner', 'banners'],
+    'theme' : ['music', 'themes']
 }
 
 
@@ -49,27 +50,31 @@ class Task(object):
         fetch = ce.fetchall()
         status = {'is_working':'run', 'total_size':0, 'remove_size':0, 'count':len(fetch), 'current':0}
         for movie in fetch:
-            if ModelSetting.get_bool('clear_movie_task_stop_flag'):
-                return 'stop'
-            time.sleep(0.05)
-            status['current'] += 1
-            data = {'mode':'movie', 'status':status, 'command':command, 'section_id':section_id, 'dryrun':dryrun, 'process':{}}
-            data['db'] = movie
-            #logger.warning(movie['title'])
-
-            
-            Task.analysis(data, con, cur)
-            data['status']['total_size'] += data['meta']['total']
-            data['status']['remove_size'] += data['meta']['remove']
-            if 'media' in data:
-                data['status']['total_size'] += data['media']['total']
-                data['status']['remove_size'] += data['media']['remove']
-            #P.logic.get_module('clear').receive_from_task(data, celery=False)
-            #continue
-            if app.config['config']['use_celery']:
-                self.update_state(state='PROGRESS', meta=data)
-            else:
-                self.receive_from_task(data, celery=False)
+            try:
+                if ModelSetting.get_bool('clear_movie_task_stop_flag'):
+                    return 'stop'
+                time.sleep(0.05)
+                status['current'] += 1
+                data = {'mode':'movie', 'status':status, 'command':command, 'section_id':section_id, 'dryrun':dryrun, 'process':{}}
+                data['db'] = movie
+                #logger.warning(movie['title'])
+   
+                Task.analysis(data, con, cur)
+                data['status']['total_size'] += data['meta']['total']
+                data['status']['remove_size'] += data['meta']['remove']
+                if 'media' in data:
+                    data['status']['total_size'] += data['media']['total']
+                    data['status']['remove_size'] += data['media']['remove']
+                #P.logic.get_module('clear').receive_from_task(data, celery=False)
+                #continue
+                if app.config['config']['use_celery']:
+                    self.update_state(state='PROGRESS', meta=data)
+                else:
+                    self.receive_from_task(data, celery=False)
+            except Exception as e:
+                logger.error(f'Exception:{str(e)}')
+                logger.error(traceback.format_exc())
+                logger.error(movie['title'])
         logger.warning(f"종료")
         return 'wait'
 
@@ -79,83 +84,7 @@ class Task(object):
     def analysis(data, con, cur):
         #logger.warning(f"분석시작 : {data['db']['title']}")
 
-        
-
-        data['meta'] = {'remove':0, 'agents' : 0}
-        data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'Movies', data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
-        data['meta']['total'] = ToolBaseFile.size(start_path=data['meta']['metapath'])
-
-        combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
-        if os.path.exists(combined_xmlpath) == False:
-            return
-        Task.xml_analysis(combined_xmlpath, data)
-
-        #logger.warning(data['db']['user_thumb_url'])
-        #logger.warning(data['info']['posters'])
-        data['process'] = {}
-        for tag, value in TAG.items():
-            data['process'][tag] = {
-                'db' : data['db'][f'user_{value[0]}_url'],
-                'db_type' : '', 
-                'url' : '',
-                'filename' : '',
-            }
-
-
-        # DB에 저장값과 일치한 로컬파일을 찾음. 상황별로 삭제 제외하기 위해
-        # 2단계 적용을 위한 로컬파일에 해당하는 URL을 구함
-        for tag, value in TAG.items():
-            if data['process'][tag]['db'] != '':
-                data['process'][tag]['db_type'] = data['process'][tag]['db'].split('//')[0]
-                data['process'][tag]['filename'] = data['process'][tag]['db'].split('/')[-1]
-                for item in data['info'][value[1]]:
-                    if data['process'][tag]['filename'] == item['filename']:
-                        data['process'][tag]['url'] = item['url']
-                        break
-
-
-        #logger.error(d(data['process']))
-
-        # 1단계.
-        # _combined 에서 ..stored 
-        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')
-        for f in os.listdir(c_metapath):
-            _path = os.path.join(c_metapath, f)
-            # 윈도우는 combined에 바로 데이터가 있어서 무조건 삭제?
-            if f == '_stored':
-                tmp = ToolBaseFile.size(start_path=_path)
-                data['meta']['stored'] = tmp
-                if platform.system() == 'Windows':
-                    data['meta']['remove'] += tmp
-                    if data['dryrun'] == False:
-                        ToolBaseFile.rmtree(_path)
-            elif f == '_combined':
-                for tag, value in TAG.items():
-                    tag_path = os.path.join(_path, value[1])
-                    #logger.warning(tag_path)
-                    if os.path.exists(tag_path) == False:
-                        continue
-                    for img_file in os.listdir(tag_path):
-                        img_path = os.path.join(tag_path, img_file)
-                        if os.path.islink(img_path):
-                            if os.path.realpath(img_path).find('_stored') == -1:
-                                # 저장된 파일에 대한 링크가 아니기 삭제
-                                # 먼저 에이전트 폴더들이 삭제될 수 있음.
-                                if data['dryrun'] == False:# and os.path.exists(img_path) == True:
-                                    os.remove(img_path)
-                        else: #윈도우
-                            if img_file != data['process'][tag]['filename']:
-                                # 저장파일이 아니기 때문에 삭제
-                                data['meta']['remove'] += os.path.getsize(img_path)
-                                if data['dryrun'] == False and os.path.exists(img_path) == True:
-                                    os.remove(img_path)
-                
-            else:
-                tmp = ToolBaseFile.size(start_path=_path)
-                data['meta']['remove'] += tmp
-                data['meta']['agents'] += tmp
-                if data['dryrun'] == False:
-                    ToolBaseFile.rmtree(_path)
+        Task.thumb_process(data)
 
         if data['command'] == 'start1':
             return
@@ -180,7 +109,8 @@ class Task(object):
                 sql += '  WHERE id = {} ;'.format(data['db']['id'])
                 sql_filepath = os.path.join(path_data, 'tmp', f"movie_{data['db']['id']}.sql")
                 PlexDBHandle.execute_query(sql, sql_filepath=sql_filepath)
-                
+        
+        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')                
         for f in os.listdir(c_metapath):
             _path = os.path.join(c_metapath, f)
             if f == '_combined':
@@ -265,3 +195,98 @@ class Task(object):
                     entity['filename'] = item.attrib['media']
                 entity['provider'] = item.attrib['provider']
                 data['info'][tag].append(entity)
+
+
+
+    # xml 정보를 가져오고, 중복된 이미지를 지운다
+    @staticmethod
+    def thumb_process(data):
+        data['meta'] = {'remove':0}
+        #logger.warning(data['db'])
+        if data['db']['metadata_type'] == 1:
+            data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'Movies', data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
+            combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
+        elif data['db']['metadata_type'] == 2:
+            data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'TV Shows', data['db']['hash'][0], f"{data['db']['hash'][1:]}.bundle")
+            combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
+            
+        data['meta']['total'] = ToolBaseFile.size(start_path=data['meta']['metapath'])
+        if data['command'] == 'start0':
+            return
+        if os.path.exists(combined_xmlpath) == False:
+            return
+
+        Task.xml_analysis(combined_xmlpath, data)
+    
+        data['process'] = {}
+        for tag, value in TAG.items():
+            data['process'][tag] = {
+                'db' : data['db'][f'user_{value[0]}_url'],
+                'db_type' : '', 
+                'url' : '',
+                'filename' : '',
+                'location' : '',
+            }
+
+        for tag, value in TAG.items():
+            if data['process'][tag]['db'] != '':
+                data['process'][tag]['db_type'] = data['process'][tag]['db'].split('//')[0]
+                data['process'][tag]['filename'] = data['process'][tag]['db'].split('/')[-1]
+                for item in data['info'][value[1]]:
+                    if data['process'][tag]['filename'] == item['filename']:
+                        data['process'][tag]['url'] = item['url']
+                        break
+
+        #logger.error(d(data['process']))
+        # 1단계.
+        # _combined 에서 ..stored 
+        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')
+        not_remove_filelist = []
+        for f in os.listdir(c_metapath):
+            _path = os.path.join(c_metapath, f)
+            # 윈도우는 combined에 바로 데이터가 있어서 무조건 삭제?
+            if f == '_stored':
+                tmp = ToolBaseFile.size(start_path=_path)
+                data['meta']['stored'] = tmp
+                if platform.system() == 'Windows':
+                    data['meta']['remove'] += tmp
+                    if data['dryrun'] == False:
+                        ToolBaseFile.rmtree(_path)
+            elif f == '_combined':
+                for tag, value in TAG.items():
+                    tag_path = os.path.join(_path, value[1])
+                    #logger.warning(tag_path)
+                    if os.path.exists(tag_path) == False:
+                        continue
+                    for img_file in os.listdir(tag_path):
+                        img_path = os.path.join(tag_path, img_file)
+                        if os.path.islink(img_path):
+                            if os.path.realpath(img_path).find('_stored') == -1:
+                                # 저장된 파일에 대한 링크가 아니기 삭제
+                                # db에 저장된 url이 stored가 아닌 에이전트 폴더를 가로 가르키는 경우가 있음
+                                #logger.warning(img_file)
+                                if img_file == data['process'][tag]['filename']:
+                                    logger.error(data['process'][tag]['filename'])
+                                    not_remove_filelist.append(data['process'][tag]['filename'])
+                                    continue
+                                if data['dryrun'] == False:# and os.path.exists(img_path) == True:
+                                    os.remove(img_path)
+                        else: #윈도우
+                            if img_file != data['process'][tag]['filename']:
+                                # 저장파일이 아니기 때문에 삭제
+                                data['meta']['remove'] += os.path.getsize(img_path)
+                                if data['dryrun'] == False and os.path.exists(img_path) == True:
+                                    os.remove(img_path)
+                  
+        #if len(not_remove_filelist) == 0:
+        for f in os.listdir(c_metapath):
+            _path = os.path.join(c_metapath, f)
+            if f == '_stored' or f == '_combined':
+                continue
+            tmp = ToolBaseFile.size(start_path=_path)
+            data['meta']['remove'] += tmp
+            if data['dryrun'] == False:
+                ToolBaseFile.rmtree(_path)
+        #else:
+        if not_remove_filelist:
+            logger.error(not_remove_filelist)

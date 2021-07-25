@@ -24,7 +24,7 @@ class P(object):
     menu = {
         'main' : [package_name, u'PLEX Mate'],
         'sub' : [
-            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'], ['manual', '매뉴얼'], ['log', u'로그']
+            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'], ['scan', '스캔'], ['watchdog', '파일시스템 감시'],['manual', '매뉴얼'], ['log', u'로그']
         ], 
         'category' : 'beta',
         'sub2' : {
@@ -35,8 +35,11 @@ class P(object):
                 ['movie', '영화 정리'], ['show', 'TV 정리'], ['bundle', '번들 삭제'], ['cache', '캐시(PhotoTranscoder) 삭제'], 
             ],
             'tool' : [
-                ['simple', '간단 명령'], ['show', '컬렉션 삭제'], ['cache', 'PhotoTranscoder'], ['bundle', '번들제거']
-            ]
+                ['simple', '간단 명령'], ['select', 'DB Select'],
+            ],
+            'manual' : [
+                ['README.md', 'README']
+            ],
         }
     }  
 
