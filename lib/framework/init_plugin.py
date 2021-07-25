@@ -92,7 +92,9 @@ def plugin_init():
             try:
                 mod = __import__('%s' % (plugin_name), fromlist=[])
                 try:
-                    mod_plugin_info = getattr(mod, 'plugin_info')      
+                    mod_plugin_info = getattr(mod, 'plugin_info')
+                    if 'category'  not in mod_plugin_info and 'category_name' in mod_plugin_info:
+                        mod_plugin_info['category'] = mod_plugin_info['category_name']
                     if 'policy_point' in mod_plugin_info:
                         if mod_plugin_info['policy_point'] > app.config['config']['point']:
                             continue
@@ -102,7 +104,9 @@ def plugin_init():
                     if 'category' in mod_plugin_info and mod_plugin_info['category'] == 'beta':
                         if SystemModelSetting.get_bool('use_beta') == False:
                             continue
-                except:
+                except Exception as exception:
+                    #logger.error('Exception:%s', exception)
+                    #logger.error(traceback.format_exc())
                     logger.debug('no plugin_info : %s', plugin_name)
 
                 mod_blue_print = getattr(mod, 'blueprint')

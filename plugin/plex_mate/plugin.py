@@ -22,7 +22,7 @@ class P(object):
     logger = get_logger(package_name)
     blueprint = Blueprint(package_name, package_name, url_prefix='/%s' %  package_name, template_folder=os.path.join(os.path.dirname(__file__), 'templates'), static_folder=os.path.join(os.path.dirname(__file__), 'static'))
     menu = {
-        'main' : [package_name, u'PLEX Mate'],
+        'main' : [package_name, u'Plex Mate'],
         'sub' : [
             ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'], ['scan', '스캔'], ['watchdog', '파일시스템 감시'],['manual', '매뉴얼'], ['log', u'로그']
         ], 
@@ -38,7 +38,7 @@ class P(object):
                 ['simple', '간단 명령'], ['select', 'DB Select'],
             ],
             'manual' : [
-                ['README.md', 'README']
+                ['README.md', 'README'], ['file/파일정리.md', '파일정리']
             ],
         }
     }  
@@ -46,13 +46,13 @@ class P(object):
     plugin_info = {
         'version' : '0.2.0.0',
         'name' : package_name,
-        'category_name' : 'beta',
+        'category' : menu['category'],
         'icon' : '',
         'developer' : u'soju6jan',
-        'description' : u'PLEX Mate',
+        'description' : u'Plex Mate',
         'home' : 'https://github.com/soju6jan/%s' % package_name,
         'more' : '',
-        'policy_level' : 10,
+        #'policy_level' : 10,
     }
     ModelSetting = get_model_setting(package_name, logger)
     logic = None
