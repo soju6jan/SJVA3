@@ -32,7 +32,15 @@
 # ~~~ ORDER BY title LIMIT 1000 OFFSET 1000;  => 2페이지. 천개 제외 1000개의 가져옴
 # ~~~ ORDER BY title LIMIT 1000 OFFSET 2000;  => 3페이지.
 
-영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title
+영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title 
 
 
+######################################################################
+# 쇼 쿼리 : 라이브러리별로 영화 데이터를 가져오는 SQL문장
+# 조건문에 metadata_type = 2 AND library_section_id = ? 필수
+#
+# 기본값 (제목순으로 모든 데이터 확인)
+# TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
+#
+TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
 
