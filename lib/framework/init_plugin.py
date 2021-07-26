@@ -126,7 +126,7 @@ def plugin_init():
         # plugin_load 를 해야 하위 로직에 있는 DB가 로딩된다.
         # plugin_load 에 db는 사용하는 코드가 있으면 안된다. (테이블도 없을 때 에러발생)
         try:
-            logger.warning('module plugin_load in celery ')
+            #logger.warning('module plugin_load in celery ')
             plugin_instance_list['mod'].plugin_load()
         except Exception as exception:
             logger.error('module plugin_load error')

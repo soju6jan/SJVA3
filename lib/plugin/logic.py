@@ -32,11 +32,20 @@ class Logic(object):
                 module.migration()
             for module in self.P.module_list:
                 module.plugin_load()
+                if module.sub_list is not None:
+                    for sub_name, sub_instance in module.sub_list.items():
+                        sub_instance.plugin_load()
             if self.P.ModelSetting is not None:
                 for module in self.P.module_list:
-                    key = '{sub}_auto_start'.format(sub=module.name)
+                    key = f'{module.name}_auto_start'
                     if self.P.ModelSetting.has_key(key) and self.P.ModelSetting.get_bool(key):
                         self.scheduler_start(module.name)
+                    if module.sub_list is not None:
+                        for sub_name, sub_instance in module.sub_list.items():
+                            key = f'{module.name}_{sub_name}_auto_start'
+                            if self.P.ModelSetting.has_key(key) and self.P.ModelSetting.get_bool(key):
+                                self.scheduler_start_sub(module.name, sub_name)
+
         except Exception as exception:
             self.P.logger.error('Exception:%s', exception)
             self.P.logger.error(traceback.format_exc())
@@ -72,6 +81,9 @@ class Logic(object):
             self.P.logger.debug('%s plugin_unload', self.P.package_name)
             for module in self.P.module_list:
                 module.plugin_unload()
+                if module.sub_list is not None:
+                    for sub_name, sub_instance in module.sub_list.items():
+                        sub_instance.plugin_unload()
         except Exception as exception:
             self.P.logger.error('Exception:%s', exception)
             self.P.logger.error(traceback.format_exc())
@@ -87,7 +99,7 @@ class Logic(object):
             self.P.logger.error('Exception:%s', exception)
             self.P.logger.error(traceback.format_exc())
 
-
+    
     def scheduler_stop(self, sub):
         try:
             job_id = '%s_%s' % (self.P.package_name, sub)
@@ -167,3 +179,70 @@ class Logic(object):
         except Exception as exception:
             self.P.logger.error('Exception:%s', exception)
             self.P.logger.error(traceback.format_exc())
+
+    #######################################################
+    # 플러그인 - 모듈 - 서브  구조하에서 서브 관련 함수
+
+    def scheduler_start_sub(self, module_name, sub_name):
+        try:
+            #self.P.logger.warning('scheduler_start_sub')
+            job_id = f'{self.P.package_name}_{module_name}_{sub_name}'
+            ins_module = self.get_module(module_name)
+            ins_sub = ins_module.sub_list[sub_name]
+            job = Job(self.P.package_name, job_id, ins_sub.get_scheduler_interval(), ins_sub.scheduler_function, ins_sub.get_scheduler_desc(), False, args=None)
+            scheduler.add_job_instance(job)
+        except Exception as exception: 
+            self.P.logger.error('Exception:%s', exception)
+            self.P.logger.error(traceback.format_exc())
+
+    def scheduler_stop_sub(self, module_name, sub_name):
+        try:
+            job_id = f'{self.P.package_name}_{module_name}_{sub_name}'
+            scheduler.remove_job(job_id)
+        except Exception as exception: 
+            self.P.logger.error('Exception:%s', exception)
+            self.P.logger.error(traceback.format_exc())
+
+    def scheduler_function_sub(self, module_name, sub_name):
+        try:
+            ins_module = self.get_module(module_name)
+            ins_sub = ins_module.sub_list[sub_name]
+            ins_sub.scheduler_function()
+        except Exception as exception: 
+            self.P.logger.error('Exception:%s', exception)
+            self.P.logger.error(traceback.format_exc())
+
+    def one_execute_sub(self, module_name, sub_name):
+        try:
+            job_id = f'{self.P.package_name}_{module_name}_{sub_name}'
+            if scheduler.is_include(job_id):
+                if scheduler.is_running(job_id):
+                    ret = 'is_running'
+                else:
+                    scheduler.execute_job(job_id)
+                    ret = 'scheduler'
+            else:
+                def func():
+                    time.sleep(2)
+                    self.scheduler_function_sub(module_name, sub_name)
+                threading.Thread(target=func, args=()).start()
+                ret = 'thread'
+        except Exception as exception: 
+            self.P.logger.error('Exception:%s', exception)
+            self.P.logger.error(traceback.format_exc())
+            ret = 'fail'
+        return ret
+    
+    def immediately_execute_sub(self, module_name, sub_name):
+        self.P.logger.debug(f'immediately_execute : {module_name} {sub_name}')
+        try:
+            def func():
+                time.sleep(1)
+                self.scheduler_function_sub(module_name, sub_name)
+            threading.Thread(target=func, args=()).start()
+            ret = {'ret':'success', 'msg':'실행합니다.'}
+        except Exception as exception: 
+            self.P.logger.error('Exception:%s', exception)
+            self.P.logger.error(traceback.format_exc())
+            ret = {'ret' : 'danger', 'msg':str(exception)}
+        return ret

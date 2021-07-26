@@ -26,31 +26,39 @@ class PlexDBHandle(object):
     
     @classmethod
     def library_sections(cls, db_file=None, section_type=None):
-        if db_file is None:
-            db_file = ModelSetting.get('base_path_db')
-        con = sqlite3.connect(db_file)
-        cur = con.cursor()
-        if section_type is None:
-            ce = con.execute('SELECT * FROM library_sections ORDER BY name, created_at')
-        else:
-            ce = con.execute('SELECT * FROM library_sections WHERE section_type = ? ORDER BY name, created_at', (section_type,))
-        ce.row_factory = dict_factory
-        data = ce.fetchall()
-        con.close()
-        return data
+        try:
+            if db_file is None:
+                db_file = ModelSetting.get('base_path_db')
+            con = sqlite3.connect(db_file)
+            cur = con.cursor()
+            if section_type is None:
+                ce = con.execute('SELECT * FROM library_sections ORDER BY name, created_at')
+            else:
+                ce = con.execute('SELECT * FROM library_sections WHERE section_type = ? ORDER BY name, created_at', (section_type,))
+            ce.row_factory = dict_factory
+            data = ce.fetchall()
+            con.close()
+            return data
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
 
     @classmethod
     def library_section(cls, library_id, db_file=None):
-        library_id = int(library_id)
-        if db_file is None:
-            db_file = ModelSetting.get('base_path_db')
-        con = sqlite3.connect(db_file)
-        cur = con.cursor()
-        ce = con.execute('SELECT * FROM library_sections WHERE id = ?', (library_id,))
-        ce.row_factory = dict_factory
-        data = ce.fetchone()
-        con.close()
-        return data
+        try:
+            library_id = int(library_id)
+            if db_file is None:
+                db_file = ModelSetting.get('base_path_db')
+            con = sqlite3.connect(db_file)
+            cur = con.cursor()
+            ce = con.execute('SELECT * FROM library_sections WHERE id = ?', (library_id,))
+            ce.row_factory = dict_factory
+            data = ce.fetchone()
+            con.close()
+            return data
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
 
 
     @classmethod

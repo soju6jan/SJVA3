@@ -45,7 +45,7 @@ class LogicPMClearBundle(LogicSubModuleBase):
             ret = {}
             if sub == 'command':
                 command = req.form['command']
-                logger.error(f"sub : {sub}  /  command : {command}")
+                #logger.error(f"sub : {sub}  /  command : {command}")
                 if command == 'start':
                     if self.data['status']['is_working'] == 'run':
                         ret = {'ret':'warning', 'msg':'실행중입니다.'}

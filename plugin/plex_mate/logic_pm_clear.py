@@ -22,6 +22,7 @@ from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 from .logic_pm_clear_library import LogicPMClearLibrary
 from .logic_pm_clear_bundle import LogicPMClearBundle
+from .logic_pm_clear_cache import LogicPMClearCache
 #########################################################
 
 
@@ -32,7 +33,8 @@ class LogicPMClear(LogicModuleBase):
         self.sub_list = {
             'movie' : LogicPMClearLibrary(P, self, 'movie'),
             'show' : LogicPMClearLibrary(P, self, 'show'),
-            'bundle' : LogicPMClearBundle(P, self, 'bundle')
+            'bundle' : LogicPMClearBundle(P, self, 'bundle'),
+            'cache' : LogicPMClearCache(P, self, 'cache')
         }
 
     def process_menu(self, sub, req):
@@ -44,6 +46,9 @@ class LogicPMClear(LogicModuleBase):
                 arg['library_list'] = PlexDBHandle.library_sections(section_type=1)
             elif sub == 'show':
                 arg['library_list'] = PlexDBHandle.library_sections(section_type=2)
+            elif sub == 'cache':
+                arg['scheduler'] = str(scheduler.is_include(self.sub_list[sub].get_scheduler_name()))
+                arg['is_running'] = str(scheduler.is_running(self.sub_list[sub].get_scheduler_name()))
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e:
             logger.error(f'Exception:{str(e)}')
@@ -60,9 +65,5 @@ class LogicPMClear(LogicModuleBase):
             P.logger.error(traceback.format_exc())
             return jsonify({'ret':'danger', 'msg':str(e)})
     
-    def plugin_load(self):
-        for key, value in self.sub_list.items():
-            value.plugin_load()
-
 
     #########################################################

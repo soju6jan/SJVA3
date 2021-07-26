@@ -422,21 +422,6 @@ function global_send_command2(command, arg1, arg2, arg3, modal_title) {
   });
 }
 
-function global_send_command_sub(command, arg1, arg2, arg3, modal_title, callback) {
-  $.ajax({
-    url: '/' + package_name + '/ajax/' + sub + '/' + sub2 + '/command',
-    type: "POST", 
-    cache: false,
-    data:{command:command, arg1:arg1, arg2:arg2, arg3},
-    dataType: "json",
-    success: function (ret) {
-      if (ret.msg != null) notify(ret.msg, ret.ret);
-      if (ret.modal != null) m_modal(ret.modal, modal_title, false);
-      if (callback != null) callback(ret);
-    }
-  });
-}
-
 function shutdown_confirm() {
   document.getElementById("confirm_title").innerHTML = "종료 확인";
   document.getElementById("confirm_body").innerHTML = "종료 하시겠습니까?";
@@ -850,6 +835,76 @@ function notify(msg, type) {
 }
 
 
+//#######################################################
+//플러그인 - 모듈 - 서브  구조하에서 서브 관련 함수
 
+function global_send_command_sub(command, arg1, arg2, arg3, modal_title, callback) {
+  $.ajax({
+    url: '/' + package_name + '/ajax/' + sub + '/' + sub2 + '/command',
+    type: "POST", 
+    cache: false,
+    data:{command:command, arg1:arg1, arg2:arg2, arg3},
+    dataType: "json",
+    success: function (ret) {
+      if (ret.msg != null) notify(ret.msg, ret.ret);
+      if (ret.modal != null) m_modal(ret.modal, modal_title, false);
+      if (callback != null) callback(ret);
+    }
+  });
+}
+
+
+$("body").on('click', '#global_one_execute_sublogic_btn', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: '/' + package_name + '/ajax/' + sub + '/' + sub2 + '/one_execute',
+    type: "POST", 
+    cache: false,
+    data: {},
+    dataType: "json",
+    success: function (ret) {
+      if (ret=='scheduler' || ret=='thread') {
+        $.notify('<strong>작업을 시작하였습니다. ('+ret+')</strong>', {
+          type: 'success'
+        });
+      } else if (ret == 'is_running') {
+        $.notify('<strong>작업중입니다.</strong>', {
+          type: 'warning'
+        });
+      } else {
+        $.notify('<strong>작업 시작에 실패하였습니다.</strong>', {
+          type: 'warning'
+        });
+      }
+    }
+  });
+});
+
+$("body").on('click', '#global_immediately_execute_sublogic_btn', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: '/' + package_name + '/ajax/' + sub + '/' + sub2 + '/immediately_execute',
+    type: "POST", 
+    cache: false,
+    data: {},
+    dataType: "json",
+    success: function (ret) {
+      if (ret.msg != null) notify(ret.msg, ret.ret);
+    }
+  });
+});
+
+$('#global_scheduler_sublogic').change(function() {
+  var ret = $(this).prop('checked');
+  $.ajax({
+    url: '/'+package_name+'/ajax/' + sub + '/' + sub2 + '/scheduler',
+    type: "POST", 
+    cache: false,
+    data: {scheduler : ret},
+    dataType: "json",
+    success: function (list) {
+    }
+  });
+});
 
 </script>

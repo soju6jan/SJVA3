@@ -8,6 +8,7 @@
   </div>
   <div class="input-group col-sm-3">
     <select id="library_select" name="library_select" class="form-control form-control-sm">
+      {% if arg['library_list'] is not none %}
       {% for item in arg['library_list'] %}
         {% if loop.counter == 0 %}
         <option value="{{ item['id'] }}" selected>{{item['name']}}</option>
@@ -15,6 +16,7 @@
         <option value="{{ item['id'] }}">{{item['name']}}</option>
         {% endif %}
       {% endfor %}
+      {% endif %}
     </select>
   </div>
   <div class='col-sm-1 set-left'>

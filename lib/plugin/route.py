@@ -127,9 +127,33 @@ def default_route(P):
         try:
             for module in P.module_list:
                 if module_name == module.name:
-                    P.logger.warning(module_name)
+                    
                     if module.sub_list is not None and sub_name in module.sub_list:
-                        return module.sub_list[sub_name].process_ajax(command, request)
+                        P.logger.debug(f"AJAX module:{module_name} sub:{sub_name} cmd:{command}")
+                        instance_sub = module.sub_list[sub_name]
+                        
+                        if command == 'scheduler':
+                            sub = request.form['sub']
+                            go = request.form['scheduler']
+                            P.logger.debug('scheduler :%s', go)
+                            if go == 'true':
+                                P.logic.scheduler_start_sub(module_name, sub_name)
+                            else:
+                                P.logic.scheduler_stop_sub(module_name, sub_name)
+                            return jsonify(go)
+                        #elif command == 'reset_db':
+                        #    sub = request.form['sub']
+                        #    ret = P.logic.reset_db(sub)
+                            return jsonify(ret)
+                        elif command == 'one_execute':
+                            ret = P.logic.one_execute_sub(module_name, sub_name)
+                            return jsonify(ret)
+                        elif command == 'immediately_execute':
+                            ret = P.logic.immediately_execute_sub(module_name, sub_name)
+                            return jsonify(ret)
+                        else:
+                            return instance_sub.process_ajax(command, request)
+            P.logger.error(f"not process ajax : {P.package_name} {module_name} {sub_name} {command}")
         except Exception as exception: 
             P.logger.error('Exception:%s', exception)
             P.logger.error(traceback.format_exc())

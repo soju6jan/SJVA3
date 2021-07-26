@@ -25,7 +25,7 @@ class LogicModuleBase(object):
     def process_normal(self, sub, req):
         pass
 
-    def scheduler_function():
+    def scheduler_function(self):
         pass
 
     def reset_db(self):
@@ -81,11 +81,39 @@ class LogicSubModuleBase(object):
         self.scheduler_desc = scheduler_desc
         self.socketio_list = None
 
-    def process_menu(self, sub):
-        pass
 
     def process_ajax(self, sub, req):
         pass
+
+    def scheduler_function(self):
+        pass
+    
+    def plugin_load(self):
+        pass
+    
+    def plugin_unload(self):
+        pass
+
+
+    def get_scheduler_desc(self):
+        return self.scheduler_desc 
+    
+    def get_scheduler_interval(self):
+        if self.P is not None and self.P.ModelSetting is not None and self.parent.name is not None and self.name is not None:
+            return self.P.ModelSetting.get(f'{self.parent.name}_{self.name}_interval')
+
+    def get_scheduler_name(self):
+        return f'{self.P.package_name}_{self.parent.name}_{self.name}'
+
+
+
+
+
+
+
+
+
+    
     
     def process_api(self, sub, req):
         pass
@@ -93,17 +121,12 @@ class LogicSubModuleBase(object):
     def process_normal(self, sub, req):
         pass
 
-    def scheduler_function():
-        pass
+    
 
     def reset_db(self):
         pass
 
-    def plugin_load(self):
-        pass
     
-    def plugin_unload(self):
-        pass
     
     def setting_save_after(self):
         pass
@@ -115,22 +138,8 @@ class LogicSubModuleBase(object):
         pass
     
     #################################################################
-    def get_scheduler_desc(self):
-        return self.scheduler_desc 
+    
 
-    def get_scheduler_interval(self):
-        if self.P is not None and self.P.ModelSetting is not None and self.name is not None:
-            return self.P.ModelSetting.get('{module_name}_interval'.format(module_name=self.name))
+    def process_menu(self, sub):
+        pass
 
-    def get_first_menu(self):
-        return self.first_menu
-
-    def get_scheduler_name(self):
-        return '%s_%s' % (self.P.package_name, self.name)
-
-    def dump(self, data):
-        if type(data) in [type({}), type([])]:
-            import json
-            return '\n' + json.dumps(data, indent=4, ensure_ascii=False)
-        else:
-            return str(data)
