@@ -53,6 +53,8 @@ class ToolBaseFile(object):
     @classmethod
     def text_for_filename(cls, text):
         text = text.replace('/', '')
+        # 2021-07-31 X:X
+        text = text.replace(':', ' ')
         text = re.sub('[\\/:*?\"<>|]', '', text).strip()
         text = re.sub("\s{2,}", ' ', text)
         return text

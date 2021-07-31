@@ -32,7 +32,7 @@ class P(object):
                 ['setting', '설정']
             ],
             'clear' : [
-                ['movie', '영화 정리'], ['show', 'TV 정리'], ['bundle', '번들 삭제'], #['cache', '캐시(PhotoTranscoder) 삭제'], 
+                ['movie', '영화 정리'], ['show', 'TV 정리'], ['bundle', '번들 삭제'], ['cache', '캐시(PhotoTranscoder) 삭제'], 
             ],
             'tool' : [
                 ['simple', '간단 명령'], ['select', 'DB Select'],

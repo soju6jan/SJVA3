@@ -16,6 +16,8 @@
     {{ macros.m_tab_content_start('normal', true) }}
 
       {{ macros.setting_input_int('clear_cache_max_size', '최대 크기',  desc=['이 크기 이상일 경우 삭제', '0이면 항상 삭제', 'GB 단위'], value=arg['clear_cache_max_size']) }}
+      {{ macros.m_hr() }}
+      {{ macros.buttons([['get_size_phototranscoder_btn', '크기 확인'], ['clear_phototranscoder_btn', '비우기']]) }}
       
       
     {{ macros.m_tab_content_end() }}  
@@ -39,39 +41,15 @@ var path_app_root = "{{arg['path_app_root']}}";
 $(document).ready(function(){
 });
 
-
-$("body").on('click', '#select_basic_path_source_btn', function(e){
+$("body").on('click', '#get_size_phototranscoder_btn', function(e){
   e.preventDefault();
-  var path = $('#basic_path_source').val().trim();
-  if (path == '') path = '/'
-  m_select_local_file_modal("소스 폴더", path, true, function(result){
-    $('#basic_path_source').val(result);
-  });
+  global_send_command_sub('cache_size');
 });
 
-$("body").on('click', '#select_basic_path_target_btn', function(e){
+$("body").on('click', '#clear_phototranscoder_btn', function(e){
   e.preventDefault();
-  var path = $('#basic_path_target').val().trim();
-  if (path == '') path = '/'
-  m_select_local_file_modal("타겟 폴더", path, true, function(result){
-    $('#basic_path_target').val(result);
-  });
+  global_send_command_sub('cache_clear');
 });
 
-$("body").on('click', '#select_basic_path_error_btn', function(e){
-  e.preventDefault();
-  var path = $('#basic_path_error').val().trim();
-  if (path == '') path = '/'
-  m_select_local_file_modal("에러 폴더", path, true, function(result){
-    $('#basic_path_error').val(result);
-  });
-});
-
-$("body").on('click', '#edit_path_config_btn', function(e){
-  e.preventDefault();
-  var config_path = $('#basic_path_config').val().trim();
-  url = "/flaskcode" + config_path.replace(path_app_root, '');
-  window.location.href = url;
-});
 </script>    
 {% endblock %}

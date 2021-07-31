@@ -122,7 +122,9 @@ class LogicPMBase(LogicModuleBase):
                     if match:
                         msg += u'<br>SjvaAgent (최신) : ' + match.group('version')
                     return jsonify({'ret':'success', 'msg':msg})
-                    
+                elif command == 'make_sql':
+                    self.make_sql()
+
             elif sub == 'plex_folder_test':
                 program_path = req.form['program_path']
                 data_path = req.form['data_path']
@@ -138,15 +140,18 @@ class LogicPMBase(LogicModuleBase):
                     ret['data']['path_metadata'] = os.path.join(data_path, 'Metadata')
                     ret['data']['path_media'] = os.path.join(data_path, 'Media')
                     ret['data']['path_phototranscoder'] = os.path.join(data_path, 'Cache', 'PhotoTranscoder')
-                    xml_string = ToolBaseFile.read(os.path.join(data_path, 'Preferences.xml'))
-                    result = xmltodict.parse(xml_string)
-                    prefs = json.loads(json.dumps(result))
-                    #logger.warning(d(prefs))
-                    ret['data']['token'] = prefs['Preferences']['@PlexOnlineToken']
-
+                    
                     if platform.system() == 'Windows':
                         ret['data']['bin_scanner'] += '.exe'
                         ret['data']['bin_sqlite'] += '.exe'
+                        ret['data']['token'] = ModelSetting.get(f'{name}_token')
+                    else:
+                        xml_string = ToolBaseFile.read(os.path.join(data_path, 'Preferences.xml'))
+                        result = xmltodict.parse(xml_string)
+                        prefs = json.loads(json.dumps(result))
+                        #logger.warning(d(prefs))
+                        ret['data']['token'] = prefs['Preferences']['@PlexOnlineToken']
+
                     for key, value in ret['data'].items():
                         if key != 'token':
                             if os.path.exists(value) == False:

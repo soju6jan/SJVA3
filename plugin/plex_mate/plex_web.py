@@ -1,5 +1,5 @@
 # python
-import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob
+import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob, urllib.parse
 from datetime import datetime, timedelta
 # third-party
 import requests, sqlite3
@@ -61,4 +61,28 @@ class PlexWebHandle(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-            
+    
+    @classmethod
+    def refresh(cls, movie_item):
+        try:
+            url = f"{ModelSetting.get('base_url')}/library/metadata/{movie_item['id']}/refresh?X-Plex-Token={ModelSetting.get('base_token')}"
+            ret = requests.put(url)
+            logger.warning(ret.request.method)
+            logger.warning(ret.text)
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+
+    @classmethod
+    def scan_refresh(cls, library_section_id, folderpath):
+        try:
+            #http://[PMS_IP_ADDRESS]:32400/library/sections/29/refresh?path=/Users/plexuser/Movies/Media/Movies/1080p&X-Plex-Token=YourTokenGoesHere
+
+            tmp = {'path':folderpath}
+            url = f"{ModelSetting.get('base_url')}/library/sections/{library_section_id}/refresh?{urllib.parse.urlencode(tmp)}&X-Plex-Token={ModelSetting.get('base_token')}"
+            ret = requests.get(url)
+            logger.warning(ret.request.method)
+            logger.warning(ret.text)
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())

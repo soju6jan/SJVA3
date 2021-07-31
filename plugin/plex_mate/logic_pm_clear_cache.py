@@ -41,26 +41,18 @@ class LogicPMClearCache(LogicSubModuleBase):
             ret = {}
             if sub == 'command':
                 command = req.form['command']
-                if command.startswith('start'):
-                    if self.data['status']['is_working'] == 'run':
-                        ret = {'ret':'warning', 'msg':'실행중입니다.'}
-                    else:
-                        self.task_interface(command, req.form['arg1'], req.form['arg2'])
-                        ret = {'ret':'success', 'msg':'작업을 시작합니다.'}
-                elif command == 'stop':
-                    if self.data['status']['is_working'] == 'run':
-                        ModelSetting.set(f'{self.parent.name}_{self.name}_task_stop_flag', 'True')
-                        ret = {'ret':'success', 'msg':'잠시 후 중지됩니다.'}
-                    else:
-                        ret = {'ret':'warning', 'msg':'대기중입니다.'}
-                elif command == 'refresh':
-                    self.refresh_data()
+                if command == 'cache_size':
+                    self.P.logic.get_module('base').task_interface('size', (ModelSetting.get('base_path_phototranscoder'),))
+                    ret = {'ret':'success', 'msg':'명령을 전달하였습니다. 잠시 후 결과 알림을 확인하세요.'}
+                elif command == 'cache_clear':
+                    self.P.logic.get_module('base').task_interface('clear', (ModelSetting.get('base_path_phototranscoder'),))
+                    ret = {'ret':'success', 'msg':'명령을 전달하였습니다. 잠시 후 결과 알림을 확인하세요.'}
             return jsonify(ret)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')
             P.logger.error(traceback.format_exc())
             return jsonify({'ret':'danger', 'msg':str(e)})
-    
+
     def scheduler_function(self):
         logger.error('scheduler_function')
     
@@ -69,7 +61,6 @@ class LogicPMClearCache(LogicSubModuleBase):
     
     def plugin_unload(self):
         logger.error('plugin_unload')
-
     #########################################################
 
     
