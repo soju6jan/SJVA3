@@ -163,6 +163,13 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
                             ret = {'ret':'warning', 'msg':'실패'}
                     else:
                         ret = {'ret':'success', 'msg':'처리할 내용이 없습니다.'}
+                elif command == 'equal_file_equal_meta':
+                    query = f"""select media_parts.file, replace(media_parts.file, rtrim(media_parts.file, replace(media_parts.file, '/', '')), '') AS filename from media_parts, metadata_items, media_items, (SELECT metadata_items.id as id, replace(media_parts.file, rtrim(media_parts.file, replace(media_parts.file, '/', '')), '') AS filename, count(*) AS cnt FROM metadata_items, media_items, media_parts WHERE metadata_items.id = media_items.metadata_item_id AND media_items.id = media_parts.media_item_id AND metadata_items.library_section_id = 18 GROUP BY filename HAVING cnt > 1 ORDER BY file) AS tmp where metadata_items.id = media_items.metadata_item_id AND media_items.id = media_parts.media_item_id AND metadata_items.library_section_id = {req.form['arg1']} and media_parts.file != '' and filename = tmp.filename and metadata_items.id = tmp.id order by file"""
+
+                    #logger.error(query)
+                    data = PlexDBHandle.select(query)
+                    ret['modal'] = json.dumps(data, indent=4, ensure_ascii=False)
+
             return jsonify(ret)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')

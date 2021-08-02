@@ -21,16 +21,18 @@ from .task_pm_base import Task
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 from .logic_pm_tool_simple import LogicPMDBToolSimple
+from .logic_pm_tool_select import LogicPMDBToolSelect
 #########################################################
 
 class LogicPMTool(LogicModuleBase):
     db_default = None
 
     def __init__(self, P):
-        super(LogicPMTool, self).__init__(P, 'simple')
+        super(LogicPMTool, self).__init__(P, 'select')
         self.name = name
         self.sub_list = {
             'simple' : LogicPMDBToolSimple(P, self, 'simple'),
+            'select' : LogicPMDBToolSelect(P, self, 'select'),
         }
 
     def process_menu(self, sub, req):
@@ -38,8 +40,11 @@ class LogicPMTool(LogicModuleBase):
         arg['sub'] = self.name
         arg['sub2'] = sub 
         try:
-            if sub == 'simple':
-                arg['library_list'] = PlexDBHandle.library_sections()
+            #if sub == 'simple':
+            arg['library_list'] = PlexDBHandle.library_sections()
+            if sub == 'select':
+                arg['library_list'].insert(0, {'id':0, 'name':'전체'})
+                #arg['preset'] = LogicPMDBToolSelect.preset
             #logger.error(d(arg))
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e: 

@@ -43,7 +43,28 @@
       {{ macros.m_hr() }}
       {{ macros.buttons([['duplicate_list_btn', '동일파일이 동일메타에 중복되어 있는 경우 (정리 대상 목록)'], ['duplicate_remove_btn', '정리']], left='스캔에러 정리', desc=None ) }}
       
-      
+      {{ macros.m_hr() }}
+      {{ macros.setting_top('동일파일 동일메타 확인') }}
+      <div class="input-group col-sm-9">
+        <select id="equal_file_equal_meta_section_id" name="equal_file_equal_meta_section_id" class="form-control form-control-sm">
+          {% for item in arg['library_list'] %}
+            {% if item['section_type'] == 1 %}
+              {% if loop.counter == 0 %}
+              <option value="{{ item['id'] }}" selected>{{item['name']}}</option>
+              {% else %}
+              <option value="{{ item['id'] }}">{{item['name']}}</option>
+              {% endif %}
+            {% endif %}   
+          {% endfor %}
+        </select>
+        <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
+        {% set buttons = [['equal_file_equal_meta_btn', '확인']] %}
+        {% for b in buttons %}
+          <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
+        {% endfor %}
+        </div>
+      </div>
+      {{ macros.setting_bottom('') }}
 
 
     {{ macros.m_tab_content_end() }}  
@@ -112,6 +133,12 @@ $("body").on('click', '#duplicate_remove_btn', function(e){
   e.preventDefault();
   global_send_command_sub('duplicate_remove');
 });
+
+$("body").on('click', '#equal_file_equal_meta_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('equal_file_equal_meta', $('#equal_file_equal_meta_section_id').val(), '', '', '목록');
+});
+
 
 
 

@@ -39,8 +39,8 @@ class PlexDBHandle(object):
             data = ce.fetchall()
             con.close()
             return data
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
 
     @classmethod
@@ -56,8 +56,8 @@ class PlexDBHandle(object):
             data = ce.fetchone()
             con.close()
             return data
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
 
 
@@ -74,8 +74,8 @@ class PlexDBHandle(object):
             else:
                 ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
             return True
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
         return False   
 
@@ -93,9 +93,71 @@ class PlexDBHandle(object):
             con.close()
             return data
 
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
         return   
 
     
+    @classmethod
+    def tool_select(cls, where, db_file=None):
+        con = cur = None
+        try:
+            if db_file is None:
+                db_file = ModelSetting.get('base_path_db')
+            con = sqlite3.connect(db_file)
+            cur = con.cursor()
+
+            query = """
+            SELECT 
+                metadata_items.id AS metadata_items_id, 
+                metadata_items.library_section_id AS library_section_id, 
+                metadata_items.metadata_type AS metadata_type, 
+                metadata_items.guid AS guid,
+                metadata_items.media_item_count AS media_item_count,
+                metadata_items.title AS title,
+                metadata_items.year AS year,
+                metadata_items.'index' AS metadata_items_index,
+                metadata_items.user_thumb_url AS user_thumb_url,
+                metadata_items.user_art_url AS user_art_url,
+                metadata_items.hash AS metadata_items_hash,
+                media_items.id AS media_items_id,
+                media_items.section_location_id AS section_location_id,
+                media_items.width AS width,
+                media_items.height AS height,
+                media_items.size AS size,
+                media_items.duration AS duration,
+                media_items.bitrate AS bitrate,
+                media_items.container AS container,
+                media_items.video_codec AS video_codec,
+                media_items.audio_codec AS audio_codec,
+                media_parts.id AS media_parts_id,
+                media_parts.directory_id AS media_parts_directory_id,
+                media_parts.hash AS media_parts_hash,
+                media_parts.file AS file
+            FROM metadata_items, media_items, media_parts 
+            WHERE metadata_items.id = media_items.metadata_item_id AND media_items.id = media_parts.media_item_id """
+            if where is not None and where != '':
+                query = query + ' AND (' + where + ') '
+            query += ' LIMIT 100'
+
+
+            #logger.warning(query)
+
+            ce = con.execute(query)
+            ce.row_factory = dict_factory
+            data = ce.fetchall()
+            cur.close
+            con.close()
+            cur = con = None
+            return {'ret':'success', 'data':data}
+
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+            return {'ret':'exception', 'log':str(e)}
+        finally:
+            if cur is not None:
+                cur.close()
+            if con is not None:
+                con.close()   

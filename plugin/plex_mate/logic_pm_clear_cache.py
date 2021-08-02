@@ -55,12 +55,26 @@ class LogicPMClearCache(LogicSubModuleBase):
 
     def scheduler_function(self):
         logger.error('scheduler_function')
-    
-    def plugin_load(self):
-        logger.error('plugin_load')
-    
-    def plugin_unload(self):
-        logger.error('plugin_unload')
+        def func():
+            time.sleep(1)
+            max_size = ModelSetting.get_int(f'{self.parent.name}_{self.name}_max_size')
+            do_clear = False
+            if max_size == 0:
+                do_clear = True
+            else:
+                ret = self.P.logic.get_module('base').task_interface2('size_ret', (ModelSetting.get('base_path_phototranscoder'),))
+                if ret['size'] > max_size * 1024 * 1024 * 1024:
+                    do_clear = True
+                else:
+                    logger.debug(f"삭제패스 - 현재 캐시 크기 : {ret['sizeh']}")
+            if do_clear:
+                ret = self.P.logic.get_module('base').task_interface2('clear_ret', (ModelSetting.get('base_path_phototranscoder'),))
+                logger.debug(f"캐시 삭제 완료 : {ret['size']}")
+        th = threading.Thread(target=func, args=())
+        th.setDaemon(True)
+        th.start()
+
+
     #########################################################
 
     

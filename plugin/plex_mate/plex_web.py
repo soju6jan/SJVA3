@@ -72,6 +72,17 @@ class PlexWebHandle(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
+    
+    @classmethod
+    def refresh_by_id(cls, id):
+        try:
+            url = f"{ModelSetting.get('base_url')}/library/metadata/{id}/refresh?X-Plex-Token={ModelSetting.get('base_token')}"
+            ret = requests.put(url)
+            logger.warning(ret.request.method)
+            logger.warning(ret.text)
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
 
     @classmethod
     def scan_refresh(cls, library_section_id, folderpath):

@@ -176,11 +176,11 @@ class LogicPMBase(LogicModuleBase):
 
 
     def task_interface2(self, command, *args):
-        if command == 'size':
+        if command == 'size' or command == 'size_ret':
             func = Task.get_size
         elif command == 'backup':
             func = Task.backup
-        elif command == 'clear':
+        elif command == 'clear' or command == 'clear_ret':
             func = Task.clear
         #ret = func(*args)
         
@@ -193,6 +193,8 @@ class LogicPMBase(LogicModuleBase):
         if command == 'size':
             noti_data = {'type':'info', 'msg' : f"경로 : {ret['target']}<br>크기 : {ret['sizeh']}"}
             socketio.emit("notify", noti_data, namespace='/framework', broadcast=True)    
+        elif command == 'size_ret':
+            return ret
         elif command == 'backup':
             if ret['ret'] == 'success':
                 noti_data = {'type':'info', 'msg' : f"경로 : {ret['target']}<br>복사하였습니다."}
@@ -201,7 +203,9 @@ class LogicPMBase(LogicModuleBase):
             socketio.emit("notify", noti_data, namespace='/framework', broadcast=True)    
         elif command == 'clear':
             noti_data = {'type':'info', 'msg' : f"경로 : {ret['target']}<br>크기 : {ret['sizeh']}"}
-            socketio.emit("notify", noti_data, namespace='/framework', broadcast=True)    
+            socketio.emit("notify", noti_data, namespace='/framework', broadcast=True) 
+        elif command == 'clear_ret':
+            return ret
 
 
     @staticmethod
