@@ -81,6 +81,24 @@ class PlexDBHandle(object):
 
 
     @classmethod
+    def execute_query2(cls, sql, sql_filepath=None):
+        try:
+            if sql_filepath is None:
+                sql_filepath = os.path.join(path_data, 'tmp', f"{str(time.time()).split('.')[0]}.sql")
+            ToolBaseFile.write(sql, sql_filepath)
+            if platform.system() == 'Windows':
+                tmp = sql_filepath.replace('\\', '\\\\')
+                cmd = f'"{ModelSetting.get("base_bin_sqlite")}" "{ModelSetting.get("base_path_db")}" ".read {tmp}"'
+                ret = ToolSubprocess.execute_command_return(cmd)
+            else:
+                ret = ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
+            return ret
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+        return '' 
+
+    @classmethod
     def select(cls, query, db_file=None):
         try:
             if db_file is None:
@@ -99,6 +117,29 @@ class PlexDBHandle(object):
         return   
 
     
+
+    @classmethod
+    def select2(cls, query, args, db_file=None):
+        try:
+            if db_file is None:
+                db_file = ModelSetting.get('base_path_db')
+            con = sqlite3.connect(db_file)
+            cur = con.cursor()
+            logger.error(args)
+            if len(args) == 0:
+                ce = con.execute(query)
+            else:
+                ce = con.execute(query, args)
+            ce.row_factory = dict_factory
+            data = ce.fetchall()
+            con.close()
+            return data
+
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+        return   
+        
     @classmethod
     def tool_select(cls, where, db_file=None):
         con = cur = None
