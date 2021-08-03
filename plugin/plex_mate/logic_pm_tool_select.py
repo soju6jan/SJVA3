@@ -43,7 +43,7 @@ class LogicPMDBToolSelect(LogicSubModuleBase):
         super(LogicPMDBToolSelect, self).__init__(P, parent, name)
         self.db_default = {
             f'{self.parent.name}_{self.name}_db_version' : '1',
-            f'{self.parent.name}_{self.name}_query' : '1',
+            f'{self.parent.name}_{self.name}_query' : '',
         }
         
 
