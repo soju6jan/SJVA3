@@ -89,9 +89,19 @@ class PlexDBHandle(object):
             if platform.system() == 'Windows':
                 tmp = sql_filepath.replace('\\', '\\\\')
                 cmd = f'"{ModelSetting.get("base_bin_sqlite")}" "{ModelSetting.get("base_path_db")}" ".read {tmp}"'
-                ret = ToolSubprocess.execute_command_return(cmd)
+                for i in range(10):
+                    ret = ToolSubprocess.execute_command_return(cmd)
+                    if ret.find('database is locked') != -1:
+                        time.sleep(5)
+                    else:
+                        break
             else:
-                ret = ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
+                for i in range(10):
+                    ret = ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
+                    if ret.find('database is locked') != -1:
+                        time.sleep(5)
+                    else:
+                        break
             return ret
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
@@ -125,7 +135,7 @@ class PlexDBHandle(object):
                 db_file = ModelSetting.get('base_path_db')
             con = sqlite3.connect(db_file)
             cur = con.cursor()
-            logger.error(args)
+            #logger.error(args)
             if len(args) == 0:
                 ce = con.execute(query)
             else:

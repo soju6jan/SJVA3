@@ -23,8 +23,8 @@ class PlexBinaryScanner(object):
     def scan_refresh(cls, section_id, folderpath):
         try:
             if platform.system() == 'Windows':
-                tmp = sql_filepath.replace('\\', '\\\\')
-                cmd = f'"{ModelSetting.get("base_bin_scanner")}" "{ModelSetting.get("base_path_db")}" ".read {tmp}"'
+                cmd = f'"{ModelSetting.get("base_bin_scanner")}" --scan  --refresh --section {section_id} --directory "{folderpath}"'
+                logger.warning(cmd)
                 ToolSubprocess.execute_command_return(cmd)
             else:
                 #env=dict(FOO='BAR', **os.environ))
