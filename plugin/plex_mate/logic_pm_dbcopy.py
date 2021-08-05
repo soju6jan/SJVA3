@@ -15,26 +15,22 @@ from .plugin import P
 logger = P.logger
 package_name = P.package_name
 ModelSetting = P.ModelSetting
-name = 'tool'
+name = 'dbcopy'
 
 from .task_pm_base import Task
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
-from .logic_pm_tool_simple import LogicPMDBToolSimple
-from .logic_pm_tool_select import LogicPMDBToolSelect
-from .logic_pm_tool_query import LogicPMDBToolQuery
+from .logic_pm_dbcopy_copy import LogicPMDbCopyCopy
 #########################################################
 
-class LogicPMTool(LogicModuleBase):
+class LogicPMDbCopy(LogicModuleBase):
     db_default = None
 
     def __init__(self, P):
-        super(LogicPMTool, self).__init__(P, 'select')
+        super(LogicPMDbCopy, self).__init__(P, 'copy')
         self.name = name
         self.sub_list = {
-            'simple' : LogicPMDBToolSimple(P, self, 'simple'),
-            'select' : LogicPMDBToolSelect(P, self, 'select'),
-            'query' : LogicPMDBToolQuery(P, self, 'query'),
+            'copy' : LogicPMDbCopyCopy(P, self, 'copy'),
         }
 
     def process_menu(self, sub, req):

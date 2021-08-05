@@ -1,6 +1,13 @@
 ## Plex Mate
 ----
 
+# 껍데기만 있고 동작하지 않는 것들이 많으니 매뉴얼로 나오는 기능만 쓰길 바랍니다. 
+
+# 파일정리 : 4개 서브 기능 완료.
+# DB툴 : 간단 명령 사용가능.  DB Select 일부 가능
+
+----
+
 #### 소개
 
 ** 이 플러그인은 Plex 서버가 실행되는 파일시스템에 접근 가능해야 한다. **
@@ -22,12 +29,24 @@ SJVA.bundle 기능 모두 대체 및 DB 직접 제어와 파일시스템 감시�
     SJVA 도커 생성시 -v /:/host 등의 명령으로 호스트 파일시스템에 접근가능하도록 설정
 
   * Linux Plex Docker 서버 + SJVA 도커   
-    SJVA 도커 생성시 -v /:/host 등의 명령으로 호스트 파일시스템에 접근가능하도록 설정   
-    Plex 도커내의 프로그램폴더, 사용자폴더를 호스트쪽에 소프트 링크(ln -s)하여 접근  
+    도커 볼륨을 통해 사용
 
   * 윈도우 Plex 서버 + 윈도우 SJVA 
 
+----
 
+#### 권장
+  * 추후 추가될 모든 기능을 사용하려면 Plex 서버입장에서 실행파일 위치나, 데이터파일, 비디오파일 경로 값이  
+    SJVA 내에서도 일치해야 함.  
+    예) Plex Native 인 경우 실행파일은 /usr/lib/plexmediaserver 에 있음.  
+    도커 SJVA라면 /host/usr/lib/plexmediaserver 으로 접근가능한데 도커내에서   
+    ```ln -s /host/usr/lib/plexmediaserver /usr/lib/plexmediaserver```  
+    와 같은 명령으로 아예 Plex Server 처럼 일치시킬 것.
+  * 마운트도 host에서 /mnt/gds에 했고 Plex에서도 그대로 사용했다면  
+    ```ln -s /host/mnt/gds /mnt/gds```   
+    명령을 실행하여 동일 환경을 만들 것.
+
+  
 ----
 
 #### 주요기능
