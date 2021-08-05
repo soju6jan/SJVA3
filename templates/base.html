@@ -859,6 +859,7 @@ function global_send_command_sub(command, arg1, arg2, arg3, modal_title, callbac
     data:{command:command, arg1:arg1, arg2:arg2, arg3},
     dataType: "json",
     success: function (ret) {
+      console.log(ret);
       if (ret.msg != null) notify(ret.msg, ret.ret);
       if (ret.modal != null) m_modal(ret.modal, modal_title, false);
       if (callback != null) callback(ret);

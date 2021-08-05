@@ -35,13 +35,13 @@ class P(object):
                 ['movie', '영화 정리'], ['show', 'TV 정리'], ['bundle', '번들 삭제'], ['cache', '캐시(PhotoTranscoder) 삭제'], 
             ],
             'tool' : [
-                ['simple', '간단 명령'], ['select', 'DB Select'], #['query', 'SQL Query'],
+                ['simple', '간단 명령'], ['select', 'DB Select'], ['query', 'SQL Query'],
             ],
             'dbcopy' : [
-                ['make', '소스 DB 생성'], ['copy', '복사'], #['query', 'SQL Query'],
+                ['make', '소스 DB 생성'], ['copy', '복사 설정'], ['status', '복사 상태'],
             ],
             'manual' : [
-                ['README.md', 'README'], ['file/파일정리.md', '파일정리']
+                ['README.md', 'README'], ['file/파일정리.md', '파일정리'], ['file/라이브러리 복사.md', '라이브러리 복사']
             ],
         }
     }  

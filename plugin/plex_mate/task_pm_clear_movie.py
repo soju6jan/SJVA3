@@ -110,35 +110,37 @@ class Task(object):
                 sql_filepath = os.path.join(path_data, 'tmp', f"movie_{data['db']['id']}.sql")
                 PlexDBHandle.execute_query(sql, sql_filepath=sql_filepath)
         
-        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')                
-        for f in os.listdir(c_metapath):
-            _path = os.path.join(c_metapath, f)
-            if f == '_combined':
-                for tag, value in TAG.items():
-                    tag_path = os.path.join(_path, value[1])
-                    if os.path.exists(tag_path):
+        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')  
+        if os.path.exists(c_metapath):
+                          
+            for f in os.listdir(c_metapath):
+                _path = os.path.join(c_metapath, f)
+                if f == '_combined':
+                    for tag, value in TAG.items():
+                        tag_path = os.path.join(_path, value[1])
+                        if os.path.exists(tag_path):
+                            if data['dryrun'] == False:
+                                data['meta']['remove'] += ToolBaseFile.size(start_path=tag_path)
+                                ToolBaseFile.rmtree(tag_path)
+                            
+                    tmp = os.path.join(_path, 'extras')
+                    if os.path.exists(tmp) and len(os.listdir(tmp)) == 0:
                         if data['dryrun'] == False:
-                            data['meta']['remove'] += ToolBaseFile.size(start_path=tag_path)
-                            ToolBaseFile.rmtree(tag_path)
-                        
-                tmp = os.path.join(_path, 'extras')
-                if os.path.exists(tmp) and len(os.listdir(tmp)) == 0:
-                    if data['dryrun'] == False:
-                        ToolBaseFile.rmtree(tmp)
-                tmp = os.path.join(_path, 'extras.xml')
-                if os.path.exists(tmp):
+                            ToolBaseFile.rmtree(tmp)
+                    tmp = os.path.join(_path, 'extras.xml')
                     if os.path.exists(tmp):
-                        data['meta']['remove'] += os.path.getsize(tmp)
-                        if data['dryrun'] == False:
-                            os.remove(tmp)
-            else:
-                tmp = ToolBaseFile.size(start_path=_path)
-                if data['dryrun'] == False:
-                    data['meta']['remove'] += tmp
-                    ToolBaseFile.rmtree(_path)
+                        if os.path.exists(tmp):
+                            data['meta']['remove'] += os.path.getsize(tmp)
+                            if data['dryrun'] == False:
+                                os.remove(tmp)
                 else:
-                    if f == '_stored':
+                    tmp = ToolBaseFile.size(start_path=_path)
+                    if data['dryrun'] == False:
                         data['meta']['remove'] += tmp
+                        ToolBaseFile.rmtree(_path)
+                    else:
+                        if f == '_stored':
+                            data['meta']['remove'] += tmp
 
         if data['command'] == 'start2':
             return
@@ -150,10 +152,12 @@ class Task(object):
         data['media'] = {'total':0, 'remove':0}
 
         for item in media_ce.fetchall():
-            logger.warning(d(item))
+            #logger.warning(d(item))
             if item['hash'] == '':
                 continue
             mediapath = os.path.join(ModelSetting.get('base_path_media'), 'localhost', item['hash'][0], f"{item['hash'][1:]}.bundle")
+            if os.path.exists(mediapath) == False:
+                continue
             data['media']['total'] += ToolBaseFile.size(start_path=mediapath)
             if item['user_thumb_url'].startswith('media') == False:
                 img = os.path.join(mediapath, 'Contents', 'Thumbnails', 'thumb1.jpg')
@@ -240,53 +244,55 @@ class Task(object):
         #logger.error(d(data['process']))
         # 1단계.
         # _combined 에서 ..stored 
-        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')
+        
         not_remove_filelist = []
-        for f in os.listdir(c_metapath):
-            _path = os.path.join(c_metapath, f)
-            # 윈도우는 combined에 바로 데이터가 있어서 무조건 삭제?
-            if f == '_stored':
+        c_metapath = os.path.join(data['meta']['metapath'], 'Contents')
+        if os.path.exists(c_metapath):
+            for f in os.listdir(c_metapath):
+                _path = os.path.join(c_metapath, f)
+                # 윈도우는 combined에 바로 데이터가 있어서 무조건 삭제?
+                if f == '_stored':
+                    tmp = ToolBaseFile.size(start_path=_path)
+                    data['meta']['stored'] = tmp
+                    if platform.system() == 'Windows':
+                        data['meta']['remove'] += tmp
+                        if data['dryrun'] == False:
+                            ToolBaseFile.rmtree(_path)
+                elif f == '_combined':
+                    for tag, value in TAG.items():
+                        tag_path = os.path.join(_path, value[1])
+                        #logger.warning(tag_path)
+                        if os.path.exists(tag_path) == False:
+                            continue
+                        for img_file in os.listdir(tag_path):
+                            img_path = os.path.join(tag_path, img_file)
+                            if os.path.islink(img_path):
+                                if os.path.realpath(img_path).find('_stored') == -1:
+                                    # 저장된 파일에 대한 링크가 아니기 삭제
+                                    # db에 저장된 url이 stored가 아닌 에이전트 폴더를 가로 가르키는 경우가 있음
+                                    #logger.warning(img_file)
+                                    if img_file == data['process'][tag]['filename']:
+                                        logger.error(data['process'][tag]['filename'])
+                                        not_remove_filelist.append(data['process'][tag]['filename'])
+                                        continue
+                                    if data['dryrun'] == False:# and os.path.exists(img_path) == True:
+                                        os.remove(img_path)
+                            else: #윈도우
+                                if img_file != data['process'][tag]['filename']:
+                                    # 저장파일이 아니기 때문에 삭제
+                                    data['meta']['remove'] += os.path.getsize(img_path)
+                                    if data['dryrun'] == False and os.path.exists(img_path) == True:
+                                        os.remove(img_path)
+                    
+            #if len(not_remove_filelist) == 0:
+            for f in os.listdir(c_metapath):
+                _path = os.path.join(c_metapath, f)
+                if f == '_stored' or f == '_combined':
+                    continue
                 tmp = ToolBaseFile.size(start_path=_path)
-                data['meta']['stored'] = tmp
-                if platform.system() == 'Windows':
-                    data['meta']['remove'] += tmp
-                    if data['dryrun'] == False:
-                        ToolBaseFile.rmtree(_path)
-            elif f == '_combined':
-                for tag, value in TAG.items():
-                    tag_path = os.path.join(_path, value[1])
-                    #logger.warning(tag_path)
-                    if os.path.exists(tag_path) == False:
-                        continue
-                    for img_file in os.listdir(tag_path):
-                        img_path = os.path.join(tag_path, img_file)
-                        if os.path.islink(img_path):
-                            if os.path.realpath(img_path).find('_stored') == -1:
-                                # 저장된 파일에 대한 링크가 아니기 삭제
-                                # db에 저장된 url이 stored가 아닌 에이전트 폴더를 가로 가르키는 경우가 있음
-                                #logger.warning(img_file)
-                                if img_file == data['process'][tag]['filename']:
-                                    logger.error(data['process'][tag]['filename'])
-                                    not_remove_filelist.append(data['process'][tag]['filename'])
-                                    continue
-                                if data['dryrun'] == False:# and os.path.exists(img_path) == True:
-                                    os.remove(img_path)
-                        else: #윈도우
-                            if img_file != data['process'][tag]['filename']:
-                                # 저장파일이 아니기 때문에 삭제
-                                data['meta']['remove'] += os.path.getsize(img_path)
-                                if data['dryrun'] == False and os.path.exists(img_path) == True:
-                                    os.remove(img_path)
-                  
-        #if len(not_remove_filelist) == 0:
-        for f in os.listdir(c_metapath):
-            _path = os.path.join(c_metapath, f)
-            if f == '_stored' or f == '_combined':
-                continue
-            tmp = ToolBaseFile.size(start_path=_path)
-            data['meta']['remove'] += tmp
-            if data['dryrun'] == False:
-                ToolBaseFile.rmtree(_path)
+                data['meta']['remove'] += tmp
+                if data['dryrun'] == False:
+                    ToolBaseFile.rmtree(_path)
         #else:
         if not_remove_filelist:
             logger.error(not_remove_filelist)

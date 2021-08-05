@@ -21,6 +21,8 @@ from .task_pm_base import Task
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 from .logic_pm_dbcopy_copy import LogicPMDbCopyCopy
+from .logic_pm_dbcopy_status import LogicPMDbCopyStatus
+from .logic_pm_dbcopy_make import LogicPMDbCopyMake
 #########################################################
 
 class LogicPMDbCopy(LogicModuleBase):
@@ -30,7 +32,9 @@ class LogicPMDbCopy(LogicModuleBase):
         super(LogicPMDbCopy, self).__init__(P, 'copy')
         self.name = name
         self.sub_list = {
+            'make' : LogicPMDbCopyMake(P, self, 'make'),
             'copy' : LogicPMDbCopyCopy(P, self, 'copy'),
+            'status' : LogicPMDbCopyStatus(P, self, 'status'),
         }
 
     def process_menu(self, sub, req):
@@ -38,12 +42,8 @@ class LogicPMDbCopy(LogicModuleBase):
         arg['sub'] = self.name
         arg['sub2'] = sub 
         try:
-            #if sub == 'simple':
-            arg['library_list'] = PlexDBHandle.library_sections()
-            if sub == 'select':
-                arg['library_list'].insert(0, {'id':0, 'name':'전체'})
-                #arg['preset'] = LogicPMDBToolSelect.preset
-            #logger.error(d(arg))
+            if sub == 'make':
+                arg['library_list'] = PlexDBHandle.library_sections()
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')

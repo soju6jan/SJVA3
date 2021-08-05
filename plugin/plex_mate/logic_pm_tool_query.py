@@ -23,20 +23,11 @@ from .plex_bin_scanner import PlexBinaryScanner
 #########################################################
 
 
+
 class LogicPMDBToolQuery(LogicSubModuleBase):
     preset = [
-        ['템플릿 : 키워드 입력 필요', ''],
-        ['제목 포함 검색', "(metadata_items.title LIKE '% __ %' AND metadata_type BETWEEN 1 and 4)"],
-        ['제목 일치 검색', "(metadata_items.title = ' __ ' AND metadata_type BETWEEN 1 and 2)"],
-        ['메타제공 사이트 일치 검색', "(metadata_items.guid LIKE '%sjva_agent://__%' AND metadata_type BETWEEN 1 and 2)"],
-        ['메타제공 사이트 불일치 검색', "(metadata_items.guid NOT LIKE '%sjva_agent://__%' AND metadata_type BETWEEN 1 and 2)"],
-        ['-------------', ''],
-        ['제목 정렬시 한글 초성이 아닌 것들', "(metadata_type BETWEEN 1 and 2 AND substr(metadata_items.title_sort, 1, 1) >= '가' and substr(metadata_items.title_sort, 1, 1) <= '힣')"],
-        ['메타 없는 것', 'metadata_items.guid LIKE "local://%"'],
-        ['미분석', '(metadata_type BETWEEN 1 and 4 AND width is null)'],
-        ['불일치 상태', "(metadata_type BETWEEN 1 and 4 AND guid LIKE 'com.plexapp.agents.none%')"],
-        ['Poster가 없거나, media이거나, upload 인 경우', "(metadata_type BETWEEN 1 and 2 AND (user_thumb_url == '' OR user_thumb_url LIKE 'media%' OR user_thumb_url LIKE 'upload%'))"],
-        ['Art가 없거나, media이거나, upload 인 경우', "(metadata_type BETWEEN 1 and 4 AND (user_art_url == '' OR user_art_url LIKE 'media%' OR user_art_url LIKE 'upload%'))"],
+        ['시즌 제목 확인', "SELECT title, `index` FROM metadata_items WHERE parent_id = (SELECT id FROM metadata_items WHERE title = ' __ ' AND metadata_type = 2)"],
+        ['시즌 제목 변경', "UPDATE metadata_items SET title = ' __ ' WHERE parent_id = (SELECT id FROM metadata_items WHERE title = ' __ ' and metadata_type = 2) AND `index` = __"],
     ]
 
     def __init__(self, P, parent, name):
@@ -53,28 +44,24 @@ class LogicPMDBToolQuery(LogicSubModuleBase):
             if sub == 'command':
                 command = req.form['command']
                 logger.error(f"sub : {sub}  /  command : {command}")
-                if command == 'select':
-                    ModelSetting.set(f'{self.parent.name}_{self.name}_query', req.form['arg1'])
-                    ret['select'] = PlexDBHandle.tool_select(req.form['arg1'])
-                elif command == 'refresh_web':
-                    PlexWebHandle.refresh_by_id(req.form['arg1'])
-                    ret['msg'] = '명령을 전송하였습니다.'
-                elif command == 'remove_metadata':
-                    folder_path = os.path.join(
-                        ModelSetting.get('base_path_metadata'),
-                        'Movies' if req.form['arg1'] == '1' else 'TV Shows',
-                        req.form['arg2'][0],
-                        f"{req.form['arg2'][1:]}.bundle"
-                    )
-                    if os.path.exists(folder_path):
-                        if ToolBaseFile.rmtree(folder_path):
-                            ret['msg'] = '삭제하였습니다.'
+                if command == 'execute':
+                    query = req.form['arg1'].lower().strip()
+                    ModelSetting.set(f'{self.parent.name}_{self.name}_query', query)
+                    if query.startswith('select'):
+                        ret['mode'] = 'select'
+                        ret['select'] = PlexDBHandle.select(query)
+                        ret['msg'] = f"{len(ret['select'])}개의 데이터"
+                    elif query.startswith('update') or query.startswith('delete') or query.startswith('insert'):
+                        ret['mode'] = 'not_select'
+                        result = PlexDBHandle.execute_query(query)
+                        if result:
+                            ret['msg'] = f"실행했습니다."
                         else:
                             ret['ret'] = 'warning'
-                            ret['msg'] = '삭제 실패'
-                    else:
-                        ret['ret'] = 'warning'
-                        ret['msg'] = f'{folder_path} 없음'
+                            ret['msg'] = f"실패"
+
+
+
             elif sub == 'get_preset':
                 ret['preset'] = self.preset
             return jsonify(ret)

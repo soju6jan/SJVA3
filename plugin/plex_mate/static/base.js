@@ -1,6 +1,6 @@
-function make_log(key, value) {
-  row = m_col(2, key, aligh='right');
-  row += m_col(10, value, aligh='left');
+function make_log(key, value, left=2, right=10) {
+  row = m_col(left, key, aligh='right');
+  row += m_col(right, value, aligh='left');
   return row;
 }
 

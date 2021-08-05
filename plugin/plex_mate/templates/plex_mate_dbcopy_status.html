@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="{{ url_for('.static', filename='base.js') }}"></script>
+<div>
+  {{ macros.m_button_group([['start_btn', '시작'], ['stop_btn', '중지']])}}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_row_end() }}
+</div>
+<div class='row' style="padding-top: 5px; padding-bottom:0px; align-items: center;">
+  <div class='col-sm-1 set-left'>
+    <strong>상태</strong>
+  </div>
+  <div id='status_div' class="col-sm-11">
+    대기중
+  </div>
+</div>
+
+{{ macros.m_hr_head_top() }}
+{{ macros.m_row_start('0') }}
+{{ macros.m_col(12,  macros.m_strong('Log')) }}
+{{ macros.m_row_end() }}
+{{ macros.m_hr_head_bottom() }}
+<div id="list_div"></div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{ arg['sub'] }}";
+var sub2 = "{{ arg['sub2'] }}";
+var current_data = null;
+
+$(document).ready(function(){
+  socket_init(package_name, sub, sub2);
+});
+
+$("body").on('click', '#start_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start');
+});
+
+$("body").on('click', '#stop_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('stop');
+});
+
+
+function make_one(data) {
+  row = m_row_start_hover();
+  if (data.ret == 'exist'){
+    row += make_log("제목", color(data.title + ' (' + data.year+')') , 1, 11);
+    row += make_log('', 'Already exist', 1, 11);
+  } else {
+    row += make_log("제목", color(data.title+ ' (' + data.year+')', 'blue'), 1, 11);
+    for (i in data.files) {
+      if (i == 0) {
+        row += make_log('파일', data.files[i], 1, 11);
+      } else {
+        row += make_log('', data.files[i], 1,11);
+      }
+    }
+  }
+  
+  row += m_row_end();
+  return row;
+}
+
+
+function make_status(data) {
+  str = '';
+  if (data.is_working == 'run')  tmp = '실행중';
+  else if (data.is_working == 'wait')  tmp = '대기중';
+  else if (data.is_working == 'stop')  tmp = '사용자 중지';
+  if (data.count != null) tmp += '(' + data.current + '/' + data.count + ') ';
+  str += '<h4>' + tmp;
+  str += '</h4>';
+  $('#status_div').html(str);
+}
+
+
+</script> 
+
+{% endblock %}

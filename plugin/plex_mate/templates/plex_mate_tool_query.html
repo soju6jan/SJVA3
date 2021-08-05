@@ -1,18 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<script src="{{ url_for('.static', filename='base.js') }}"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.8.0/jquery.contextMenu.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.8.0/jquery.contextMenu.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.8.0/jquery.ui.position.js"></script>
 
-<!--<style>
-  .table td.fit, 
-.table th.fit {
-    white-space: nowrap;
-    width: 1%;
-}
-</style>-->
 <div class='row' style="padding-top: 5px; padding-bottom:5px; align-items: center;">
   <div class='col-sm-1 set-left'>
     <strong>Library</strong>
@@ -30,38 +18,36 @@
       {% endif %}
     </select>
   </div>
-  <div class='col-sm-2 set-left'>
-    <strong>조건문 프리셋</strong>
+  <div class='col-sm-1 set-left'>
+    <strong>프리셋</strong>
   </div>
-  <div class="input-group col-sm-6">
+  <div class="input-group col-sm-5">
     <select id="preset" name="preset" class="form-control form-control-sm">
       <div id="preset_options"></div>
     </select>
+  </div>
+  <div class='col-sm-1 set-left'>
+    <strong>Wide</strong>
+  </div>
+  <div class="input-group col-sm-1">
+    <input id="wide_checkbox" name="wide_checkbox" class="form-control form-control-sm" type="checkbox" data-toggle="toggle">
   </div>
 </div>
 
 <div class='row' style="padding-top: 5px; padding-bottom:5px; align-items: center;">
   <div class='col-sm-1 set-left'>
-    <strong>조건문</strong>
+    <strong>Query</strong>
   </div>
   <div class="input-group col-sm-10">
-    <textarea id="query" name="query" rows="5" class="form-control form-control-sm">{{ arg['tool_select_query'] }}</textarea>
+    <textarea id="query" name="query" rows="5" class="form-control form-control-sm">{{ arg['tool_query_query'] }}</textarea>
   </div>
   <div class="input-group col-sm-1">
-    <button id="select_btn" class="btn btn-sm btn-outline-info">SELECT</button>
+    <button id="execute_btn" class="btn btn-sm btn-outline-info">실행</button>
   </div>
 </div>
 
 <table id="result_table" class="table table-sm  tableRowHover">
-  <thead class="thead-dark">
-    <tr>
-      <th>IDX</th>
-      <th>IDs</th>
-      <th></th>
-      <th>Info</th>
-      <th>File</th>
-      <th></th>
-    </tr>
+  <thead class="thead-dark" id=table_head>
   </thead>
   <tbody id="list" >
   </tbody>
@@ -79,7 +65,6 @@ var query_library = '';
 var query_preset = '';
 
 $(function(){ 
-  //$('#main_container').attr('class', 'container-fluid');  
   $.ajax({
     url: '/' + package_name + '/ajax/' + sub + '/' + sub2 + '/get_preset',
     type: "POST",
@@ -96,105 +81,52 @@ $(function(){
       $('#preset').html(str);
     }
   });
-
-  $.contextMenu({
-    selector: '.chover',
-    trigger: 'left',
-    callback: function(key, options) {
-      index = $(this).data('index');
-      data = current_data[index];
-      filename = $(this).data('filename');
-      if (key == 'refresh_web') {
-        global_send_command_sub('refresh_web', data.metadata_items_id);
-      } else if (key == 'remove_metadata') {
-        global_send_command_sub('remove_metadata', data.metadata_type, data.metadata_items_hash);
-      } else if (key == 'other') {
-        global_send_command2('move_file_other', index);
-      } else if (key == 'delete') {
-        cm_delete(index, filename);
-      }
-    },
-    items: {
-        "refresh_web": {name: "메타데이터 새로 고침 (웹)", icon: "edit"},
-        "refresh_bin": {name: "메타데이터 새로 고침 (Bin)", icon: "edit"},
-
-        "remove_metadata": {name: "메타데이터 폴더 삭제", icon: "delete"},
-
-        "rename": {name: "파일명 변경", icon: "edit"},
-        "delete": {name: "파일 삭제", icon: "delete"},
-        "other": {name: "other 폴더로 이동", icon: "paste"},
-        "play": {name: "Play", icon: "fa-play"},
-        //"sep1": "---------",
-        //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
-    }
-  });
 });
+
+$("body").on('change', '#wide_checkbox', function(e){
+  e.preventDefault();
+  if ($(this).prop('checked') === false) {
+    $('#main_container').attr('class', 'container');  
+  } else {
+    $('#main_container').attr('class', 'container-fluid');  
+  }
+});
+
 
 
 $("body").on('change', '#library_select', function(e){
   e.preventDefault();
   console.log(preset);
   value = $(this).val();
-  if (value == 0) {
-    query_library = '';
-  } else {
-    query_library = 'metadata_items.library_section_id = ' + value;
-  }
-  make_query();
+  query_library = 'WHERE metadata_items.library_section_id = ' + value;
+  tmp = $('#query').val();
+  $('#query').val(tmp + ' ' + query_library);
 });
 
 
 $("body").on('change', '#preset', function(e){
   e.preventDefault();
   value = $(this).val();
-  if (value == 0) {
-    query_preset = '';
-  } else {
-    query_preset = preset[value][1];
-  }
-  console.log(preset);
-  console.log($(this).val());
-  make_query();
+  query_preset = preset[value][1];
+  $('#query').val(query_preset);
 });
-
-
-
-function make_query() {
-  str = '';
-  if (query_library != '') {
-    str = query_library;
-  }
-  if (query_preset != '') {
-    if (str == '') {
-      str = query_preset;
-    } else {
-      str = str + ' AND ' + query_preset;
-    }
-  }
-  $('#query').val(str);
-}
 
 
 
 
 //global_send_command_sub(command, arg1, arg2, arg3, modal_title, callback) {
-$("body").on('click', '#select_btn', function(e){
+$("body").on('click', '#execute_btn', function(e){
   e.preventDefault();
-  global_send_command_sub('select', $('#query').val(), '', '', '', process_select);
+  global_send_command_sub('execute', $('#query').val(), '', '', '', process_select);
   
 });
 
 function process_select(ret) {
   console.log(ret);
-  if (ret.select.ret == 'success') {
-    current_data = ret.select.data;
+  if (ret.mode == 'select') {
+    current_data = ret.select;
     make_list(current_data);
-  } else {
-    notify(ret.select.log, 'warning');
   }
-  
-
-  
 }
 
 
@@ -204,8 +136,21 @@ function make_list(data) {
   if (data.length == 0) {
     notify("검색된 데이터가 없습니다.", 'warning');
   } else {
-    for (i in data) {
-      str += make_one(i, data[i]);
+
+    if ( data.length > 0 ) {
+      str = '';
+      count = Object.keys(data[0]).length;
+      console.log(count);
+      width = parseInt(100 / count);
+      console.log(width);
+      for (var key in data[0]) { 
+        str += '<th style="width:'+width+'%">'+key+'</th>'
+      } 
+      $('#table_head').html('<tr>' + str + '</tr>');
+      str = '';
+      for (i in data) {
+        str += make_one(i, data[i]);
+      }
     }
   }
   document.getElementById("list").innerHTML = str;
@@ -214,34 +159,15 @@ function make_list(data) {
 
 
 
-
 function make_one(idx, data) {
   str = '<tr class="chover" style="cursor: pointer;" data-index="'+ idx + '">';
-  str += '<td scope="col" style="width:2%">'+ (parseInt(idx)+1) + '</td>';
-  tmp = data.metadata_items_id + '<br>' + data.media_items_id + '<br>' + data.media_parts_id;
-  str += '<td scope="col" style="width:4%">'+ tmp + '</td>';
+  count = Object.keys(data).length;
+  width = parseInt(100 / count);
+  for (var key in data) { 
+    console.log("key : " + key +", value : " + current_data[0][key]); 
+    str += '<td scope="col" style="width:'+width+'%">'+ data[key]; + '</td>';
+  } 
 
-  tmp = data.library_section_id + '<br>' + data.media_item_count + '<br>' + data.metadata_items_index;
-  str += '<td scope="col" style="width:4%">'+ tmp + '</td>';
-
-  tmp = data.title;
-  if (tmp != '' && data.year != null && data.year != '') {
-    tmp += ' (' + data.year + ')';
-  }
-  tmp = color(tmp, 'blue');
-  tmp += '<br>' + data.guid + '<br>' + data.user_thumb_url + '<br>' + data.user_art_url + '<br>' + data.file + '<br>' + data.metadata_items_hash + ' / ' + data.media_parts_hash;
-  str += '<td scope="col" style="width:70%">'+ tmp + '</td>';
-  //str += '<td scope="col" >'+ data.file + '</td>';
-
-  if (data.width == null) {
-    tmp = color('미분석');
-  } else {
-    tmp = data.width + 'x' + data.height + '<br>' + data.video_codec + ' / ' + data.audio_codec + '<br>' + data.container;
-  }
-  str += '<td scope="col" style="width:10%">'+ tmp + '</td>';
-  
-  tmp =  parseInt(data.bitrate/1024) + ' kbps<br>' + msToHMS(data.duration) + '<br>' + humanFileSize(data.size);
-  str += '<td scope="col" style="width:10%">'+ tmp + '</td>';
 
   str += '</tr>'
   

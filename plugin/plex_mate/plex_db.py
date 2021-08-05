@@ -72,7 +72,8 @@ class PlexDBHandle(object):
                 cmd = f'"{ModelSetting.get("base_bin_sqlite")}" "{ModelSetting.get("base_path_db")}" ".read {tmp}"'
                 ToolSubprocess.execute_command_return(cmd)
             else:
-                ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
+                ret = ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
+                logger.warning(ret)
             return True
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
@@ -107,6 +108,35 @@ class PlexDBHandle(object):
             logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
         return '' 
+
+
+    @classmethod
+    def execute_query_with_db_filepath(cls, sql, db_filepath):
+        try:
+            sql_filepath = os.path.join(path_data, 'tmp', f"{str(time.time()).split('.')[0]}.sql")
+            ToolBaseFile.write(sql, sql_filepath)
+            if platform.system() == 'Windows':
+                tmp = sql_filepath.replace('\\', '\\\\')
+                cmd = f'"{ModelSetting.get("base_bin_sqlite")}" "{db_filepath}" ".read {tmp}"'
+                for i in range(10):
+                    ret = ToolSubprocess.execute_command_return(cmd)
+                    if ret.find('database is locked') != -1:
+                        time.sleep(5)
+                    else:
+                        break
+            else:
+                for i in range(10):
+                    ret = ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), db_filepath, f".read {sql_filepath}"])
+                    if ret.find('database is locked') != -1:
+                        time.sleep(5)
+                    else:
+                        break
+            return ret
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+        return '' 
+
 
     @classmethod
     def select(cls, query, db_file=None):
