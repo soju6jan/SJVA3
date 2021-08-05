@@ -32,10 +32,7 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
             f'{self.parent.name}_{self.name}_path_create' : os.path.join(path_data, package_name),
             f'{self.parent.name}_{self.name}_path_section_id' : '',
         }
-        logger.error(f'{self.parent.name}_{self.name}_path_create')
-        if os.path.exists(ModelSetting.get(f'{self.parent.name}_{self.name}_path_create')) == False:
-            os.makedirs(ModelSetting.get(f'{self.parent.name}_{self.name}_path_create'))
-
+        
 
     def process_ajax(self, sub, req):
         try:
@@ -57,6 +54,10 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
             P.logger.error(traceback.format_exc())
             return jsonify({'ret':'danger', 'msg':str(e)})
     
+    def plugin_load(self):
+        if os.path.exists(ModelSetting.get(f'{self.parent.name}_{self.name}_path_create')) == False:
+            os.makedirs(ModelSetting.get(f'{self.parent.name}_{self.name}_path_create'))
+
     #########################################################
 
 
