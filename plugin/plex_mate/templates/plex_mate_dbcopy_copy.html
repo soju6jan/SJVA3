@@ -5,12 +5,12 @@
   {{ macros.m_row_start('5') }}
   {{ macros.m_row_end() }}
   <form id='setting'>
-    {{ macros.setting_input_text_and_buttons('dbcopy_copy_path_source_db', '소스 DB 파일 경로', [['select_dbcopy_copy_path_source_db_btn', '경로 선택']], value=arg['dbcopy_copy_path_source_db'], desc=['복사에 사용할 DB파일']) }}
-    {{ macros.setting_input_text_and_buttons('dbcopy_copy_source_section_id', '소스 Section ID', [['source_section_btn', '소스 DB 섹션 확인']], value=arg['dbcopy_copy_source_section_id'], col=6, desc= None) }}
+    {{ macros.setting_input_text_and_buttons('dbcopy_copy_path_source_db', '소스 DB 파일 경로', [['select_dbcopy_copy_path_source_db_btn', '경로 선택'], ['source_section_btn', '소스 DB 섹션 확인']], value=arg['dbcopy_copy_path_source_db'], desc=['복사에 사용할 DB파일']) }}
+    <!--{{ macros.setting_input_text_and_buttons('dbcopy_copy_source_section_id', '소스 Section ID', [['source_section_btn', '소스 DB 섹션 확인']], value=arg['dbcopy_copy_source_section_id'], col=6, desc= None) }}-->
     {{ macros.setting_input_text('dbcopy_copy_path_source_root_path', '소스 파일 경로', value=arg['dbcopy_copy_path_source_root_path'], desc=['경로 변환시 사용할 소스 Root']) }}
     {{ macros.setting_input_text('dbcopy_copy_path_target_root_path', '타겟 파일 경로', value=arg['dbcopy_copy_path_target_root_path'], desc=['경로 변환시 사용할 타겟 Root']) }}
     {{ macros.setting_input_text_and_buttons('dbcopy_copy_target_section_id', 'Plex Section ID', [['target_section_id_btn', 'DB 확인']], value=arg['dbcopy_copy_target_section_id'], desc=None) }}
-    {{ macros.setting_input_text_and_buttons('dbcopy_copy_target_section_location_id', 'Plex Section Location ID', [['target_section_location_id_btn', 'DB 확인']], value=arg['dbcopy_copy_target_section_location_id'], desc=None) }}
+    <!--{{ macros.setting_input_text_and_buttons('dbcopy_copy_target_section_location_id', 'Plex Section Location ID', [['target_section_location_id_btn', 'DB 확인']], value=arg['dbcopy_copy_target_section_location_id'], desc=None) }}-->
     {{ macros.setting_radio('dbcopy_copy_dir_updated_mode', 'updated_at 모드', ['DB 값 사용', '파일시스템 사용'], value=0) }}
   </form>
 </div>

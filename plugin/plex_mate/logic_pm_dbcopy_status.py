@@ -85,10 +85,12 @@ class LogicPMDbCopyStatus(LogicSubModuleBase):
         self.refresh_data()
         ModelSetting.set(f'{self.parent.name}_{self.name}_task_stop_flag', 'False')
         try:
+            logger.debug('22222222222222222')
             if app.config['config']['use_celery']:
                 result = Task.start.apply_async()
                 ret = result.get(on_message=self.receive_from_task, propagate=True)
             else:
+                logger.debug('333333333333333333333')
                 ret = Task.start(self)
             self.data['status']['is_working'] = ret
         except Exception as e: 
