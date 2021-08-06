@@ -58,3 +58,10 @@ class Task(object):
 
 
 
+    @staticmethod
+    @celery.task()
+    def empty_episode_process(args):
+        logger.warning(args)
+
+        
+
