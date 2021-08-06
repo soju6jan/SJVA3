@@ -97,6 +97,8 @@ class Task(object):
             #    data['process']['banner']['url'],
             #    data['db']['id']
             #)
+            if 'poster' not in data['process']:
+                return
             sql = 'UPDATE metadata_items SET '
             if data['process']['poster']['url'] != '':
                 sql += ' user_thumb_url = "{}", '.format(data['process']['poster']['url'])

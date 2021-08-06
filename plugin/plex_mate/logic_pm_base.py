@@ -176,12 +176,15 @@ class LogicPMBase(LogicModuleBase):
 
 
     def task_interface2(self, command, *args):
+        logger.warning(command)
         if command == 'size' or command == 'size_ret':
             func = Task.get_size
         elif command == 'backup':
             func = Task.backup
         elif command == 'clear' or command == 'clear_ret':
             func = Task.clear
+        elif command == 'empty_episode_process':
+            func = Task.empty_episode_process
         #ret = func(*args)
         
         if app.config['config']['use_celery']:
@@ -206,6 +209,9 @@ class LogicPMBase(LogicModuleBase):
             socketio.emit("notify", noti_data, namespace='/framework', broadcast=True) 
         elif command == 'clear_ret':
             return ret
+        elif command == 'empty_episode_process':
+            noti_data = {'type':'info', 'msg' : f"썸네일 처리 완료"}
+            return 
 
 
     @staticmethod

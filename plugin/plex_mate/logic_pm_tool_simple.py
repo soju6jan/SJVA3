@@ -169,6 +169,20 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
                     #logger.error(query)
                     data = PlexDBHandle.select(query)
                     ret['modal'] = json.dumps(data, indent=4, ensure_ascii=False)
+                elif command == 'empty_episode_process':
+                    section_id = req.form['arg1']
+                    #P.logic.get_module('base').task_interface('empty_episode_process', (section_id,))
+                    #ret = {'ret':'success', 'msg':'시작합니다.'}
+                    #query = f"""UPDATE metadata_items as A SET user_thumb_url = (SELECT user_art_url FROM metadata_items as B WHERE id in (SELECT parent_id FROM metadata_items WHERE A.id = b.parent_id AND library_section_id = {section_id} AND (user_thumb_url = '' or user_thumb_url LIKE 'media%'))) WHERE library_section_id = {section_id} AND (user_thumb_url = '' or user_thumb_url LIKE 'media%');"""
+                    # null로 세팅하면 부모것을 사용함
+                    query = f"""UPDATE metadata_items as A SET user_thumb_url = (SELECT user_art_url FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items as B WHERE id in (SELECT parent_id FROM metadata_items WHERE A.id = b.parent_id AND library_section_id = {section_id} AND (user_thumb_url = '' or user_thumb_url LIKE 'media%')))) WHERE library_section_id = {section_id} AND (user_thumb_url = '' or user_thumb_url LIKE 'media%')"""
+
+
+                    result = PlexDBHandle.execute_query(query)
+                    if result:
+                        ret = {'ret':'success', 'msg':'정상적으로 처리되었습니다.'}
+                    else:
+                        ret = {'ret':'warning', 'msg':'실패'}
 
             return jsonify(ret)
         except Exception as e: 
@@ -179,75 +193,3 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
 
 
     #########################################################
-
-    def task_interface(self, *args):
-        logger.warning(args)
-        def func():
-            time.sleep(1)
-            self.task_interface2(*args)
-        th = threading.Thread(target=func, args=())
-        th.setDaemon(True)
-        th.start()
-
-
-    def task_interface2(self, *args):
-        logger.warning(args)
-        #if sub == 'movie':
-        library_section = PlexDBHandle.library_section(args[1])
-        #logger.warning(d(library_section))
-        self.data['list'] = []
-        self.data['status']['is_working'] = 'run'
-        self.refresh_data()
-        ModelSetting.set(f'{self.parent.name}_{self.name}_task_stop_flag', 'False')
-
-        if library_section['section_type'] == 1:
-            func = TaskThumbMovie.start
-            config = TaskThumbMovie.load_config()
-        elif library_section['section_type'] == 2:
-            func = TaskThumbShow.start
-        try:
-            self.list_max = config['웹페이지에 표시할 세부 정보 갯수']
-        except:
-            self.list_max = 200
-        #func(*args)
-        #return
-        if app.config['config']['use_celery']:
-            result = func.apply_async(args)
-            ret = result.get(on_message=self.receive_from_task, propagate=True)
-        else:
-            ret = func(*args)
-        self.data['status']['is_working'] = ret
-        self.refresh_data()
-
-
-    def refresh_data(self, index=-1):
-        #logger.error(f"refresh_data : {index}")
-        if index == -1:
-            self.socketio_callback('refresh_all', self.data)
-            
-        else:
-            self.socketio_callback('refresh_one', {'one' : self.data['list'][index], 'status' : self.data['status']})
-        
-
-    def receive_from_task(self, arg, celery=True):
-        try:
-            result = None
-            if celery:
-                if arg['status'] == 'PROGRESS':
-                    result = arg['result']
-            else:
-                result = arg
-            if result is not None:
-                self.data['status'] = result['status']
-                #logger.warning(result)
-                del result['status']
-                #logger.warning(result)
-                if self.list_max != 0:
-                    if len(self.data['list']) == self.list_max:
-                        self.data['list'] = []
-                result['index'] = len(self.data['list'])
-                self.data['list'].append(result)
-                self.refresh_data(index=result['index'])
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
-            logger.error(traceback.format_exc())
