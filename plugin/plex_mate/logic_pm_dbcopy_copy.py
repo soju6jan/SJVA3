@@ -61,6 +61,12 @@ class LogicPMDbCopyCopy(LogicSubModuleBase):
                     logger.warning(req.form['arg1'])
                     data = PlexDBHandle.select2('SELECT * FROM section_locations WHERE library_section_id = ?', (req.form['arg1'],))
                     ret['modal'] = d(data)
+                elif command == 'select_source_locations':
+                    data = PlexDBHandle.select('SELECT * FROM section_locations', db_file=req.form['arg1'])
+                    ret['modal'] = d(data)
+                elif command == 'select_target_locations':
+                    data = PlexDBHandle.select('SELECT * FROM section_locations')
+                    ret['modal'] = d(data)
             return jsonify(ret)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')

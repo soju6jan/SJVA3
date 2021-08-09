@@ -214,12 +214,13 @@ DROP TRIGGER fts4_metadata_titles_after_insert_icu;
 DROP TRIGGER fts4_metadata_titles_after_update_icu;
 DROP TRIGGER fts4_metadata_titles_before_delete_icu;
 DROP TRIGGER fts4_metadata_titles_before_update_icu;
+CREATE TABLE "metadata" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "hash" varchar(255), "data" text); 
 VACUUM;
             '''
-            if include_info_xml:
-                query += '''
-                    CREATE TABLE "metadata" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "hash" varchar(255), "data" text); 
-                '''
+            #if include_info_xml:
+            #    query += '''
+            #        CREATE TABLE "metadata" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "hash" varchar(255), "data" text); 
+            #    '''
             logger.warning("쿼리 실행 시작")
             PlexDBHandle.execute_query_with_db_filepath(query, newpath)
             logger.warning("쿼리 실행 끝")

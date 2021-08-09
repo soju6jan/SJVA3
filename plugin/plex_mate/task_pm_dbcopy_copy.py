@@ -124,11 +124,13 @@ class Task(object):
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())
                 finally:
+                    #Task.create_info_xml(metadata_item, 1)
                     if app.config['config']['use_celery']:
                         celery_instance.update_state(state='PROGRESS', meta=data)
                     else:
                         celery_instance.receive_from_task(data, celery=False)
 
+                
 
                 # bin scan
                 """
@@ -201,11 +203,11 @@ class Task(object):
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())
                 finally:
+                    #Task.create_info_xml(show_metadata_item, 2)
                     if app.config['config']['use_celery']:
                         celery_instance.update_state(state='PROGRESS', meta=data)
                     else:
                         celery_instance.receive_from_task(data, celery=False)
-
 
 
 
@@ -455,3 +457,24 @@ class Task(object):
         for TARGET_LOCATION in Task.TARGET_LOCATIONS:
             if TARGET_LOCATION['root_path'] == new_root_path:
                 return TARGET_LOCATION['id']
+
+
+    @staticmethod
+    def create_info_xml(metadata_item, metadata_type):
+        row_ce = Task.source_con.execute('SELECT hash, data FROM metadata WHERE hash = ?', (metadata_item['hash'],))
+        row_ce.row_factory = dict_factory
+        row = row_ce.fetchall()
+        if len(row) == 1:
+            metapath = os.path.join(ModelSetting.get('base_path_metadata'), 'Movies' if metadata_type == 1 else 'TV Shows', metadata_item['hash'][0], f"{metadata_item['hash'][1:]}.bundle", 'Contents', '_combined', 'Info.xml')
+            if os.path.exists(metapath):
+                logger.warning(f"{metadata_item['title']} Info.xml already exist..")
+            else:
+                folder_path = os.path.dirname(metapath)
+                if os.path.exists(folder_path) == False:
+                    os.makedirs(folder_path)
+                    ToolBaseFile.write(row[0]['data'], metapath)
+                    logger.debug(metapath)
+                    logger.warning(f"{metadata_item['title']} Info.xml write..")
+        else:
+            logger.warning('info.xml data not exist')                
+
