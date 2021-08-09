@@ -183,6 +183,10 @@ $(document).ready(function(){
     });
   });
 
+  socket.on('modal', function(data){
+    m_modal(data.data, data.title, false);
+  });
+
   socket.on('command_modal_add_text', function(data){
     document.getElementById("command_modal_textarea").innerHTML += data ;
     document.getElementById("command_modal_textarea").scrollTop = document.getElementById("command_modal_textarea").scrollHeight;

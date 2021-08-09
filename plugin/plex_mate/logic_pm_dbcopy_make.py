@@ -4,7 +4,7 @@
 import os, sys, traceback, re, json, threading, time, shutil, platform
 from datetime import datetime
 # third-party
-import requests, xmltodict
+import requests, xmltodict, sqlite3
 from flask import request, render_template, jsonify, redirect
 # sjva 공용
 from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util
@@ -16,7 +16,7 @@ logger = P.logger
 package_name = P.package_name
 ModelSetting = P.ModelSetting
 
-from .plex_db import PlexDBHandle
+from .plex_db import PlexDBHandle, dict_factory
 from .plex_web import PlexWebHandle
 from .logic_pm_base import LogicPMBase
 #########################################################
@@ -30,7 +30,8 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
         self.db_default = {
             f'{self.parent.name}_{self.name}_db_version' : '1',
             f'{self.parent.name}_{self.name}_path_create' : os.path.join(path_data, package_name),
-            f'{self.parent.name}_{self.name}_path_section_id' : '',
+            f'{self.parent.name}_{self.name}_section_id' : '',
+            f'{self.parent.name}_{self.name}_include_info_xml' : 'False',
         }
         
 
@@ -40,14 +41,11 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
             if sub == 'command':
                 command = req.form['command']
                 if command.startswith('start'):
-                    logger.warning(req.form['arg1'])
-                    logger.warning(req.form['arg2'])
-                    newpath = self.start(req.form['arg1'], req.form['arg2'])
-                    if newpath is not None:
-                        ret['msg'] = f"{newpath}<br>생성하였습니다."
-                    else:
-                        ret['ret'] = 'warning'
-                        ret['msg'] = f"실패하였습니다."
+                    ModelSetting.set(f'{self.parent.name}_{self.name}_path_create', req.form['arg1'])
+                    ModelSetting.set(f'{self.parent.name}_{self.name}_section_id', req.form['arg2'])
+                    ModelSetting.set(f'{self.parent.name}_{self.name}_include_info_xml', 'True' if (req.form['arg3']=='true') else 'False')
+                    self.task_interface()
+                    ret['msg'] = f"작업을 시작합니다.<br>완료시 팝업 창이 나타납니다."
             return jsonify(ret)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')
@@ -59,22 +57,41 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
             os.makedirs(ModelSetting.get(f'{self.parent.name}_{self.name}_path_create'))
 
     #########################################################
+    def task_interface(self):
+        def func():
+            time.sleep(1)
+            self.task_interface2()
+        th = threading.Thread(target=func, args=())
+        th.setDaemon(True)
+        th.start()
 
+    def task_interface2(self):
+        func = LogicPMDbCopyMake.start
+        if app.config['config']['use_celery']:
+            result = func.apply_async()
+            ret = result.get()
+        else:
+            ret = func()
+        msg = f"{ret}<br>파일 생성을 완료하였습니다."
+        socketio.emit("modal", {'title':'DB 생성 완료', 'data' : msg}, namespace='/framework', broadcast=True)  
 
-    def start(self, folderpath, section_id):
-        
+    @staticmethod
+    @celery.task
+    def start():
         try:
-            ModelSetting.set(f'{self.parent.name}_{self.name}_path_create', folderpath)
+            db_folderpath = ModelSetting.get(f'dbcopy_make_path_create')
+            section_id = ModelSetting.get(f'dbcopy_make_section_id')
             section = PlexDBHandle.library_section(section_id)
-            logger.warning(d(section))
-
-            
+            include_info_xml = ModelSetting.get_bool(f'dbcopy_make_include_info_xml')
+            #newpath = "/root/SJVA3/data/plex_mate/영화 All (중복제거)_18_20210809_152135.db"
+            #LogicPMDbCopyMake.insert_info_xml(newpath, section['section_type'])
+            #return newpath
             db_path = ModelSetting.get(f'base_path_db')
             if os.path.exists(db_path):
                 basename = os.path.basename(db_path)
                 tmp = os.path.splitext(basename)
                 newfilename = f"{section['name']}_{section['id']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{tmp[1]}"
-                newpath = os.path.join(ModelSetting.get(f'{self.parent.name}_{self.name}_path_create'), newfilename)
+                newpath = os.path.join(db_folderpath, newfilename)
                 shutil.copy(db_path, newpath)
             logger.debug(newpath)
             
@@ -199,12 +216,46 @@ DROP TRIGGER fts4_metadata_titles_before_delete_icu;
 DROP TRIGGER fts4_metadata_titles_before_update_icu;
 VACUUM;
             '''
-
-            
+            if include_info_xml:
+                query += '''
+                    CREATE TABLE "metadata" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "hash" varchar(255), "data" text); 
+                '''
+            logger.warning("쿼리 실행 시작")
             PlexDBHandle.execute_query_with_db_filepath(query, newpath)
+            logger.warning("쿼리 실행 끝")
 
+            if include_info_xml:
+                LogicPMDbCopyMake.insert_info_xml(newpath, section['section_type'])
             return newpath
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
         return
+
+    
+    @staticmethod
+    def insert_info_xml(db_filepath, metadata_type):
+        con = sqlite3.connect(db_filepath)
+
+        ce = con.execute('SELECT title, hash FROM metadata_items WHERE metadata_type BETWEEN 1 AND 2')
+        ce.row_factory = dict_factory
+        datas = ce.fetchall()
+        count = len(datas)
+        for idx, item in enumerate(datas):
+            row_ce = con.execute('SELECT hash FROM metadata WHERE hash = ?', (item['hash'],))
+            row_ce.row_factory = dict_factory
+            row = row_ce.fetchall()
+            if len(row) == 1:
+                logger.warning(f"{idx+1} / {count} : {item['title']} Already Info.xml saved")
+            elif len(row) == 0:
+                metapath = os.path.join(ModelSetting.get('base_path_metadata'), 'Movies' if metadata_type == 1 else 'TV Shows', item['hash'][0], f"{item['hash'][1:]}.bundle", 'Contents', '_combined', 'Info.xml')
+                #logger.debug(metapath)
+                if os.path.exists(metapath):
+                    xml = ToolBaseFile.read(metapath)
+                    insert_ce = con.execute('INSERT INTO metadata (hash, data) VALUES (?,?)', (item['hash'], xml))
+                    logger.warning(f"{idx+1} / {count} : {item['title']} insert..")
+                else:
+                    logger.warning(f"{idx+1} / {count} : {item['title']} Not exist Info.xml file")
+        con.commit()
+        con.close()
+    

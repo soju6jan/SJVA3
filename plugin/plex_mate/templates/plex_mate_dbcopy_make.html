@@ -10,7 +10,8 @@
       <select id="library_select" name="library_select" class="form-control form-control-sm">
         {% if arg['library_list'] is not none %}
         {% for item in arg['library_list'] %}
-          {% if loop.counter == 0 %}
+          {% set value = item['id'] | string() %}
+          {% if value == arg['dbcopy_make_section_id'] %}
           <option value="{{ item['id'] }}" selected>{{item['name']}}</option>
           {% else %}
           <option value="{{ item['id'] }}">{{item['name']}}</option>
@@ -20,7 +21,10 @@
       </select>
     </div>
     {{ macros.setting_bottom('') }}
+
+    {{ macros.setting_checkbox('dbcopy_make_include_info_xml', 'Info.xml 포함', value=arg['dbcopy_make_include_info_xml'], desc=None) }}
     {{ macros.buttons([['start_btn', '생성 시작']])}}
+
   </form>
 </div>
 
@@ -47,7 +51,7 @@ $("body").on('click', '#select_dbcopy_make_path_create_btn', function(e){
 
 $("body").on('click', '#start_btn', function(e){
   e.preventDefault();
-  global_send_command_sub('start', $('#dbcopy_make_path_create').val(), $('#library_select').val());
+  global_send_command_sub('start', $('#dbcopy_make_path_create').val(), $('#library_select').val(), $('#dbcopy_make_include_info_xml').prop('checked') === true);
 });
 
 
