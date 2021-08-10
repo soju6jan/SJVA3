@@ -259,6 +259,8 @@ class Task(object):
         new_filepath = filepath.replace(Task.change_rule[0], Task.change_rule[1])
         if Task.change_rule[1][0] != '/': #windows
             new_filepath = new_filepath.replace('/', '\\')
+        else:
+            new_filepath = new_filepath.replace('\\', '/')
         #logger.warning(f"새로운 경로 : {new_filepath}")
         #라이브러리 폴더 root_path
         
