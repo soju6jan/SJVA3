@@ -59,8 +59,7 @@ class Task(object):
                     return Task.movie_start(self)
                 elif data[0]['section_type'] == 2:
                     return Task.tv_start(self)
-
-                
+     
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
@@ -81,6 +80,7 @@ class Task(object):
         status = {'is_working':'run', 'count':0, 'current':0}
         for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
             CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
+            #ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
             ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
     
             ce.row_factory = dict_factory
@@ -120,11 +120,12 @@ class Task(object):
                                 #logger.debug(d(media_stream))
                                 media_stream_id = Task.insert_media_streams(media_stream, media_item_id, media_part_id, Task.TARGET_SECTION_ID)
                                 #logger.warning(f"media_stream_id : {media_stream_id}")
+                    Task.insert_tag(metadata_item, metadata_item_id)
                 except Exception as e: 
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())
                 finally:
-                    #Task.create_info_xml(metadata_item, 1)
+                    
                     if app.config['config']['use_celery']:
                         celery_instance.update_state(state='PROGRESS', meta=data)
                     else:
@@ -199,11 +200,12 @@ class Task(object):
                                         #logger.debug(d(media_stream))
                                         media_stream_id = Task.insert_media_streams(media_stream, media_item_id, media_part_id, Task.TARGET_SECTION_ID)
                                         #logger.warning(f"media_stream_id : {media_stream_id}")
+                    Task.insert_tag(show_metadata_item, show_metadata_item_id)
                 except Exception as e: 
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())
                 finally:
-                    #Task.create_info_xml(show_metadata_item, 2)
+                    
                     if app.config['config']['use_celery']:
                         celery_instance.update_state(state='PROGRESS', meta=data)
                     else:
@@ -478,3 +480,73 @@ class Task(object):
         else:
             logger.warning('info.xml data not exist')                
 
+    @staticmethod
+    def insert_tag(metadata_item, plex_metadata_item_id):
+        #query = f"DELETE FROM tags WHERE created_at = 'None';" 
+        #logger.warning(query)
+        #ret = PlexDBHandle.execute_query2(query)
+        #return
+
+
+        row_ce = Task.source_con.execute('SELECT taggings.tag_id, taggings.`index` AS taggings_index, taggings.text AS taggings_text, taggings.time_offset AS taggings_time_offset, taggings.end_time_offset AS taggings_end_time_offset, taggings.created_at AS taggings_created_at, taggings.extra_data AS taggings_extra_data, tags.tag AS tags_tag, tags.tag_type AS tags_tag_type, tags.user_thumb_url AS tags_user_thumb_url, tags.created_at AS tags_created_at, tags.updated_at AS tags_updated_at FROM taggings, tags WHERE taggings.tag_id = tags.id AND taggings.metadata_item_id = ? ORDER BY taggings.id', (metadata_item['id'],))
+        row_ce.row_factory = dict_factory
+        rows = row_ce.fetchall()
+
+        for tag_item in rows:
+            logger.debug(tag_item)
+            if tag_item['taggings_index'] is not None:
+                data = PlexDBHandle.select2(f"SELECT * FROM taggings, tags WHERE taggings.tag_id = tags.id AND taggings.metadata_item_id = ? AND taggings.`index` = ? AND taggings.text = ? AND taggings.extra_data = ? AND tags.tag = ? AND tags.tag_type = ?", (plex_metadata_item_id, tag_item['taggings_index'], tag_item['taggings_text'], tag_item['taggings_extra_data'], tag_item['tags_tag'], tag_item['tags_tag_type']))
+            else:
+                data = PlexDBHandle.select2(f"SELECT * FROM taggings, tags WHERE taggings.tag_id = tags.id AND taggings.metadata_item_id = ? AND taggings.text = ? AND taggings.extra_data = ? AND tags.tag = ? AND tags.tag_type = ?", (plex_metadata_item_id, tag_item['taggings_text'], tag_item['taggings_extra_data'], tag_item['tags_tag'], tag_item['tags_tag_type']))
+            logger.error(f"PLEX DB에 있는 카운트 : {len(data)}")
+            if len(data) > 0:
+                continue
+            
+            tag_id = -1
+            data = PlexDBHandle.select2(f"SELECT * FROM tags WHERE tag = ? AND tag_type = ? AND user_thumb_url = ?", (tag_item['tags_tag'], tag_item['tags_tag_type'], tag_item['tags_user_thumb_url']))
+            if len(data) > 0:
+                tag_id = data[0]['id']
+                logger.warning(f'tag exist {tag_id}')
+            elif len(data) == 0:
+                insert_col = "'tag', 'tag_type', 'user_thumb_url', 'updated_at', 'user_art_url', 'user_music_url', 'extra_data', 'key'"
+                value = tag_item["tags_tag"].replace('"', '""')
+                insert_value = f'"{value}", {tag_item["tags_tag_type"]}, "{tag_item["tags_user_thumb_url"]}", "{tag_item["tags_updated_at"]}", "", "", "", ""'
+
+                if tag_item["tags_created_at"] is not None:
+                    insert_col += ", 'created_at'"
+                    insert_value += f', "{tag_item["tags_created_at"]}"'
+              
+                query = f"INSERT INTO tags({insert_col}) VALUES ({insert_value});SELECT max(id) FROM tags;" 
+                logger.error(query)
+                ret = PlexDBHandle.execute_query2(query)
+                if ret != '':
+                    tag_id = int(ret)
+                    logger.warning(f'tag insert {tag_id}')
+            
+            if tag_id == -1:
+                continue
+            insert_col = "'metadata_item_id', 'tag_id', 'created_at', 'text',"
+            value = tag_item["taggings_text"].replace('"', '""')
+            insert_value = f'{plex_metadata_item_id}, {tag_id}, "{tag_item["taggings_created_at"]}", "{value}",'
+
+            if tag_item["taggings_index"] is not None:
+                insert_col += " `index`,"
+                insert_value += f' {tag_item["taggings_index"]},'
+
+            if tag_item["taggings_time_offset"] is not None:
+                insert_col += " 'time_offset', 'end_time_offset',"
+                insert_value += f' {tag_item["taggings_time_offset"]}, {tag_item["taggings_end_time_offset"]},'
+            if tag_item["taggings_extra_data"] is not None:
+                insert_col += " 'extra_data',"
+                insert_value += f' "{tag_item["taggings_extra_data"]}",'
+            insert_col += " 'thumb_url'"
+            insert_value += f' ""'
+
+            query = f"INSERT INTO taggings({insert_col}) VALUES ({insert_value});SELECT max(id) FROM taggings;" 
+            logger.warning(query)
+            ret = PlexDBHandle.execute_query2(query)
+            if ret != '':
+                taggins_id = int(ret)
+            logger.warning(f"{taggins_id} insert")
+                
+            
