@@ -495,12 +495,12 @@ class Task(object):
         rows = row_ce.fetchall()
 
         for tag_item in rows:
-            logger.debug(tag_item)
+            #logger.debug(tag_item)
             if tag_item['taggings_index'] is not None:
                 data = PlexDBHandle.select2(f"SELECT * FROM taggings, tags WHERE taggings.tag_id = tags.id AND taggings.metadata_item_id = ? AND taggings.`index` = ? AND taggings.text = ? AND taggings.extra_data = ? AND tags.tag = ? AND tags.tag_type = ?", (plex_metadata_item_id, tag_item['taggings_index'], tag_item['taggings_text'], tag_item['taggings_extra_data'], tag_item['tags_tag'], tag_item['tags_tag_type']))
             else:
                 data = PlexDBHandle.select2(f"SELECT * FROM taggings, tags WHERE taggings.tag_id = tags.id AND taggings.metadata_item_id = ? AND taggings.text = ? AND taggings.extra_data = ? AND tags.tag = ? AND tags.tag_type = ?", (plex_metadata_item_id, tag_item['taggings_text'], tag_item['taggings_extra_data'], tag_item['tags_tag'], tag_item['tags_tag_type']))
-            logger.error(f"PLEX DB에 있는 카운트 : {len(data)}")
+            #logger.error(f"PLEX DB에 있는 카운트 : {len(data)}")
             if len(data) > 0:
                 continue
             
@@ -508,7 +508,7 @@ class Task(object):
             data = PlexDBHandle.select2(f"SELECT * FROM tags WHERE tag = ? AND tag_type = ? AND user_thumb_url = ?", (tag_item['tags_tag'], tag_item['tags_tag_type'], tag_item['tags_user_thumb_url']))
             if len(data) > 0:
                 tag_id = data[0]['id']
-                logger.warning(f'tag exist {tag_id}')
+                #logger.warning(f'tag exist {tag_id}')
             elif len(data) == 0:
                 insert_col = "'tag', 'tag_type', 'user_thumb_url', 'updated_at', 'user_art_url', 'user_music_url', 'extra_data', 'key'"
                 value = tag_item["tags_tag"].replace('"', '""')
@@ -519,11 +519,11 @@ class Task(object):
                     insert_value += f', "{tag_item["tags_created_at"]}"'
               
                 query = f"INSERT INTO tags({insert_col}) VALUES ({insert_value});SELECT max(id) FROM tags;" 
-                logger.error(query)
+                #logger.error(query)
                 ret = PlexDBHandle.execute_query2(query)
                 if ret != '':
                     tag_id = int(ret)
-                    logger.warning(f'tag insert {tag_id}')
+                    #logger.warning(f'tag insert {tag_id}')
             
             if tag_id == -1:
                 continue
@@ -545,10 +545,10 @@ class Task(object):
             insert_value += f' ""'
 
             query = f"INSERT INTO taggings({insert_col}) VALUES ({insert_value});SELECT max(id) FROM taggings;" 
-            logger.warning(query)
+            #logger.warning(query)
             ret = PlexDBHandle.execute_query2(query)
             if ret != '':
                 taggins_id = int(ret)
-            logger.warning(f"{taggins_id} insert")
+            #logger.warning(f"{taggins_id} insert")
                 
             
