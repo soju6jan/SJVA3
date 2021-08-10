@@ -93,7 +93,7 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
                 newfilename = f"{section['name']}_{section['id']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{tmp[1]}"
                 newpath = os.path.join(db_folderpath, newfilename)
                 shutil.copy(db_path, newpath)
-            logger.debug(newpath)
+            logger.debug(f"파일 : {newpath}")
             
             query = ''
             if section['section_type'] == 1:
@@ -210,10 +210,21 @@ DROP INDEX index_title_sort_icu;
 DROP INDEX index_library_sections_on_changed_at;
 DROP INDEX index_library_sections_on_name;
 DROP INDEX index_library_sections_on_name_sort;
+DROP INDEX index_taggings_on_metadata_item_id;
+DROP INDEX index_taggings_on_tag_id;
+DROP INDEX index_tags_on_key;
+DROP INDEX index_tags_on_parent_id;
+DROP INDEX index_tags_on_tag;
+DROP INDEX index_tags_on_tag_type;
+DROP INDEX index_tags_on_tag_type_and_tag;
 DROP TRIGGER fts4_metadata_titles_after_insert_icu;
 DROP TRIGGER fts4_metadata_titles_after_update_icu;
 DROP TRIGGER fts4_metadata_titles_before_delete_icu;
 DROP TRIGGER fts4_metadata_titles_before_update_icu;
+DROP TRIGGER fts4_tag_titles_after_insert_icu;
+DROP TRIGGER fts4_tag_titles_after_update_icu;
+DROP TRIGGER fts4_tag_titles_before_delete_icu;
+DROP TRIGGER fts4_tag_titles_before_update_icu;
 VACUUM;
             '''
             #if include_info_xml:
