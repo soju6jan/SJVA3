@@ -109,6 +109,8 @@ DELETE FROM media_items WHERE library_section_id is null OR library_section_id !
 DELETE FROM directories WHERE library_section_id is null OR library_section_id != {section_id};
 DELETE FROM section_locations WHERE library_section_id is null OR library_section_id != {section_id};
 DELETE FROM library_sections WHERE id is null OR id != {section_id};
+DELETE FROM taggings WHERE metadata_item_id not in (SELECT id FROM metadata_items);
+DELETE FROM tags WHERE id not in (SELECT tag_id FROM taggings GROUP BY tag_id);
 DROP TABLE accounts;
 DROP TABLE activities;
 DROP TABLE blobs;
@@ -164,8 +166,6 @@ DROP TABLE synced_library_sections;
 DROP TABLE synced_metadata_items;
 DROP TABLE synced_play_queue_generators;
 DROP TABLE synchronization_files;
-DROP TABLE taggings;
-DROP TABLE tags;
 DROP TABLE versioned_metadata_items;
 DROP TABLE view_settings;
 DROP INDEX index_directories_on_deleted_at;
@@ -214,7 +214,6 @@ DROP TRIGGER fts4_metadata_titles_after_insert_icu;
 DROP TRIGGER fts4_metadata_titles_after_update_icu;
 DROP TRIGGER fts4_metadata_titles_before_delete_icu;
 DROP TRIGGER fts4_metadata_titles_before_update_icu;
-CREATE TABLE "metadata" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "hash" varchar(255), "data" text); 
 VACUUM;
             '''
             #if include_info_xml:
@@ -225,8 +224,8 @@ VACUUM;
             PlexDBHandle.execute_query_with_db_filepath(query, newpath)
             logger.warning("쿼리 실행 끝")
 
-            if include_info_xml:
-                LogicPMDbCopyMake.insert_info_xml(newpath, section['section_type'])
+            #if include_info_xml:
+            #    LogicPMDbCopyMake.insert_info_xml(newpath, section['section_type'])
             return newpath
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
