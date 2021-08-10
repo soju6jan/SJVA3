@@ -110,7 +110,7 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
 
                     query += f'UPDATE media_parts SET file = REPLACE(file, "{req.form["arg1"]}", "{req.form["arg2"]}");'
 
-                    query += f'UPDATE media_streams SET url = REPLACE(file, "{req.form["arg1"]}", "{req.form["arg2"]}");'
+                    query += f'UPDATE media_streams SET url = REPLACE(url, "{req.form["arg1"]}", "{req.form["arg2"]}");'
 
                     result = PlexDBHandle.execute_query(query)
                     if result:
