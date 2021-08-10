@@ -73,7 +73,7 @@ class PlexDBHandle(object):
                 ToolSubprocess.execute_command_return(cmd)
             else:
                 ret = ToolSubprocess.execute_command_return([ModelSetting.get('base_bin_sqlite'), ModelSetting.get('base_path_db'), f".read {sql_filepath}"])
-                logger.warning(ret)
+                #logger.warning(ret)
             return True
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
