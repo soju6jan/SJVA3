@@ -123,7 +123,9 @@ def config_initialize(action):
         logger.debug('======================================')
     elif action == 'auth':
         from system.logic_auth import SystemLogicAuth
-        SystemLogicAuth.do_auth()
+        # 2021-08-11 로딩시 인증 실행 여부 
+        #SystemLogicAuth.do_auth()
+        
         tmp = SystemLogicAuth.get_auth_status()
         app.config['config']['auth_status'] = tmp['ret']
         app.config['config']['auth_desc'] = tmp['desc']
