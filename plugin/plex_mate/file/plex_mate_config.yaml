@@ -44,3 +44,32 @@
 #
 TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
 
+
+
+######################################################################
+# 라이브러리 복사 영화 쿼리
+# 기본 값 : SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?)
+#
+# 조건식 추가
+# 1. 2000년도 이상 영화만 복사
+# ORDER BY 앞에  AND year >= 2000
+# SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) AND year >= 2000 ORDER BY title DESC
+#
+# 2. 제목별로 나누어 복사
+# 예) 한글제목만 : substr(title, 1, 1) >= '가' AND substr(title, 1, 1) <= '힣'
+# SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) AND substr(title, 1, 1) >= '가' AND substr(title_sort, 1, 1) <= '힣') ORDER BY title
+# 예) ㄱ 만 : substr(title, 1, 1) >= '가' AND substr(title, 1, 1) < '나'
+
+라이브러리 복사 영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC
+
+
+######################################################################
+# 라이브러리 복사 TV 쿼리
+# 기본 값 : SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC
+
+라이브러리 복사 TV 쿼리: SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC
+
+
+
+
+

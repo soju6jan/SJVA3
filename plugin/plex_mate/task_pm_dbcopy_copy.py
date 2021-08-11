@@ -28,11 +28,13 @@ class Task(object):
     SOURCE_LOCATIONS = None
     TARGET_SECTION_ID = None
     TARGET_LOCATIONS = None
+    config = None
 
     @staticmethod
     @celery.task(bind=True)
     def start(self):
         try:
+            Task.config = LogicPMBase.load_config()
             Task.change_rule = [ModelSetting.get('dbcopy_copy_path_source_root_path'), ModelSetting.get('dbcopy_copy_path_target_root_path')]
             Task.file_change_rule = [ModelSetting.get('dbcopy_copy_path_source_root_path'), ModelSetting.get('dbcopy_copy_path_target_root_path').replace(' ', '%20')]
             Task.TARGET_SECTION_ID = ModelSetting.get('dbcopy_copy_target_section_id')
@@ -81,12 +83,18 @@ class Task(object):
         for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
             CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
             #ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
-            ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
+            try:
+                ce = Task.source_con.execute(Task.config['라이브러리 복사 영화 쿼리'], (SOURCE_LOCATION['id'],))
+            except Exception as e: 
+                logger.error(f'Exception:{str(e)}')
+                logger.error(traceback.format_exc())
+                ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
     
             ce.row_factory = dict_factory
             meta_list = ce.fetchall()
             status['count'] += len(meta_list)
-            
+            #logger.warning(len(meta_list))
+            #return 'stop'
             for idx, metadata_item in enumerate(meta_list):
                 if ModelSetting.get_bool('dbcopy_status_task_stop_flag'):
                     return 'stop'
@@ -149,7 +157,12 @@ class Task(object):
             CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
             if CURRENT_TARGET_LOCATION_ID is None:
                 return 'fail'
-            ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
+            try:
+                ce = Task.source_con.execute(Task.config['라이브러리 복사 TV 쿼리'], (SOURCE_LOCATION['id'],))
+            except Exception as e: 
+                logger.error(f'Exception:{str(e)}')
+                logger.error(traceback.format_exc())
+                ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
     
             ce.row_factory = dict_factory
             meta_list = ce.fetchall()
