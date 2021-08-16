@@ -151,7 +151,6 @@ class SystemLogicTrans(object):
             return text
 
 
-
     @staticmethod
     def trans_name(name):
         trans_papago_key = ModelSetting.get_list('trans_papago_key')
@@ -183,7 +182,6 @@ class SystemLogicTrans(object):
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())                
         return        
-
 
 
 
