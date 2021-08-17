@@ -53,8 +53,8 @@ def get_json(url):
         if is_plex:
             return JSON.ObjectFromURL(url)
         else:
-            from lib_metadata import SiteUtil
-            return SiteUtil.get_response_daum(url).json()
+            from system import SystemLogicSite
+            return SystemLogicSite.get_response_daum(url).json()
     except Exception as exception: 
         log_error('Exception:%s', exception)
         log_error(traceback.format_exc())            
@@ -64,8 +64,8 @@ def get_html(url):
         if is_plex:
             return HTML.ElementFromURL(url)
         else:
-            from lib_metadata import SiteUtil
-            return SiteUtil.get_tree_daum(url)
+            from system import SystemLogicSite
+            return SystemLogicSite.get_tree_daum(url)
     except Exception as exception: 
         log_error('Exception:%s', exception)
         log_error(traceback.format_exc())
@@ -277,8 +277,8 @@ class MovieSearch(object):
         try:
             #movie_list = []
             url = 'https://suggest-bar.daum.net/suggest?id=movie&cate=movie&multiple=1&mod=json&code=utf_in_out&q=%s' % (py_urllib.quote(movie_name.encode('utf8')))
-            from lib_metadata import SiteUtil
-            data = SiteUtil.get_response_daum(url).json()
+            from system import SystemLogicSite
+            data = SystemLogicSite.get_response_daum(url).json()
 
             #data = get_json(url)
             

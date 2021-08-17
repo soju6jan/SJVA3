@@ -6,3 +6,5 @@ from .logic_trans import SystemLogicTrans
 from .logic_plugin import LogicPlugin
 from .logic_selenium import SystemLogicSelenium
 from .logic_command import SystemLogicCommand
+
+from .logic_site import SystemLogicSite
