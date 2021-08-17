@@ -171,3 +171,50 @@ class SystemLogicSite(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             return {'TIARA':'gaXEIPluo-wWAFlwZN6l8gN3yzhkoo_piP.Kymhuy.6QBt4Q6.cRtxbKDaWpWajcyteRHzrlTVpJRxLjwLoMvyYLVi_7xJ1L'}
+
+
+    daum_headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+        'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Cookie' : 'over18=1;age_check_done=1;',
+    } 
+
+    @classmethod 
+    def get_tree_daum(cls, url, post_data=None):
+        from lxml import html
+        from framework import SystemModelSetting
+        text = cls.get_text(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        if text is None:
+            return
+        return html.fromstring(text)
+    
+    @classmethod 
+    def get_text_daum(cls, url, post_data=None):
+        from system.logic_site import SystemLogicSite
+        from framework import SystemModelSetting
+        res = cls.get_response(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        return res.text
+
+
+    @classmethod 
+    def get_response_daum(cls, url, post_data=None):
+        from system.logic_site import SystemLogicSite
+        from framework import SystemModelSetting
+        res = cls.get_response(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        return res
+
+
+    @classmethod 
+    def get_response(cls, url, proxy_url=None, headers=None, post_data=None, cookies=None):
+        import requests
+        proxies = None
+        if proxy_url is not None and proxy_url != '':
+            proxies = {"http"  : proxy_url, "https" : proxy_url}
+        if headers is None:
+            headers = SystemLogicSite.default_headers
+        if post_data is None:
+            res = requests.get(url, headers=headers, proxies=proxies, cookies=cookies)
+        else:
+            res = requests.post(url, headers=headers, proxies=proxies, data=post_data, cookies=cookies)
+        return res

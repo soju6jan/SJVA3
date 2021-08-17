@@ -114,8 +114,8 @@ class Logic(object):
     @staticmethod
     def get_lxml_by_url(url):
         try:
-            from lib_metadata import SiteUtil
-            return SiteUtil.get_tree_daum(url)
+            from system import SystemLogicSite
+            return SystemLogicSite.get_tree_daum(url)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -252,8 +252,8 @@ class Logic(object):
             else:
                 url = 'https://search.daum.net/search?w=tv&q=%s' % (py_urllib.quote(search_name.encode('utf8')))
 
-            from lib_metadata import SiteUtil
-            data = SiteUtil.get_text_daum(url)
+            from system import SystemLogicSite
+            data = SystemLogicSite.get_text_daum(url)
 
             #logger.debug(data)
             logger.error(url)
