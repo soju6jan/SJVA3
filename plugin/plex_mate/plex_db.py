@@ -223,7 +223,7 @@ class PlexDBHandle(object):
             query += ' LIMIT 100'
 
 
-            logger.warning(query)
+            #logger.warning(query)
 
             ce = con.execute(query)
             ce.row_factory = dict_factory

@@ -30,6 +30,7 @@ class LogicPMDBToolSelect(LogicSubModuleBase):
         ['제목 일치 검색', "(metadata_items.title = ' __ ' AND metadata_type BETWEEN 1 and 2)"],
         ['메타제공 사이트 일치 검색', "(metadata_items.guid LIKE '%sjva_agent://__%' AND metadata_type BETWEEN 1 and 2)"],
         ['메타제공 사이트 불일치 검색', "(metadata_items.guid NOT LIKE '%sjva_agent://__%' AND metadata_type BETWEEN 1 and 2)"],
+        ['휴지통', "(metadata_items.deleted_at != '')"],
         ['-------------', ''],
         ['제목 정렬시 한글 초성이 아닌 것들', "(metadata_type BETWEEN 1 and 2 AND substr(metadata_items.title_sort, 1, 1) >= '가' and substr(metadata_items.title_sort, 1, 1) <= '힣')"],
         ['메타 없는 것', 'metadata_items.guid LIKE "local://%"'],
@@ -59,6 +60,9 @@ class LogicPMDBToolSelect(LogicSubModuleBase):
                     ret['select'] = PlexDBHandle.tool_select(req.form['arg1'])
                 elif command == 'refresh_web':
                     PlexWebHandle.refresh_by_id(req.form['arg1'])
+                    ret['msg'] = '명령을 전송하였습니다.'
+                elif command == 'refresh_bin':
+                    PlexBinaryScanner.scan_refresh(req.form['arg1'], os.path.dirname(req.form['arg2']))
                     ret['msg'] = '명령을 전송하였습니다.'
                 elif command == 'remove_metadata':
                     folder_path = os.path.join(

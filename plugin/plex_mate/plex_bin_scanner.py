@@ -34,9 +34,6 @@ class PlexBinaryScanner(object):
                 #logger.error(os.environ())
                 #ret = ToolSubprocess.execute_command_return(command,  env=dict(PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR='/var/lib/plexmediaserver/Library/Application Support', **os.environ))
                 ret = ToolSubprocess.execute_command_return(command,  env=dict(PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR=f"{os.path.dirname(os.path.dirname(ModelSetting.get('base_path_metadata')))}", **os.environ))
-                
-
-
                 logger.warning(ret)
             return True
         except Exception as exception: 

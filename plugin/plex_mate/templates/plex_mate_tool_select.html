@@ -106,6 +106,8 @@ $(function(){
       filename = $(this).data('filename');
       if (key == 'refresh_web') {
         global_send_command_sub('refresh_web', data.metadata_items_id);
+      } else if (key == 'refresh_bin') {
+        global_send_command_sub('refresh_bin', data.library_section_id, data.file);
       } else if (key == 'remove_metadata') {
         global_send_command_sub('remove_metadata', data.metadata_type, data.metadata_items_hash);
       } else if (key == 'other') {
@@ -120,10 +122,10 @@ $(function(){
 
         "remove_metadata": {name: "메타데이터 폴더 삭제", icon: "delete"},
 
-        "rename": {name: "파일명 변경", icon: "edit"},
-        "delete": {name: "파일 삭제", icon: "delete"},
-        "other": {name: "other 폴더로 이동", icon: "paste"},
-        "play": {name: "Play", icon: "fa-play"},
+        //"rename": {name: "파일명 변경", icon: "edit"},
+        //"delete": {name: "파일 삭제", icon: "delete"},
+        //"other": {name: "other 폴더로 이동", icon: "paste"},
+        //"play": {name: "Play", icon: "fa-play"},
         //"sep1": "---------",
         //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
     }
