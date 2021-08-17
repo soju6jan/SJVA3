@@ -54,7 +54,6 @@ class SystemLogic(object):
         'web_title' : 'SJ Video Assistant',
         'my_ip' : '',
         'wavve_guid' : '', 
-        'videoportal_adult' : 'False',
 
         #번역
         'trans_type' : '0',
@@ -408,6 +407,16 @@ class SystemLogic(object):
                     ret['ret'] = 'success'
                     ret['log'] = '%s - %s' % (tmp[1], tmp[2])
                     return ret
+            
+            if tmp[0] == 'set2':
+                if tmp[1] == 'klive':
+                    from klive import ModelSetting as KLiveModelSetting
+                    if KLiveModelSetting.get(tmp[2]) is not None:
+                        KLiveModelSetting.set(tmp[2], tmp[3])
+                        ret['ret'] = 'success'
+                        ret['log'] = f'KLive 설정 값 변경 : {tmp[2]} - {tmp[3]}'
+                        return ret
+                   
             
             ret['ret'] = 'fail'
             ret['log'] = 'wrong command'
