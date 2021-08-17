@@ -85,7 +85,7 @@ class SystemLogicCommand(object):
             #logger.error(traceback.format_exc()) 
             if show_modal:
                 socketio.emit("command_modal_show", SystemLogicCommand.title, namespace='/framework', broadcast=True)
-                socketio.emit("command_modal_add_text", str(xception), namespace='/framework', broadcast=True)
+                socketio.emit("command_modal_add_text", str(exception), namespace='/framework', broadcast=True)
                 socketio.emit("command_modal_add_text", str(traceback.format_exc()), namespace='/framework', broadcast=True)
 
 
@@ -206,26 +206,19 @@ class SystemLogicCommand(object):
     @staticmethod
     def execute_command_return(command, format=None, force_log=False):
         try:
-            
             logger.debug('execute_command_return : %s', ' '.join(command))
-            if app.config['config']['is_py2']:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
-                ret = []
-                with process.stdout:
-                    for line in iter(process.stdout.readline, b''):
-                        ret.append(line.strip())
-                        if force_log:
-                            logger.debug(ret[-1])
-                    process.wait() # wait for the subprocess to exit
-            else:
-                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-                ret = []
-                with process.stdout:
-                    for line in iter(process.stdout.readline, ''):
-                        ret.append(line.strip())
-                        if force_log:
-                            logger.debug(ret[-1])
-                    process.wait() # wait for the subprocess to exit
+
+            if app.config['config']['running_type'] == 'windows':
+                command = ' '.join(command)
+            
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+            ret = []
+            with process.stdout:
+                for line in iter(process.stdout.readline, ''):
+                    ret.append(line.strip())
+                    if force_log:
+                        logger.debug(ret[-1])
+                process.wait() # wait for the subprocess to exit
 
 
             if format is None:

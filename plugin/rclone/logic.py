@@ -318,9 +318,9 @@ class Logic(object):
             logger.debug(job)
             command = '%s %s %s %s:%s %s %s' % (Logic.path_rclone, job.command, job.local_path, job.remote, job.remote_path, job.option_static, job.option_user)
             import platform
-            if platform.system() == 'Windows'  and app.config['config']['is_py2']:
+            if platform.system() == 'Windows':#  and app.config['config']['is_py2']:
                 tmp = command
-                tmp = command.encode('cp949')
+                #tmp = command.encode('cp949')
             else:
                 #tmp = [Logic.path_rclone, job.command, job.local_path, '%s:%s' % (job.remote, job.remote_path)] + job.option_static.split(' ') + job.option_user.split(' ')
                 tmp = [Logic.path_rclone, job.command, job.local_path, '%s:%s' % (job.remote, job.remote_path)] + job.option_static.split(' ') + Logic.get_user_command_list(job.option_user)
