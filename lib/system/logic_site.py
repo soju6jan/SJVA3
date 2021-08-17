@@ -184,7 +184,7 @@ class SystemLogicSite(object):
     def get_tree_daum(cls, url, post_data=None):
         from lxml import html
         from framework import SystemModelSetting
-        text = cls.get_text(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        text = cls.get_text_daum(url, post_data=post_data)
         if text is None:
             return
         return html.fromstring(text)
