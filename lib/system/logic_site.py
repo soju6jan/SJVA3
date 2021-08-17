@@ -173,7 +173,7 @@ class SystemLogicSite(object):
             return {'TIARA':'gaXEIPluo-wWAFlwZN6l8gN3yzhkoo_piP.Kymhuy.6QBt4Q6.cRtxbKDaWpWajcyteRHzrlTVpJRxLjwLoMvyYLVi_7xJ1L'}
 
 
-    default_headers = {
+    daum_headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
         'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -184,7 +184,7 @@ class SystemLogicSite(object):
     def get_tree_daum(cls, url, post_data=None):
         from lxml import html
         from framework import SystemModelSetting
-        text = cls.get_text(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        text = cls.get_text(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
         if text is None:
             return
         return html.fromstring(text)
@@ -193,7 +193,7 @@ class SystemLogicSite(object):
     def get_text_daum(cls, url, post_data=None):
         from system.logic_site import SystemLogicSite
         from framework import SystemModelSetting
-        res = cls.get_response(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        res = cls.get_response(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
         return res.text
 
 
@@ -201,7 +201,7 @@ class SystemLogicSite(object):
     def get_response_daum(cls, url, post_data=None):
         from system.logic_site import SystemLogicSite
         from framework import SystemModelSetting
-        res = cls.get_response(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
+        res = cls.get_response(url, proxy_url=SystemModelSetting.get('site_daum_proxy'), headers=SystemLogicSite.daum_headers, post_data=post_data, cookies=SystemLogicSite.get_daum_cookies())
         return res
 
 
