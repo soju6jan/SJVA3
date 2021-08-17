@@ -6,7 +6,6 @@ import requests, sqlite3
 
 # sjva 공용
 from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util
-from framework.common.plugin import LogicModuleBase, default_route_socketio
 from tool_expand import ToolExpandFileProcess
 from tool_base import ToolShutil, d, ToolUtil, ToolBaseFile, ToolOSCommand, ToolSubprocess
 

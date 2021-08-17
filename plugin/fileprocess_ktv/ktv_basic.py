@@ -11,7 +11,7 @@ from sqlalchemy import or_, and_, func, not_, desc
 
 # sjva 공용
 from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util, path_app_root
-from framework.common.plugin import LogicModuleBase, default_route_socketio
+from plugin import LogicModuleBase, default_route_socketio
 from tool_base import ToolBaseFile, d
 
 # 패키지

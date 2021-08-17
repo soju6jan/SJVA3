@@ -10,7 +10,7 @@ from flask import Blueprint, request, send_file, redirect
 from framework import app, path_data, check_api, py_urllib, SystemModelSetting
 from framework.logger import get_logger
 from framework.util import Util
-from framework.common.plugin import get_model_setting, Logic, default_route
+from plugin import get_model_setting, Logic, default_route
 
 # 패키지
 #########################################################

@@ -7,7 +7,7 @@ import requests
 from flask import request, render_template, jsonify, redirect
 # sjva 공용
 from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util
-from framework.common.plugin import LogicModuleBase, default_route_socketio
+from plugin import LogicModuleBase, default_route_socketio
 from tool_base import ToolBaseFile
 #########################################################
 from .plugin import P

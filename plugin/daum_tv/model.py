@@ -17,7 +17,7 @@ package_name = __name__.split('.')[0]
 logger = get_logger(package_name)
 #########################################################
 app.config['SQLALCHEMY_BINDS'][package_name] = 'sqlite:///%s' % (os.path.join(path_data, 'db', '%s.db' % package_name))
-from framework.common.plugin import get_model_setting
+from plugin import get_model_setting
 ModelSetting = get_model_setting(package_name, logger)
 
 class ModelDaumTVShow(db.Model):
