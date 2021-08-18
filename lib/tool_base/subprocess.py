@@ -10,34 +10,29 @@ class ToolSubprocess(object):
     def execute_command_return(cls, command, format=None, force_log=False, shell=False, env=None):
         try:
             #logger.debug('execute_command_return : %s', ' '.join(command))
+            if app.config['config']['running_type'] == 'windows':
+                tmp = []
+                for x in command:
+                    if x.find(' ') == -1:
+                        tmp.append(x)
+                    else:
+                        tmp.append(f'"{x}"')
+                command = ' '.join(tmp)
+
+            iter_arg =  b'' if app.config['config']['is_py2'] else ''
             if app.config['config']['is_py2']:
                 process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1, shell=shell, env=env)
-                ret = []
-                with process.stdout:
-                    for line in iter(process.stdout.readline, b''):
-                        ret.append(line.strip())
-                        if force_log:
-                            logger.debug(ret[-1])
-                    process.wait() # wait for the subprocess to exit
             else:
                 process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell, env=env, encoding='utf8')
-                ret = []
-                with process.stdout:
-                    if platform.system() == 'Windows':
-                        try:
-                            for line in iter(process.stdout.readline, ''):
-                                ret.append(line.strip())
-                                if force_log:
-                                    logger.debug(ret[-1])
-                        except:
-                            pass
-                    else:
-                        for line in iter(process.stdout.readline, ''):
-                            ret.append(line.strip())
-                            if force_log:
-                                logger.debug(ret[-1])
-                    process.wait() # wait for the subprocess to exit
-
+            
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell, env=env, encoding='utf8')
+            ret = []
+            with process.stdout:
+                for line in iter(process.stdout.readline, iter_arg):
+                    ret.append(line.strip())
+                    if force_log:
+                        logger.debug(ret[-1])
+                process.wait() # wait for the subprocess to exit
 
             if format is None:
                 ret2 = '\n'.join(ret)

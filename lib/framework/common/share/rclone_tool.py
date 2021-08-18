@@ -14,6 +14,7 @@ import json
 # sjva 공용
 from framework import app, path_data, socketio
 from system.logic_command import SystemLogicCommand
+from tool_base import ToolSubprocess
 
 from . import logger, Vars
 
@@ -25,13 +26,12 @@ class RcloneTool(object):
     @staticmethod
     def lsjson(rclone_path, config_path, remote_path, option=None):
         try:
-            from system.logic_command import SystemLogicCommand
             command = [rclone_path, '--config', config_path, 'lsjson', remote_path]
             logger.debug(command)
             if option is not None:
                 command += option
             logger.debug(command)
-            ret = SystemLogicCommand.execute_command_return(command, format='json')
+            ret = ToolSubprocess.execute_command_return(command, format='json')
             return ret
         except Exception as exception: 
             logger.error('Exception:%s', exception)
@@ -40,11 +40,10 @@ class RcloneTool(object):
     @staticmethod
     def size(rclone_path, config_path, remote_path, option=None):
         try:
-            from system.logic_command import SystemLogicCommand
             command = [rclone_path, '--config', config_path, 'size', remote_path, '--json']
             if option is not None:
                 command += option
-            ret = SystemLogicCommand.execute_command_return(command, format='json')
+            ret = ToolSubprocess.execute_command_return(command, format='json')
             return ret
         except Exception as exception: 
             logger.error('Exception:%s', exception)
@@ -53,13 +52,12 @@ class RcloneTool(object):
     @staticmethod
     def rmdir(rclone_path, config_path, remote_path, option=None):
         try:
-            from system.logic_command import SystemLogicCommand
             command = [rclone_path, '--config', config_path, 'rmdir', remote_path]
             logger.debug(command)
             if option is not None:
                 command += option
             logger.debug(command)
-            ret = SystemLogicCommand.execute_command_return(command)
+            ret = ToolSubprocess.execute_command_return(command)
             return ret
         except Exception as exception: 
             logger.error('Exception:%s', exception)
