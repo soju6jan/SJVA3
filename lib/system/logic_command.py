@@ -206,6 +206,8 @@ class SystemLogicCommand(object):
     # 외부 호출    
     @staticmethod
     def execute_command_return(command, format=None, force_log=False):
+        from tool_base import ToolSubprocess
+        return ToolSubprocess.execute_command_return(command, format=format, force_log=force_log)
         try:
             logger.debug('execute_command_return : %s', ' '.join(command))
 

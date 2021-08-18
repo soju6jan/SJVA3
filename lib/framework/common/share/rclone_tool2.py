@@ -267,8 +267,8 @@ class RcloneTool2(object):
                     break
             emit('업로드 결과 : {}. (True:성공, False:실패)\n\n'.format(ret['completed']))
             return ret
-        except Exception as exception: 
-            logger.error('Exception:%s', exception)
+        except Exception as e: 
+            logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
             emit('에러 : {}'.format(str(e)))
 

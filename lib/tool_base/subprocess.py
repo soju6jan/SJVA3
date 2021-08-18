@@ -12,12 +12,13 @@ class ToolSubprocess(object):
             #logger.debug('execute_command_return : %s', ' '.join(command))
             if app.config['config']['running_type'] == 'windows':
                 tmp = []
-                for x in command:
-                    if x.find(' ') == -1:
-                        tmp.append(x)
-                    else:
-                        tmp.append(f'"{x}"')
-                command = ' '.join(tmp)
+                if type(command) == type([]):
+                    for x in command:
+                        if x.find(' ') == -1:
+                            tmp.append(x)
+                        else:
+                            tmp.append(f'"{x}"')
+                    command = ' '.join(tmp)
 
             iter_arg =  b'' if app.config['config']['is_py2'] else ''
             if app.config['config']['is_py2']:
