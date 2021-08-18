@@ -166,7 +166,8 @@ class Ffmpeg(object):
                             return
             except:
                 pass
-            self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+            #self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+            self.process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
 
             self.status = Status.READY
             self.log_thread = threading.Thread(target=self.log_thread_fuction, args=())
@@ -386,7 +387,7 @@ class Ffmpeg(object):
             if app.config['config']['is_py2']:
                 process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
             else:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
             iter_arg =  b'' if app.config['config']['is_py2'] else ''
             ret = []
             with process.stdout:

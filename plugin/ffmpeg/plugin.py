@@ -267,7 +267,8 @@ def streaming():
 
             logger.debug(' '.join(ffmpeg_command))
             #logger.debug('command : %s', ffmpeg_command)
-            process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
+            #process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
+            process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, encoding='utf8')
             global process_list
             process_list.append(process)
             while True:

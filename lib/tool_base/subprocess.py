@@ -20,7 +20,7 @@ class ToolSubprocess(object):
                             logger.debug(ret[-1])
                     process.wait() # wait for the subprocess to exit
             else:
-                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell, env=env)
+                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell, env=env, encoding='utf8')
                 ret = []
                 with process.stdout:
                     if platform.system() == 'Windows':

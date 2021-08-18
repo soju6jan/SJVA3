@@ -134,7 +134,8 @@ class LogicNormal(object):
                 if LogicNormal.foreground_process is not None:
                     LogicNormal.foreground_command_close()
                     time.sleep(0.5)
-                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                #process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
                 LogicNormal.foreground_process = process
                 LogicNormal.start_communicate2(process)
             return 'success'
@@ -259,7 +260,7 @@ class LogicNormal(object):
                 if app.config['config']['is_py2']:
                     p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
                 else:
-                    p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+                    p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
 
                 command_logger = None
                 logger.debug(LogicNormal.process_list)

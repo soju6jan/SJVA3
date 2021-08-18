@@ -73,7 +73,8 @@ class SystemLogicCommand(object):
                     if command[0] == 'hide':
                         show_command = False
                         command = command[1:]
-                    SystemLogicCommand.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                    #SystemLogicCommand.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                    SystemLogicCommand.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
                     SystemLogicCommand.start_communicate(command, show_command=show_command)
                     SystemLogicCommand.send_queue_start(show_modal)
                     if SystemLogicCommand.process is not None:
@@ -211,7 +212,7 @@ class SystemLogicCommand(object):
             if app.config['config']['running_type'] == 'windows':
                 command = ' '.join(command)
             
-            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
             ret = []
             with process.stdout:
                 for line in iter(process.stdout.readline, ''):

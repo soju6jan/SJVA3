@@ -332,7 +332,7 @@ class Logic(object):
             if app.config['config']['is_py2']:
                 Logic.current_process = subprocess.Popen(tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
             else:
-                Logic.current_process = subprocess.Popen(tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+                Logic.current_process = subprocess.Popen(tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
             Logic.current_data = {}
             Logic.current_data['job'] = job.as_dict()
             Logic.current_data['command'] = command

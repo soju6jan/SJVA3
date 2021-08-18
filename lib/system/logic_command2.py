@@ -80,7 +80,8 @@ class SystemLogicCommand2(object):
                     if command[0] == 'hide':
                         show_command = False
                         command = command[1:]
-                    self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                    #self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, bufsize=1)
+                    self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8')
                     self.start_communicate(command, show_command=show_command)
                     self.send_queue_start()
                     if self.process is not None:
