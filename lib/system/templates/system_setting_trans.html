@@ -44,15 +44,19 @@ $(document).ready(function(){
 
 function set_trans_type(type) {
   $('input[name=trans_type]')[parseInt(type)].checked = true;
-  if (type == '0' || type == '3') {
-    $('#google_div').collapse('hide')
-    $('#papago_div').collapse('hide')
-  } else if (type == '1') {
+  if (type == '1') // use google trans
+  {
     $('#google_div').collapse('show')
     $('#papago_div').collapse('hide')
-  } else if (type == '2') {
+  }
+  else if (type == '2') // use papago trans
+  {
     $('#google_div').collapse('hide')
     $('#papago_div').collapse('show')
+  }
+  else { // default
+    $('#google_div').collapse('hide')
+    $('#papago_div').collapse('hide')
   }
 }
 
