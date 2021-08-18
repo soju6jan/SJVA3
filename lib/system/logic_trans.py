@@ -71,6 +71,8 @@ class SystemLogicTrans(object):
                 return SystemLogicTrans.trans_papago(source)
             elif trans_type == '3':
                 return SystemLogicTrans.trans_google_web(source)
+            elif trans_type == '4':
+                return SystemLogicTrans.trans_papago_web(source)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -88,6 +90,8 @@ class SystemLogicTrans(object):
                 return SystemLogicTrans.trans_papago(text, source, target) 
             elif trans_type == '3':
                 return SystemLogicTrans.trans_google_web(text, source, target) 
+            elif trans_type == '4':
+                return SystemLogicTrans.trans_papago_web(text, source, target)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -122,8 +126,31 @@ class SystemLogicTrans(object):
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())                
         return text
-
     
+    
+    '''
+    source 값은 필요 없지만 호환성을 위해서 남겨 놓음.
+    '''
+    @staticmethod
+    def trans_papago_web(text, source='ja', target='ko'):
+        if app.config['config']['is_py2']:
+            return u'Python >=3 '
+        try:
+            from papagopy import Papagopy
+        except:
+            try: os.system("{} install --upgrade papagopy".format(app.config['config']['pip']))
+            except: pass
+            from papagopy import Papagopy
+        try:
+            translator = Papagopy()
+            translate_text = translator.translate(text, sourceCode=source, targetCode=target)
+            return translate_text
+        except Exception as exception:
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+            return text
+
+
     @staticmethod
     def trans_name(name):
         trans_papago_key = ModelSetting.get_list('trans_papago_key')
@@ -155,7 +182,6 @@ class SystemLogicTrans(object):
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())                
         return        
-
 
 
 
