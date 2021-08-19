@@ -208,6 +208,7 @@ class SystemLogicCommand(object):
     def execute_command_return(command, format=None, force_log=False):
         from tool_base import ToolSubprocess
         return ToolSubprocess.execute_command_return(command, format=format, force_log=force_log)
+        """
         try:
             logger.debug('execute_command_return : %s', ' '.join(command))
 
@@ -243,3 +244,5 @@ class SystemLogicCommand(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             logger.error('command : %s', command)
+        """
+        
