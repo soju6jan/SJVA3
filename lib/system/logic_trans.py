@@ -18,6 +18,14 @@ from framework.util import Util
 from .plugin import package_name, logger
 from .model import ModelSetting
 
+# 외부 패키지 업데이트 확인
+try:
+    os.system("{} install --upgrade papagopy".format(app.config['config']['pip']))
+    from papagopy import Papagopy
+except:
+    pass
+
+
 class SystemLogicTrans(object):
     @staticmethod
     def process_ajax(sub, req):
@@ -135,12 +143,6 @@ class SystemLogicTrans(object):
     def trans_papago_web(text, source='ja', target='ko'):
         if app.config['config']['is_py2']:
             return u'Python >=3 '
-        try:
-            from papagopy import Papagopy
-        except:
-            try: os.system("{} install --upgrade papagopy".format(app.config['config']['pip']))
-            except: pass
-            from papagopy import Papagopy
         try:
             translator = Papagopy()
             translate_text = translator.translate(text, sourceCode=source, targetCode=target)
