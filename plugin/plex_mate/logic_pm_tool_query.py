@@ -50,13 +50,14 @@ class LogicPMDBToolQuery(LogicSubModuleBase):
                 command = req.form['command']
                 logger.error(f"sub : {sub}  /  command : {command}")
                 if command == 'execute':
-                    query = req.form['arg1'].lower().strip()
+                    query = req.form['arg1'].strip()
                     ModelSetting.set(f'{self.parent.name}_{self.name}_query', query)
-                    if query.startswith('select'):
+                    tmp = query.lower()
+                    if tmp.startswith('select'):
                         ret['mode'] = 'select'
                         ret['select'] = PlexDBHandle.select(query)
                         ret['msg'] = f"{len(ret['select'])}개의 데이터"
-                    elif query.startswith('update') or query.startswith('delete') or query.startswith('insert'):
+                    elif tmp.startswith('update') or tmp.startswith('delete') or tmp.startswith('insert'):
                         ret['mode'] = 'not_select'
                         result = PlexDBHandle.execute_query(query)
                         if result:
@@ -64,8 +65,6 @@ class LogicPMDBToolQuery(LogicSubModuleBase):
                         else:
                             ret['ret'] = 'warning'
                             ret['msg'] = f"실패"
-
-
 
             elif sub == 'get_preset':
                 ret['preset'] = self.preset
