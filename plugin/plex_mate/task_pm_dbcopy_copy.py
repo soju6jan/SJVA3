@@ -292,16 +292,25 @@ class Task(object):
         if len(data) == 1:
             return data[0]['id']
         elif len(data) == 0:
-            tmps = path.split('/')
-            if len(tmps) == 1:
-                parent_path = ''
-            else:
-                parent_path = '/'.join(tmps[:-1])
-
-            parent_directory_id = Task.make_directories(library_section_id, parent_path)
-
+            #logger.warning(path)
             time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updated_str = time_str
+            if path == '':
+                # '' parent 를 구하기 위해서 왔는데 DB 없다
+                query = f"INSERT INTO directories ('library_section_id','path','created_at','updated_at') VALUES ('{library_section_id}','{path}','{time_str}','{updated_str}');SELECT max(id) FROM directories;" 
+                #logger.error(query)
+                ret = PlexDBHandle.execute_query2(query)
+                if ret != '':
+                    #logger.warning(f"path:{path} id:{ret}")
+                    return int(ret)
+            else:
+                tmps = path.split('/')
+                if len(tmps) == 1:
+                    parent_path = ''
+                else:
+                    parent_path = '/'.join(tmps[:-1])
+
+            parent_directory_id = Task.make_directories(library_section_id, parent_path)
             try:
                 updated_at_ce = Task.source_con.execute('SELECT updated_at FROM directories WHERE path = ?', (path,))
                 updated_at_ce.row_factory = dict_factory
@@ -312,7 +321,6 @@ class Task(object):
                 logger.error(f'Exception:{str(e)}')
                 logger.error(traceback.format_exc())
                 
-
             path = path.replace("'", "''")
             query = f"INSERT INTO directories ('library_section_id','parent_directory_id','path','created_at','updated_at') VALUES ('{library_section_id}',{parent_directory_id},'{path}','{time_str}','{updated_str}');SELECT max(id) FROM directories;" 
             #logger.error(query)
