@@ -165,8 +165,8 @@ def init_define():
     app.config['DEFINE']['RSS_SUBTITLE_UPLOAD_WEBHOOK'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
 
     app.config['DEFINE']['WEBHOOK_LIST_FOR_IMAGE_PROXY'] = [
-        'https://discord.com/api/webhooks/810372911872344114/7yLzAhRnBUcsbCB-dIG16tCEEw3Z7QkBSa9eKw7J7o7fQhF8M2o4L-e-WIXOYznxnFNO',
-        'https://discord.com/api/webhooks/810373137225089035/twZOBuMzJlxyiV87e0Ubers8yTeKd7a71mjGiBTMube7WbN5S3PlxlZYVa2ee3XeQjn3',
+        'https://discord.com/api/webhooks/806952424455274557/_h8e1IGzf6H40xy0y2rgYuFKdzXdOFZcrRvUYx7e6rqO-_ddzseu9ZuGkeqBfyMfvJZd',
+        'https://discord.com/api/webhooks/794660845232848946/3B4UaxHTD_UyfDu_B79FaWeOuXQlctjvxY_pU6a7G2D58OU6qXepzlHpvQF4O2tM35g-',
         'https://discord.com/api/webhooks/810373216547766282/GFAS8enTYSoc58vqd7j3_ehrCT8odat8J1LuuAzluTtjxlAOLCNBQtsx7mhiMVC7BTqk',
         'https://discord.com/api/webhooks/810373281127333928/Jpmrq9VUp9pQZLgD3RdDIxN-xP_ZuHUSqoWYUgpYIxeTBpS0HVhdotX9tepYDlMQmnMi',
         'https://discord.com/api/webhooks/810373348776476683/h_uJLBBlHzD0w_CG0nUajFO-XEh3fvy-vQofQt1_8TMD7zHiR7a28t3jF-xBCP6EVlow',
