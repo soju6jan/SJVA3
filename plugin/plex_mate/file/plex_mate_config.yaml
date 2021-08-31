@@ -45,6 +45,19 @@
 TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
 
 
+영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title 
+
+
+######################################################################
+# 음악 쿼리 : 라이브러리별로 음악 데이터를 가져오는 SQL문장
+# 조건문에 metadata_type = 8 AND library_section_id = ? 필수
+#
+# 기본값 (제목순으로 모든 데이터 확인)
+# 음악 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title
+#
+음악 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title
+
+
 
 ######################################################################
 # 라이브러리 복사 영화 쿼리

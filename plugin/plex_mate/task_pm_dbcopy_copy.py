@@ -61,6 +61,8 @@ class Task(object):
                     return Task.movie_start(self)
                 elif data[0]['section_type'] == 2:
                     return Task.tv_start(self)
+                elif data[0]['section_type'] == 8:
+                    return Task.music_start(self)
      
         except Exception as e: 
             logger.error(f'Exception:{str(e)}')
@@ -223,6 +225,85 @@ class Task(object):
                         celery_instance.update_state(state='PROGRESS', meta=data)
                     else:
                         celery_instance.receive_from_task(data, celery=False)
+
+
+    @staticmethod
+    def music_start(celery_instance):
+        status = {'is_working':'run', 'count':0, 'current':0}
+        for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
+            CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
+            if CURRENT_TARGET_LOCATION_ID is None:
+                return 'fail'
+            try:
+                ce = Task.source_con.execute(Task.config['라이브러리 복사 음악 쿼리'], (SOURCE_LOCATION['id'],))
+            except Exception as e: 
+                logger.error(f'Exception:{str(e)}')
+                logger.error(traceback.format_exc())
+                ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
+    
+            ce.row_factory = dict_factory
+            meta_list = ce.fetchall()
+            status['count'] += len(meta_list)
+            
+            for idx, artist_metadata_item in enumerate(meta_list):
+                if ModelSetting.get_bool('dbcopy_status_task_stop_flag'):
+                    return 'stop'
+                try:
+                    status['current'] += 1
+                    data = {'status':status, 'ret':'append', 'title':artist_metadata_item['title'], 'year':'', 'files':[]}
+                    logger.warning(f"{idx} / {len(meta_list)} {artist_metadata_item['title']}")
+                    artist_metadata_item_id, is_exist = Task.insert_metadata_items(artist_metadata_item, Task.TARGET_SECTION_ID)
+                    if is_exist:
+                        data['ret'] = 'exist'
+                        continue
+
+                    album_ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE parent_id = ? ORDER BY `index`', (artist_metadata_item['id'],))
+                    album_ce.row_factory = dict_factory
+                    for album_metadata_item in album_ce.fetchall():
+                        album_metadata_item_id, is_exist = Task.insert_metadata_items(album_metadata_item, Task.TARGET_SECTION_ID, parent_id=artist_metadata_item_id)
+
+                        track_ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE parent_id = ? ORDER BY `index`', (album_metadata_item['id'],))
+                        track_ce.row_factory = dict_factory
+
+                        for track_metadata_item in track_ce.fetchall():
+                            track_metadata_item_id, is_exist = Task.insert_metadata_items(track_metadata_item, Task.TARGET_SECTION_ID, parent_id=album_metadata_item_id)
+                           
+                            new_filename = None
+                            media_ce = Task.source_con.execute('SELECT * FROM media_items WHERE metadata_item_id = ? ORDER BY id', (track_metadata_item['id'],))
+                            media_ce.row_factory = dict_factory
+                            for media_item in media_ce.fetchall():
+                                #logger.debug(d(media_item))
+                                media_item_id = Task.insert_media_items(media_item, Task.TARGET_SECTION_ID, CURRENT_TARGET_LOCATION_ID, track_metadata_item_id)
+                                #logger.warning(f"media_item_id : {media_item_id}")
+
+                                part_ce = Task.source_con.execute('SELECT * FROM media_parts WHERE media_item_id = ? ORDER BY id', (media_item['id'],))
+                                part_ce.row_factory = dict_factory
+                                for media_part in part_ce.fetchall():
+                                    #logger.debug(d(media_part))
+                                    media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID)
+                                    #logger.warning(f"media_part_id : {media_part_id}")
+                                    data['files'].append(new_filename)
+                                    stream_ce = Task.source_con.execute('SELECT * FROM media_streams WHERE media_item_id = ? AND media_part_id = ? ORDER BY id', (media_item['id'],media_part['id']))
+                                    stream_ce.row_factory = dict_factory
+                                    for media_stream in stream_ce.fetchall():
+                                        #logger.debug(d(media_stream))
+                                        media_stream_id = Task.insert_media_streams(media_stream, media_item_id, media_part_id, Task.TARGET_SECTION_ID)
+                                        #logger.warning(f"media_stream_id : {media_stream_id}")
+                    Task.insert_tag(artist_metadata_item, artist_metadata_item_id)
+                except Exception as e: 
+                    logger.error(f'Exception:{str(e)}')
+                    logger.error(traceback.format_exc())
+                finally:
+                    
+                    if app.config['config']['use_celery']:
+                        celery_instance.update_state(state='PROGRESS', meta=data)
+                    else:
+                        celery_instance.receive_from_task(data, celery=False)
+
+
+
+
+
 
 
 

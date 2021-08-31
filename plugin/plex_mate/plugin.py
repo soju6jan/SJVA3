@@ -24,7 +24,7 @@ class P(object):
     menu = {
         'main' : [package_name, u'Plex Mate'],
         'sub' : [
-            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'], ['scan', '스캔'], ['watchdog', '파일시스템 감시'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그']
+            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'], ['scan', '스캔(개발중)'], ['watchdog', '파일시스템 감시(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그']
         ], 
         'category' : 'beta',
         'sub2' : {
@@ -32,10 +32,16 @@ class P(object):
                 ['setting', '설정']
             ],
             'clear' : [
-                ['movie', '영화 정리'], ['show', 'TV 정리'], ['bundle', '번들 삭제'], ['cache', '캐시(PhotoTranscoder) 삭제'], 
+                ['movie', '영화 정리'], ['show', 'TV 정리'], ['music', '음악 정리'], ['bundle', '번들 삭제'], ['cache', '캐시(PhotoTranscoder) 삭제'], 
             ],
             'tool' : [
                 ['simple', '간단 명령'], ['select', 'DB Select'], ['query', 'SQL Query'],
+            ],
+            'scan' : [
+                ['manual', '수동'], ['auto', '자동'], ['list', '목록'],
+            ],
+            'watchdog' : [
+                ['setting', '설정'], ['list', '목록'],
             ],
             'dbcopy' : [
                 ['make', '소스 DB 생성'], ['copy', '복사 설정'], ['status', '복사 상태'],
@@ -72,7 +78,9 @@ def initialize():
         from .logic_pm_clear import LogicPMClear
         from .logic_pm_tool import LogicPMTool
         from .logic_pm_dbcopy import LogicPMDbCopy
-        P.module_list = [LogicPMBase(P), LogicPMClear(P), LogicPMTool(P), LogicPMDbCopy(P)]
+        from .logic_pm_scan import LogicPMScan
+        from .logic_pm_watchdog import LogicPMWatchdog
+        P.module_list = [LogicPMBase(P), LogicPMClear(P), LogicPMTool(P), LogicPMDbCopy(P), LogicPMScan(P), LogicPMWatchdog(P)]
         P.logic = Logic(P)
         default_route(P)
     except Exception as e: 

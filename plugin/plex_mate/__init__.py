@@ -7,6 +7,14 @@ except:
     try: os.system(f"{app.config['config']['pip']} install xmltodict")
     except: pass
 
+try:
+    from watchdog.observers import Observer
+except:
+    from framework import app
+    import os
+    try: os.system(f"{app.config['config']['pip']} install watchdog")
+    except: pass
+
 from .plugin import P
 blueprint = P.blueprint
 menu = P.menu

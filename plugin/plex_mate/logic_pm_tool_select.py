@@ -32,7 +32,7 @@ class LogicPMDBToolSelect(LogicSubModuleBase):
         ['메타제공 사이트 불일치 검색', "(metadata_items.guid NOT LIKE '%sjva_agent://__%' AND metadata_type BETWEEN 1 and 2)"],
         ['휴지통', "(metadata_items.deleted_at != '')"],
         ['-------------', ''],
-        ['제목 정렬시 한글 초성이 아닌 것들', "(metadata_type BETWEEN 1 and 2 AND substr(metadata_items.title_sort, 1, 1) >= '가' and substr(metadata_items.title_sort, 1, 1) <= '힣')"],
+        ['제목 정렬시 한글 초성이 아닌 것들', "(metadata_type in (1,2,8,9) AND substr(metadata_items.title_sort, 1, 1) >= '가' and substr(metadata_items.title_sort, 1, 1) <= '힣')"],
         ['메타 없는 것', 'metadata_items.guid LIKE "local://%"'],
         ['미분석', '(metadata_type BETWEEN 1 and 4 AND width is null)'],
         ['불일치 상태', "(metadata_type BETWEEN 1 and 4 AND guid LIKE 'com.plexapp.agents.none%')"],

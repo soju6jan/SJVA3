@@ -102,6 +102,9 @@ DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND meta
             elif section['section_type'] == 2:
                 query += f'''
 DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 2 AND 4);'''
+            elif section['section_type'] == 8:
+                query += f'''
+DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 8 AND 10);'''
             query += f'''
 DELETE FROM media_streams WHERE media_item_id not in (SELECT id FROM media_items WHERE library_section_id = {section_id});
 DELETE FROM media_parts WHERE media_item_id not in (SELECT id FROM media_items WHERE library_section_id = {section_id});

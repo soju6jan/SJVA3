@@ -133,7 +133,7 @@ def default_route(P):
                         instance_sub = module.sub_list[sub_name]
                         
                         if command == 'scheduler':
-                            sub = request.form['sub']
+                            sub = sub_name
                             go = request.form['scheduler']
                             P.logger.debug('scheduler :%s', go)
                             if go == 'true':

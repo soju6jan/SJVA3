@@ -19,6 +19,7 @@ ModelSetting = P.ModelSetting
 
 from .task_pm_clear_movie import Task as TaskMovie
 from .task_pm_clear_show import Task as TaskShow
+from .task_pm_clear_music import Task as TaskMusic
 from .plex_db import PlexDBHandle
 from .plex_web import PlexWebHandle
 from .logic_pm_base import LogicPMBase
@@ -91,15 +92,18 @@ class LogicPMClearLibrary(LogicSubModuleBase):
             config = LogicPMBase.load_config()
             if library_section['section_type'] == 1:
                 func = TaskMovie.start
-                
             elif library_section['section_type'] == 2:
                 func = TaskShow.start
+            elif library_section['section_type'] == 8:
+                func = TaskMusic.start
             try:
                 self.list_max = config['웹페이지에 표시할 세부 정보 갯수']
             except:
                 self.list_max = 200
             #func(*args)
             #return
+            logger.debug(func)
+            logger.debug(library_section['section_type'])
             if app.config['config']['use_celery']:
                 result = func.apply_async(args)
                 ret = result.get(on_message=self.receive_from_task, propagate=True)

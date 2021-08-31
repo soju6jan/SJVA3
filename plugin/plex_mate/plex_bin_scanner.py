@@ -27,7 +27,7 @@ class PlexBinaryScanner(object):
             else:
                 #env=dict(FOO='BAR', **os.environ))
                 #command = [f'"{ModelSetting.get("base_bin_scanner")}"', '--scan', '--refresh', '--section', section_id, '--directory', f'"{folderpath}"']
-                command = [ModelSetting.get("base_bin_scanner"), '--scan', '--refresh', '--section', section_id, '--directory', folderpath]
+                command = [ModelSetting.get("base_bin_scanner"), '--scan', '--refresh', '--section', str(section_id), '--directory', folderpath]
                 #logger.warning(' '.join(command))
                 #logger.error(os.environ())
                 #ret = ToolSubprocess.execute_command_return(command,  env=dict(PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR='/var/lib/plexmediaserver/Library/Application Support', **os.environ))
