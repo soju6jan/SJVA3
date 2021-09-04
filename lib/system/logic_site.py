@@ -15,6 +15,7 @@ from flask import Blueprint, request, Response, send_file, render_template, redi
 from framework.logger import get_logger
 from framework import path_app_root, path_data, socketio, scheduler
 from framework.job import Job
+from tool_base import d
 
 
 # 패키지
@@ -214,6 +215,10 @@ class SystemLogicSite(object):
         if headers is None:
             headers = SystemLogicSite.default_headers
         if post_data is None:
+            logger.warning(d(headers))
+            logger.warning(d(proxies))
+            logger.warning(d(cookies))
+
             res = requests.get(url, headers=headers, proxies=proxies, cookies=cookies)
         else:
             res = requests.post(url, headers=headers, proxies=proxies, data=post_data, cookies=cookies)

@@ -20,10 +20,10 @@ from .model import ModelSetting
 
 # 외부 패키지 업데이트 확인
 try:
-    os.system("{} install --upgrade papagopy".format(app.config['config']['pip']))
+    #os.system("{} install --upgrade papagopy".format(app.config['config']['pip']))
     from papagopy import Papagopy
 except:
-    pass
+    os.system("{} install papagopy".format(app.config['config']['pip']))
 
 
 class SystemLogicTrans(object):
