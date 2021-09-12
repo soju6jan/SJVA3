@@ -102,8 +102,10 @@ def hls_play():
 
 
 
-@app.route("/upload", methods=['GET', 'POST'])
+@app.route("/up", methods=['GET', 'POST'])
 def upload():
+    # curl -F file=@downloader_video.tar https://dev.soju6jan.com/up
+    # 
     try:
         if request.method == 'POST':
             f = request.files['file']
