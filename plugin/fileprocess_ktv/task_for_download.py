@@ -212,8 +212,16 @@ class Task(object):
         
         compare_folder_name = os.path.split(program_folder)[-1]
         if 'target_folder_list' not in config:
+            max_depth = 2
             config['target_folder_list'] = []
             for base, dirs, files in os.walk(config['타겟 폴더']):
+                tmp = base.replace(config['타겟 폴더'], '')
+                depth = len(tmp.split(os.sep))
+                logger.debug(f"Depth : {depth}")
+                if depth > max_depth:
+                    logger.debug(f"{base} {dirs}")
+                    continue
+
                 for _dir in dirs:
                     logger.debug(os.path.join(base, _dir))
                     config['target_folder_list'].append(os.path.join(base, _dir))
