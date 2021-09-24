@@ -68,7 +68,7 @@ class Task(object):
                             data['result_filename'] = original_filename
                             if is_dry == False:
                                 ToolBaseFile.file_move(os.path.join(base, original_filename), data['result_folder'], data['result_filename'])
-                    except Exception as e: 
+                    except Exception as e:    
                         P.logger.error(f"Exception:{e}")
                         P.logger.error(traceback.format_exc())
                     finally:
