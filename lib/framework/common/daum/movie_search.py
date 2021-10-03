@@ -146,9 +146,12 @@ class MovieSearch(object):
             movie = None
             try:
                 movie = html.get_element_by_id('movieEColl')
+                
             except Exception as exception: 
                 pass
             if movie is None:
+                logger.error("Daum Movie search fail!!")
+                logger.error(lxml.etree.tostring(html))
                 return None
             
             title_tag = movie.get_element_by_id('movieTitle')
