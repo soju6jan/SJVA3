@@ -83,7 +83,7 @@ class Task(object):
     def movie_start(celery_instance):
         status = {'is_working':'run', 'count':0, 'current':0}
         for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
-            CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
+            CURRENT_TARGET_LOCATION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH = Task.get_target_location_id(SOURCE_LOCATION)
             #ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
             try:
                 ce = Task.source_con.execute(Task.config['라이브러리 복사 영화 쿼리'], (SOURCE_LOCATION['id'],))
@@ -121,7 +121,7 @@ class Task(object):
                         part_ce.row_factory = dict_factory
                         for media_part in part_ce.fetchall():
                             #logger.debug(d(media_part))
-                            media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID)
+                            media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH)
                             #logger.warning(f"media_part_id : {media_part_id}")
                             data['files'].append(new_filename)
                             stream_ce = Task.source_con.execute('SELECT * FROM media_streams WHERE media_item_id = ? AND media_part_id = ? ORDER BY id', (media_item['id'],media_part['id']))
@@ -156,8 +156,10 @@ class Task(object):
     def tv_start(celery_instance):
         status = {'is_working':'run', 'count':0, 'current':0}
         for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
-            CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
+            CURRENT_TARGET_LOCATION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH = Task.get_target_location_id(SOURCE_LOCATION)
             if CURRENT_TARGET_LOCATION_ID is None:
+                logger.error(f"CURRENT_TARGET_LOCATION_ID is None. {SOURCE_LOCATION}")
+                continue
                 return 'fail'
             try:
                 ce = Task.source_con.execute(Task.config['라이브러리 복사 TV 쿼리'], (SOURCE_LOCATION['id'],))
@@ -206,7 +208,7 @@ class Task(object):
                                 part_ce.row_factory = dict_factory
                                 for media_part in part_ce.fetchall():
                                     #logger.debug(d(media_part))
-                                    media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID)
+                                    media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH)
                                     #logger.warning(f"media_part_id : {media_part_id}")
                                     data['files'].append(new_filename)
                                     stream_ce = Task.source_con.execute('SELECT * FROM media_streams WHERE media_item_id = ? AND media_part_id = ? ORDER BY id', (media_item['id'],media_part['id']))
@@ -231,7 +233,7 @@ class Task(object):
     def music_start(celery_instance):
         status = {'is_working':'run', 'count':0, 'current':0}
         for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
-            CURRENT_TARGET_LOCATION_ID = Task.get_target_location_id(SOURCE_LOCATION)
+            CURRENT_TARGET_LOCATION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH = Task.get_target_location_id(SOURCE_LOCATION)
             if CURRENT_TARGET_LOCATION_ID is None:
                 return 'fail'
             try:
@@ -280,7 +282,7 @@ class Task(object):
                                 part_ce.row_factory = dict_factory
                                 for media_part in part_ce.fetchall():
                                     #logger.debug(d(media_part))
-                                    media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID)
+                                    media_part_id, new_filename = Task.insert_media_parts(media_part, media_item_id, Task.TARGET_SECTION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH)
                                     #logger.warning(f"media_part_id : {media_part_id}")
                                     data['files'].append(new_filename)
                                     stream_ce = Task.source_con.execute('SELECT * FROM media_streams WHERE media_item_id = ? AND media_part_id = ? ORDER BY id', (media_item['id'],media_part['id']))
@@ -348,25 +350,47 @@ class Task(object):
 
 
     @staticmethod
-    def process_localfile(filepath, library_section_id):
+    def process_localfile(filepath, library_section_id, current_section_folderpath):
         #logger.error(filepath)
         new_filepath = filepath.replace(Task.change_rule[0], Task.change_rule[1])
         if Task.change_rule[1][0] != '/': #windows
             new_filepath = new_filepath.replace('/', '\\')
+            text = new_filepath.replace(current_section_folderpath + '\\', '')
+            folderpath = '/'.join(text.split('\\')[:-1])
         else:
             new_filepath = new_filepath.replace('\\', '/')
+            text = new_filepath.replace(current_section_folderpath + '/', '')
+            folderpath = '/'.join(text.split('/')[:-1])
         #logger.warning(f"새로운 경로 : {new_filepath}")
         #라이브러리 폴더 root_path
         
-        text = filepath.replace(Task.change_rule[0] + '/', '')
+        ########################################
+        ######################################
+        #  짧게 쓴경우 이게 문제 발생 2021-10-12
+        #######################################
+        
+        #text = filepath.replace(Task.change_rule[0] + '/', '')
         #logger.debug(text)
-        folderpath = '/'.join(text.split('/')[:-1])
+        #folderpath = '/'.join(text.split('/')[:-1])
         ret = {}
         ret['new_filepath'] = new_filepath
         ret['dir_id'] = Task.make_directories(library_section_id, folderpath)
-        #logger.debug(ret)
+        logger.debug(ret)
         return ret
-     
+    
+    # 2021-10-12 중대오류
+    # 라이브러리 폴더 지정 이후의 값만 와야함.
+    # 영화 : 영화/가/가나다 (1999) 영화를 
+    #   폴더 : 영화 로 한경우 - NULL -> 가/가나다(1999)
+    #   폴더 : 영화/가 로 지정한경우 - NULL -> 가나다(1999)
+
+    # 쇼 : 쇼는 무조건 컨텐츠 폴더가 와야한다
+    # 애니/가/가나다/시즌1 인경우
+    # 라이브러리 폴더는 애니/가  필수
+    # NULL -> 가나다
+    # NULL -> 가나다/시즌1 생성
+
+    # 여기서는 그 섹션의 루트 폴더를 받아서 처리
     @staticmethod
     def make_directories(library_section_id, path):
         data = PlexDBHandle.select2(f"SELECT id FROM directories WHERE library_section_id = ? AND path = ?", (library_section_id, path))
@@ -410,14 +434,16 @@ class Task(object):
                 #logger.warning(f"path:{path} id:{ret}")
                 return int(ret)
     
+
+
     @staticmethod
-    def insert_media_parts(media_part, media_item_id, library_section_id):
+    def insert_media_parts(media_part, media_item_id, library_section_id, current_section_folderpath):
         data = PlexDBHandle.select2(f"SELECT id FROM media_parts WHERE hash = ? AND media_item_id = ?", (media_part['hash'], media_item_id))
         #logger.error(data)
         if len(data) >= 1:
             return data[0]['id'], None
         elif len(data) == 0:
-            file_ret = Task.process_localfile(media_part['file'], library_section_id)
+            file_ret = Task.process_localfile(media_part['file'], library_section_id, current_section_folderpath)
 
             insert_col = ''
             insert_value = ''
@@ -562,8 +588,8 @@ class Task(object):
             new_root_path = new_root_path.replace('/', '\\')
         for TARGET_LOCATION in Task.TARGET_LOCATIONS:
             if TARGET_LOCATION['root_path'] == new_root_path:
-                return TARGET_LOCATION['id']
-
+                return TARGET_LOCATION['id'], TARGET_LOCATION['root_path']
+        return None, None
 
     @staticmethod
     def create_info_xml(metadata_item, metadata_type):

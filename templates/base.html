@@ -851,6 +851,7 @@ function global_send_command2(command, arg1, arg2, arg3, modal_title, callback) 
     success: function (ret) {
       if (ret.msg != null) notify(ret.msg, ret.ret);
       if (ret.modal != null) m_modal(ret.modal, modal_title, false);
+      if (ret.json != null) m_modal(ret.json, modal_title, true);
       if (callback != null) callback(ret);
     }
   });
@@ -871,6 +872,7 @@ function global_send_command_sub(command, arg1, arg2, arg3, modal_title, callbac
       console.log(ret);
       if (ret.msg != null) notify(ret.msg, ret.ret);
       if (ret.modal != null) m_modal(ret.modal, modal_title, false);
+      if (ret.json != null) m_modal(ret.json, modal_title, true);
       if (callback != null) callback(ret);
     }
   });
