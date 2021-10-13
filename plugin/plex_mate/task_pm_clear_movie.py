@@ -43,6 +43,7 @@ class Task(object):
         db_file = ModelSetting.get('base_path_db')
         con = sqlite3.connect(db_file)
         cur = con.cursor()
+        logger.debug(config['영화 쿼리'])
         #ce = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title', (section_id,))
         #ce = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? AND user_thumb_url NOT LIKE "upload%" AND (user_thumb_url NOT LIKE "http%" OR refreshed_at is NULL) ORDER BY title', (section_id,))
         ce = con.execute(config['영화 쿼리'], (section_id,))
