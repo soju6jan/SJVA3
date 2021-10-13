@@ -82,6 +82,9 @@ class Task(object):
     @staticmethod
     def movie_start(celery_instance):
         status = {'is_working':'run', 'count':0, 'current':0}
+        #exist = PlexDBHandle.select2(f"SELECT guid, title FROM metadata_items WHERE library_section_id = ? AND metadata_type = 1", (Task.TARGET_SECTION_ID))
+        #logger.error(exist)
+        #logger.error(len(exist))
         for SOURCE_LOCATION in Task.SOURCE_LOCATIONS:
             CURRENT_TARGET_LOCATION_ID, CURRENT_TARGET_LOCATION_FOLDERPATH = Task.get_target_location_id(SOURCE_LOCATION)
             #ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC', (SOURCE_LOCATION['id'],))
@@ -97,6 +100,9 @@ class Task(object):
             status['count'] += len(meta_list)
             #logger.warning(len(meta_list))
             #return 'stop'
+            #insert_count = 0
+            #guid_list = []
+
             for idx, metadata_item in enumerate(meta_list):
                 if ModelSetting.get_bool('dbcopy_status_task_stop_flag'):
                     return 'stop'
@@ -105,8 +111,19 @@ class Task(object):
                     data = {'status':status, 'ret':'append', 'title':metadata_item['title'], 'year':metadata_item['year'], 'files':[]}
                     #logger.warning(f"{idx} / {len(meta_list)} {metadata_item['title']}")
                     metadata_item_id, is_exist = Task.insert_metadata_items(metadata_item, Task.TARGET_SECTION_ID)
+                    #if metadata_item['guid'] not in guid_list:
+                    #    guid_list.append(metadata_item['guid'])
+                    #else:
+                    #    logger.error("같은 guid")
+                    #    logger.error(metadata_item['guid'])
+                    #    logger.error(metadata_item['title'])
+
                     if is_exist:
                         data['ret'] = 'exist'
+                        #for idx, tmp in enumerate(exist):
+                        #    if tmp['guid'] == metadata_item['guid']:
+                        #        del exist[idx]
+                        #        break
                         continue
                     #logger.warning(f"metadata_item_id : {metadata_item_id}")
                     new_filename = None
@@ -141,8 +158,6 @@ class Task(object):
                     else:
                         celery_instance.receive_from_task(data, celery=False)
 
-                
-
                 # bin scan
                 """
                 if new_filename is not None:
@@ -150,8 +165,9 @@ class Task(object):
                     PlexBinaryScanner.scan_refresh(section_id, meta_root)
                 """
                 #PlexDBHandle.execute_query
-        
+        #logger.error(exist)
 
+        
     @staticmethod
     def tv_start(celery_instance):
         status = {'is_working':'run', 'count':0, 'current':0}
@@ -228,6 +244,7 @@ class Task(object):
                     else:
                         celery_instance.receive_from_task(data, celery=False)
 
+            
 
     @staticmethod
     def music_start(celery_instance):
