@@ -109,9 +109,11 @@ class Task(object):
                 season_index = season['index']
                 episode_index = episode['index']
                 if episode['index'] == -1:
-                    episode_index = episode['available_at'].split(' ')[0]
-                    season_index = episode_index.split('-')[0]
-
+                    if episode['available_at'] is not None:
+                        episode_index = episode['available_at'].split(' ')[0]
+                    else:
+                        episode_index = episode['originally_available_at'].split(' ')[0]
+                    #season_index = episode_index.split('-')[0]
                 if season_index not in data['seasons']:
                     data['seasons'][season_index] = {'db':season}
                     combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'seasons', f"{season_index}.xml")
