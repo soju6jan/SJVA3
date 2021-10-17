@@ -188,12 +188,7 @@ class Task(object):
                         if key in ['id'] or value is None:
                             continue
                         if key == 'user_thumb_url' and value is not None and value.startswith('media') and metadata_item['user_art_url'] is not None and metadata_item['user_art_url'].startswith('http'):
-                            #logger.error(value)
                             value = metadata_item['user_art_url']
-                            #value = ''
-                            
-                            logger.error(value)
-
                         insert_col += f"'{key}',"
                         if type(value) == type(''):
                             value = value.replace('"', '""')
