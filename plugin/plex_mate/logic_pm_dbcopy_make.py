@@ -94,17 +94,26 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
                 newpath = os.path.join(db_folderpath, newfilename)
                 shutil.copy(db_path, newpath)
             logger.debug(f"파일 : {newpath}")
+            #DELETE FROM metadata_items WHERE (not (library_section_id = {section_id} AND metadata_type = 1)) AND (id not in (SELECT related_metadata_item_id FROM metadata_relations WHERE metadata_item_id in (SELECT id FROM metadata_items WHERE library_section_id = {section_id})));
+
+            # file로된부가항목만
+            #DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.related_metadata_item_id AND metadata_items.guid LIKE 'file://%');
             
             query = ''
             if section['section_type'] == 1:
                 query += f'''
-DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type = 1);'''
+DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.metadata_item_id AND metadata_items.library_section_id = {section_id});
+DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.related_metadata_item_id AND metadata_items.guid LIKE 'file://%');
+DELETE FROM metadata_items WHERE id not in (SELECT id FROM metadata_items WHERE (library_section_id = {section_id} AND metadata_type = 1) OR (id in (SELECT related_metadata_item_id FROM metadata_relations)));'''
             elif section['section_type'] == 2:
                 query += f'''
-DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 2 AND 4);'''
+DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 2 AND 4);
+DROP TABLE metadata_relations;'''
+
             elif section['section_type'] == 8:
                 query += f'''
-DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 8 AND 10);'''
+DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 8 AND 10);
+DROP TABLE metadata_relations;'''
             query += f'''
 DELETE FROM media_streams WHERE media_item_id not in (SELECT id FROM media_items WHERE library_section_id = {section_id});
 DELETE FROM media_parts WHERE media_item_id not in (SELECT id FROM media_items WHERE library_section_id = {section_id});
@@ -144,7 +153,6 @@ DROP TABLE metadata_item_clusterings;
 DROP TABLE metadata_item_clusters;
 DROP TABLE metadata_item_settings;
 DROP TABLE metadata_item_views;
-DROP TABLE metadata_relations;
 DROP TABLE metadata_subscription_desired_items;
 DROP TABLE play_queue_generators;
 DROP TABLE play_queue_items;
@@ -272,4 +280,4 @@ VACUUM;
                     logger.warning(f"{idx+1} / {count} : {item['title']} Not exist Info.xml file")
         con.commit()
         con.close()
-    
+        

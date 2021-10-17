@@ -148,6 +148,10 @@ class Task(object):
                                 media_stream_id = Task.insert_media_streams(media_stream, media_item_id, media_part_id, Task.TARGET_SECTION_ID)
                                 #logger.warning(f"media_stream_id : {media_stream_id}")
                     Task.insert_tag(metadata_item, metadata_item_id)
+
+                    # 2021-10-17
+                    # 부가항목
+                    Task.process_extra(metadata_item, metadata_item_id)
                 except Exception as e: 
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())
@@ -165,9 +169,71 @@ class Task(object):
                     PlexBinaryScanner.scan_refresh(section_id, meta_root)
                 """
                 #PlexDBHandle.execute_query
+
+                
         #logger.error(exist)
 
-        
+    @staticmethod
+    def process_extra(metadata_item, new_metadata_item_id):
+        try:
+            relation_ce = Task.source_con.execute('SELECT * FROM metadata_relations WHERE metadata_item_id = ? ORDER BY related_metadata_item_id', (metadata_item['id'],))
+            relation_ce.row_factory = dict_factory
+            for relation in relation_ce.fetchall():
+                try:
+                    relation_metadata_ce = Task.source_con.execute('SELECT * FROM metadata_items WHERE id = ?', (relation['related_metadata_item_id'],))
+                    relation_metadata_ce.row_factory = dict_factory
+                    relation_metadata_item = relation_metadata_ce.fetchall()[0]
+                    insert_col = insert_value = ''
+                    for key, value in relation_metadata_item.items():
+                        if key in ['id'] or value is None:
+                            continue
+                        if key == 'user_thumb_url' and value is not None and value.startswith('media') and metadata_item['user_art_url'] is not None and metadata_item['user_art_url'].startswith('http'):
+                            value = metadata_item['user_art_url']
+                        insert_col += f"'{key}',"
+                        if type(value) == type(''):
+                            value = value.replace('"', '""')
+                            insert_value += f'"{value}",'
+                        else:
+                            insert_value += f"{value},"
+                    insert_col = insert_col.rstrip(',')
+                    insert_value = insert_value.rstrip(',')
+                    query = f"INSERT INTO metadata_items({insert_col}) VALUES({insert_value});SELECT max(id) FROM metadata_items;" 
+                    #logger.error(query)
+                    insert_col = insert_value = ''
+                    ret = PlexDBHandle.execute_query2(query)
+                    if ret != '':
+                        new_extra_metadata_item_id = int(ret)
+                    else:
+                        logger.error('insert fail!!')
+                        continue
+                    for key, value in relation.items():
+                        if key in ['id'] or value is None:
+                            continue
+                        if key == 'metadata_item_id':
+                            value = new_metadata_item_id
+                        if key == 'related_metadata_item_id':
+                            value = new_extra_metadata_item_id
+                        insert_col += f"'{key}',"
+                        if type(value) == type(''):
+                            value = value.replace('"', '""')
+                            insert_value += f'"{value}",'
+                        else:
+                            insert_value += f"{value},"
+                    insert_col = insert_col.rstrip(',')
+                    insert_value = insert_value.rstrip(',')
+                    query = f"INSERT INTO metadata_relations({insert_col}) VALUES({insert_value});" 
+                    ret = PlexDBHandle.execute_query2(query)
+                    logger.warning(ret)
+                except Exception as e: 
+                    logger.error(f'Exception:{str(e)}')
+                    logger.error(traceback.format_exc())
+            return True
+        except Exception as e: 
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+
+
+
     @staticmethod
     def tv_start(celery_instance):
         status = {'is_working':'run', 'count':0, 'current':0}
