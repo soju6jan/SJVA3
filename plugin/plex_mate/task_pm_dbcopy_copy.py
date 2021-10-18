@@ -1,5 +1,5 @@
 # python
-import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob, platform
+import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob, platform, urllib.request
 from datetime import datetime, timedelta
 # third-party
 import requests, sqlite3, yaml
@@ -24,6 +24,7 @@ class Task(object):
     source_con = source_cur = None
     target_con = target_cur = None
     change_rule = None
+    change_rule_extra = None
     SOURCE_SECTION_ID = None
     SOURCE_LOCATIONS = None
     TARGET_SECTION_ID = None
@@ -151,7 +152,11 @@ class Task(object):
 
                     # 2021-10-17
                     # 부가항목
-                    Task.process_extra(metadata_item, metadata_item_id)
+                    # 메타는 쓰여지나 미디어 처리는 하다가 중단.
+                    # db make 단계부터 라이브러리 id를 기준으로 처리를 많이하나 부가영상은은 라이브러리 소속이 아니다.
+                    # 개별로 metadata_item 이며 relations 테이블을 통해 연결된다. make단계부터 이를 고려하여 db를 생성해야하나 노력에 비해 효과가 미비할 것으로 보인다.
+                    # media_item, pars, stream은 그냥 코드를 가져다 써도 되겠지만 directory를 테스트하기도 빡세다.
+                    #Task.process_extra(metadata_item, metadata_item_id)
                 except Exception as e: 
                     logger.error(f'Exception:{str(e)}')
                     logger.error(traceback.format_exc())
@@ -200,7 +205,7 @@ class Task(object):
                     insert_col = insert_col.rstrip(',')
                     insert_value = insert_value.rstrip(',')
                     query = f"INSERT INTO metadata_items({insert_col}) VALUES({insert_value});SELECT max(id) FROM metadata_items;" 
-                    #logger.error(query)
+                    logger.error(query)
                     insert_col = insert_value = ''
                     ret = PlexDBHandle.execute_query2(query)
                     if ret != '':
@@ -436,15 +441,26 @@ class Task(object):
     @staticmethod
     def change_extra_guid(source):
         logger.error(source)
-        source = source.replace('file://', '')
+        #source = source.replace('file://', '')
         # 한글 quote처리. _plus인지 확인필요
-        source = source.replace(urllib.requests.quote(Task.change_rule[0]), urllib.requests.quote(Task.change_rule[1]))
-        source = source.replace('\\', '/')
-        if Task.change_rule[1][0] != '/': #windows
-            source = 'file:///' + source
-        else:
-            source = 'file://' + source
-        logger.warning(source)
+        if Task.change_rule_extra is None:
+            Task.change_rule_extra = []
+            for rule in Task.change_rule:
+                rule_extra = []
+                if rule[0] != '/':
+                    sp = rule.split('\\')
+                else:
+                    sp = rule.split('/')
+                for tmp in sp:
+                    rule_extra.append(urllib.request.quote(json.dumps(tmp).strip('"')).replace('%3A', ':'))
+                tmp2 = '/'.join(rule_extra)
+                if tmp2[0] != '/':
+                    tmp2 = '/' + tmp2
+                Task.change_rule_extra.append(tmp2)
+                logger.warning(Task.change_rule_extra)
+        target = source.replace(Task.change_rule_extra[0], Task.change_rule_extra[1])
+        logger.warning(target)
+        return target
 
     @staticmethod
     def process_localfile(filepath, library_section_id, current_section_folderpath):

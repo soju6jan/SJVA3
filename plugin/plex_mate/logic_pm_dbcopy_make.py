@@ -99,21 +99,20 @@ class LogicPMDbCopyMake(LogicSubModuleBase):
             # file로된부가항목만
             #DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.related_metadata_item_id AND metadata_items.guid LIKE 'file://%');
             
+            # 영화 부가영상도 복사. 했다가 멈춤
+            # DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.metadata_item_id AND metadata_items.library_section_id = {section_id})''';
+            # DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.related_metadata_item_id AND metadata_items.guid LIKE 'file://%');            
+            # DELETE FROM metadata_items WHERE id not in (SELECT id FROM metadata_items WHERE (library_section_id = {section_id} AND metadata_type = 1) OR (id in (SELECT related_metadata_item_id FROM metadata_relations)));'''
             query = ''
             if section['section_type'] == 1:
                 query += f'''
-DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.metadata_item_id AND metadata_items.library_section_id = {section_id});
-DELETE FROM metadata_relations WHERE metadata_relations.id not in (SELECT metadata_relations.id FROM metadata_relations, metadata_items WHERE metadata_items.id = metadata_relations.related_metadata_item_id AND metadata_items.guid LIKE 'file://%');
-DELETE FROM metadata_items WHERE id not in (SELECT id FROM metadata_items WHERE (library_section_id = {section_id} AND metadata_type = 1) OR (id in (SELECT related_metadata_item_id FROM metadata_relations)));'''
+DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type = 1);'''
             elif section['section_type'] == 2:
                 query += f'''
-DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 2 AND 4);
-DROP TABLE metadata_relations;'''
-
+DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 2 AND 4);'''
             elif section['section_type'] == 8:
                 query += f'''
-DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 8 AND 10);
-DROP TABLE metadata_relations;'''
+DELETE FROM metadata_items WHERE not (library_section_id = {section_id} AND metadata_type BETWEEN 8 AND 10);'''
             query += f'''
 DELETE FROM media_streams WHERE media_item_id not in (SELECT id FROM media_items WHERE library_section_id = {section_id});
 DELETE FROM media_parts WHERE media_item_id not in (SELECT id FROM media_items WHERE library_section_id = {section_id});
@@ -123,6 +122,7 @@ DELETE FROM section_locations WHERE library_section_id is null OR library_sectio
 DELETE FROM library_sections WHERE id is null OR id != {section_id};
 DELETE FROM taggings WHERE metadata_item_id not in (SELECT id FROM metadata_items);
 DELETE FROM tags WHERE id not in (SELECT tag_id FROM taggings GROUP BY tag_id);
+DROP TABLE metadata_relations;
 DROP TABLE accounts;
 DROP TABLE activities;
 DROP TABLE blobs;
