@@ -189,6 +189,8 @@ class Task(object):
                             continue
                         if key == 'user_thumb_url' and value is not None and value.startswith('media') and metadata_item['user_art_url'] is not None and metadata_item['user_art_url'].startswith('http'):
                             value = metadata_item['user_art_url']
+                        if key == 'guid' and value.startswith('file://'):
+                            value = Task.change_extra_guid(value)
                         insert_col += f"'{key}',"
                         if type(value) == type(''):
                             value = value.replace('"', '""')
@@ -431,6 +433,18 @@ class Task(object):
             logger.error("동일 정보가 여러가 있음")
 
 
+    @staticmethod
+    def change_extra_guid(source):
+        logger.error(source)
+        source = source.replace('file://', '')
+        # 한글 quote처리. _plus인지 확인필요
+        source = source.replace(urllib.requests.quote(Task.change_rule[0]), urllib.requests.quote(Task.change_rule[1]))
+        source = source.replace('\\', '/')
+        if Task.change_rule[1][0] != '/': #windows
+            source = 'file:///' + source
+        else:
+            source = 'file://' + source
+        logger.warning(source)
 
     @staticmethod
     def process_localfile(filepath, library_section_id, current_section_folderpath):
