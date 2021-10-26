@@ -170,7 +170,7 @@ class LogicPMPeriodic(LogicModuleBase):
 
 
     def start(self):
-        logger.error("START")
+        #logger.error("START")
         data = self.get_jobs()
 
         for idx, item in enumerate(data):
