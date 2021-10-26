@@ -183,7 +183,7 @@ class LogicPMPeriodic(LogicModuleBase):
         config = LogicPMBase.load_config()
         data = config.get('라이브러리 주기적 스캔 목록', None)
         if data is None or type(data) != type([]):
-            return None
+            return []
         for idx, item in enumerate(data):
             item['job_id'] = f'{package_name}_periodic_{idx}'
             item['설명'] = item.get('설명', f"섹션: {item['섹션ID']}")
