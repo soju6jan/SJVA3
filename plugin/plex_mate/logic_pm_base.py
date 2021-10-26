@@ -59,11 +59,11 @@ class LogicPMBase(LogicModuleBase):
             shutil.copyfile(config_source_filepath, config_path)
         if os.path.exists(config_path):
             logger.warning(d(config))
-            if config.get('파일정리 영화 쿼리', None) is None:
+            if '파일정리 영화 쿼리' not in config.get:
                 ToolUtilYaml.copy_section(config_source_filepath, config_path, '파일정리')
-            if config.get('라이브러리 복사 영화 쿼리', None) is None:
+            if '라이브러리 복사 영화 쿼리' not in config.get:
                 ToolUtilYaml.copy_section(config_source_filepath, config_path, '라이브러리 복사')
-            if config.get('라이브러리 주기적 스캔 목록', None) is None:
+            if '라이브러리 주기적 스캔 목록' not in config.get:
                 ToolUtilYaml.copy_section(config_source_filepath, config_path, '라이브러리 주기적 스캔')
 
                 
