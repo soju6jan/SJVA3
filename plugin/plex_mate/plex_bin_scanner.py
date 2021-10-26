@@ -1,6 +1,6 @@
 # python
-import os, sys, traceback, re, json, threading, time, shutil, fnmatch, glob, platform, subprocess
-from datetime import datetime, timedelta
+import os, traceback, platform, subprocess
+from datetime import datetime
 # third-party
 import requests, sqlite3
 
@@ -67,10 +67,10 @@ class PlexBinaryScanner(object):
         try:
             if platform.system() == 'Windows':
                 if folderpath is None or folderpath == '':
-                    cmd = f'"{ModelSetting.get("base_bin_scanner")}" --scan  --refresh --section {section_id}"'
+                    command = f'"{ModelSetting.get("base_bin_scanner")}" --scan  --refresh --section {section_id}"'
                 else:
-                    cmd = f'"{ModelSetting.get("base_bin_scanner")}" --scan  --refresh --section {section_id} --directory "{folderpath}"'
-                logger.warning(cmd)
+                    command = f'"{ModelSetting.get("base_bin_scanner")}" --scan  --refresh --section {section_id} --directory "{folderpath}"'
+                logger.warning(command)
                 tmp = []
                 if type(command) == type([]):
                     for x in command:
@@ -133,9 +133,9 @@ class PlexBinaryScanner(object):
         try:
             if platform.system() == 'Windows':
                 if folderpath is not None and folderpath != '':
-                    cmd = f'"{ModelSetting.get("base_bin_scanner")}" --analyze --section {section_id} --directory "{folderpath}"'
+                    command = f'"{ModelSetting.get("base_bin_scanner")}" --analyze --section {section_id} --directory "{folderpath}"'
                 elif metadata_item_id is not None and metadata_item_id != '':
-                    cmd = f'"{ModelSetting.get("base_bin_scanner")}" --analyze --section {section_id} --item {metadata_item_id}'
+                    command = f'"{ModelSetting.get("base_bin_scanner")}" --analyze --section {section_id} --item {metadata_item_id}'
                 else:
                     cmd = f'"{ModelSetting.get("base_bin_scanner")}" --analyze --section {section_id}'
                 tmp = []
