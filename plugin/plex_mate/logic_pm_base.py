@@ -9,7 +9,7 @@ from flask import request, render_template, jsonify, redirect
 # sjva 공용
 from framework import db, scheduler, path_data, socketio, SystemModelSetting, app, celery, Util, path_app_root
 from plugin import LogicModuleBase, default_route_socketio
-from tool_base import ToolBaseFile, d, ToolSubprocess
+from tool_base import ToolBaseFile, d, ToolSubprocess, ToolUtilYaml
 # 패키지
 from .plugin import P
 logger = P.logger
@@ -39,7 +39,10 @@ class LogicPMBase(LogicModuleBase):
         f'{name}_url' : 'http://172.17.0.1:32400',
         f'{name}_backup_location_mode' : 'True',
         f'{name}_backup_location_manual' : '',
-        f'{name}_path_config' : os.path.join(path_data, 'db', f'{package_name}_config.yaml')
+        f'{name}_path_config' : os.path.join(path_data, 'db', f'{package_name}_config.yaml'),
+        f'{name}_bin_scanner_uid' : '0',
+        f'{name}_bin_scanner_gid' : '0',
+        f'{name}_machine' : '',
     }
 
 
@@ -50,9 +53,20 @@ class LogicPMBase(LogicModuleBase):
 
     def plugin_load(self):
         config_path = ModelSetting.get(f'{name}_path_config')
-        if os.path.exists(config_path) == False:
-            shutil.copyfile(os.path.join(os.path.dirname(__file__), 'file', os.path.basename(config_path)), config_path)
+        config_source_filepath = os.path.join(os.path.dirname(__file__), 'file', os.path.basename(config_path))
+        config = LogicPMBase.load_config()
+        if os.path.exists(config_path) == False or config is None:
+            shutil.copyfile(config_source_filepath, config_path)
+        if os.path.exists(config_path):
+            logger.warning(d(config))
+            if config.get('파일정리 영화 쿼리', None) is None:
+                ToolUtilYaml.copy_section(config_source_filepath, config_path, '파일정리')
+            if config.get('라이브러리 복사 영화 쿼리', None) is None:
+                ToolUtilYaml.copy_section(config_source_filepath, config_path, '라이브러리 복사')
+            if config.get('라이브러리 주기적 스캔 목록', None) is None:
+                ToolUtilYaml.copy_section(config_source_filepath, config_path, '라이브러리 주기적 스캔')
 
+                
 
     def process_menu(self, sub, req):
         arg = P.ModelSetting.to_dict()
@@ -149,11 +163,12 @@ class LogicPMBase(LogicModuleBase):
                         xml_string = ToolBaseFile.read(os.path.join(data_path, 'Preferences.xml'))
                         result = xmltodict.parse(xml_string)
                         prefs = json.loads(json.dumps(result))
-                        #logger.warning(d(prefs))
+                        logger.warning(d(prefs))
                         ret['data']['token'] = prefs['Preferences']['@PlexOnlineToken']
+                        ret['data']['machine'] = prefs['Preferences']['@ProcessedMachineIdentifier']
 
                     for key, value in ret['data'].items():
-                        if key != 'token':
+                        if key not in ['token', 'machine']:
                             if os.path.exists(value) == False:
                                 ret = {'ret':'fail', 'msg':'올바른 경로가 아닙니다.<br>' + value}
                                 return jsonify(ret)

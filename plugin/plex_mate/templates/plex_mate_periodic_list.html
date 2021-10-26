@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .badge-sm {
+    min-width: 1.8em;
+    padding: .25em !important;
+    margin-left: .1em;
+    margin-right: .1em;
+    color: white !important;
+    cursor: pointer;
+}
+</style>
+
+
+{{ macros.m_button_group([['global_reset_db_sub_btn', 'DB 초기화'], ['remove_no_append_data_btn', '추가 파일이 없는 데이터 삭제'], ['all_append_files_show_btn', '모두 확장'], ['all_append_files_hide_btn', '모두 축소'] ])}}
+{{ macros.m_row_start('5') }}
+{{ macros.m_row_end() }}
+
+
+{{ macros.m_hr_head_bottom() }}
+
+<div>
+  <form id="form_search" class="form-inline" style="text-align:left">
+    <div class="container-fluid">
+      <div class="row show-grid">
+        <span class="col-md-6">
+          <select id="order" name="order" class="form-control form-control-sm">
+            <option value="desc">최근순</option>
+            <option value="asc">오래된순</option>
+          </select>
+          <select id="option1" name="option1" class="form-control form-control-sm">
+            <option value="all" selected>전체</option>
+            {% if arg['library_list'] is not none %}
+            {% for item in arg['library_list'] %}
+              <option value="{{ item['id'] }}">{{item['name']}}</option>
+            {% endfor %}
+            {% endif %}
+          </select>
+          <select id="option2" name="option2" class="form-control form-control-sm">
+            <option value="all" selected>전체</option>
+            <option value="append">추가된 항목만</option>
+          </select>
+        </span>
+        <span class="col-md-6">
+          <input id="keyword" name="keyword" class="form-control form-control-sm w-75" type="text" placeholder="추가된 파일 경로" aria-label="Search">
+          <button id="search" class="btn btn-sm btn-outline-success">검색</button>
+          <button id="reset_btn" class="btn btn-sm btn-outline-success">리셋</button>
+        </span>
+      </div>
+    </div>
+  </form>
+  <div id='page1'></div>
+  
+  <div id="list_div"></div>
+  <div id='page2'></div>
+</div>
+
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub']}}";
+var current_data = null;
+var last_list_option = "{{arg['periodic_item_last_list_option']}}";
+var machine = "{{arg['base_machine']}}";
+
+$(document).ready(function(){
+  console.log(last_list_option);
+  tmp = last_list_option.split('|');
+  if (tmp.length == 5) {
+    document.getElementById("order").value = tmp[0];
+    document.getElementById("keyword").value = tmp[2];
+    document.getElementById("option1").value = tmp[3];
+    document.getElementById("option1").value = tmp[4];
+    global_sub_request_search(tmp[1]);
+  } else {
+    global_sub_request_search('1');
+  }
+});
+
+
+/*
+$(document).ready(function(){
+  
+  $.contextMenu({
+    selector: '.chover',
+    trigger: '11left',
+    callback: function(key, options) {
+      index = $(this).data('index');
+      filename = $(this).data('filename');
+      if (key == 'play') {
+        cm_play(index, filename);
+      } else if (key == 'rename') {
+        cm_rename(index, filename);
+      } else if (key == 'other') {
+        global_send_command2('move_file_other', index);
+      } else if (key == 'delete') {
+        cm_delete(index, filename);
+      }
+    },
+    items: {
+        "rename": {name: "파일명 변경", icon: "edit"},
+        "delete": {name: "파일 삭제", icon: "delete"},
+        "other": {name: "other 폴더로 이동", icon: "paste"},
+        "play": {name: "Play", icon: "fa-play"},
+        //"sep1": "---------",
+        //"quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
+    }
+  });
+
+});
+*/
+
+$("#search").click(function(e) {
+  e.preventDefault();
+  global_sub_request_search('1');
+});
+
+$("body").on('click', '#page', function(e){
+  e.preventDefault();
+  global_sub_request_search($(this).data('page'));
+});
+
+$("body").on('click', '#reset_btn', function(e){
+  e.preventDefault();
+  document.getElementById("order").value = 'desc';
+  document.getElementById("option1").value = 'all';
+  document.getElementById("option2").value = 'all';
+  document.getElementById("keyword").value = '';
+  global_sub_request_search('1')
+});
+
+$("body").on('change', '#order', function(e){
+  global_sub_request_search('1');
+});
+
+
+function make_list(data) {
+  str = '';
+  str = '<table id="result_table" class="table table-sm  tableRowHover "  ><thead class="thead-dark"><tr> \
+    <th style="width:5%">ID</th> \
+    <th style="width:5%" text-align:left;>모드</th> \
+    <th style="width:10%; text-align:center;">시작시간</th> \
+    <th style="width:10%; text-align:center;">종료시간</th> \
+    <th style="width:20%; text-align:left;">섹션명</th> \
+    <th style="width:10%; text-align:left;">상태</th> \
+    <th style="width:10%; text-align:right;">스캔시간</th> \
+    <th style="width:10%; text-align:right;">추가 파일 수</th> \
+    <th style="width:10%; text-align:right;">전체 파일 수</th> \
+    </tr></thead><tbody id="list">';
+  
+  if (data.length == 0) str += '<tr><td colspan="6"><h4>검색된 데이터가 없습니다.</h4></td></tr>';
+
+  for(i in data) {
+    console.log(data[i]);
+    str += '<tr class="chover" style="cursor: pointer;" data-toggle="collapse" data-target="#collapse_' + i + '" aria-expanded="true" >';
+    //str += '<td class="chover"  scope="col" style="width:70%" data-index="'+ data.index+'_'+j +'" data-filename="'+data.files[j].filename.original+'">'+ data.files[j].filename.original + '</td>';
+    str += '<td scope="col" style="width:5%; text-align:left;">'+ data[i].id + '</td>';
+    tmp =  (data[i].mode == 'scheduler') ? '자동' : '수동';
+    str += '<td scope="col" style="width:5%; text-align:left;">'+ tmp + '</td>';
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ data[i].start_time + '</td>';
+    //tmp =  data[i].finish_time;
+    //if (tmp == null && data[i].status == 'working') tmp = '실행중';
+    //else if (tmp == null && data[i].status == 'working') tmp = text_color('중지', 'red');
+    //tmp = (data[i].finish_time != null) ? data[i].finish_time : text_color("실행중", 'blue');
+    tmp =  (data[i].finish_time != null) ? data[i].finish_time  : '--';
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
+    str += '<td scope="col" style="width:20%; text-align:left;">'+ data[i].section_title + '</td>';
+    tmp = data[i].status;
+    if (data[i].status == 'working') {
+      tmp = text_color('실행중', 'blue');
+      tmp += '<span style="margin-left:10px"></span></span><input type="button" id="kill_btn" value="KILL" class="btn btn-sm btn-outline-danger py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'">';
+    }
+    else if (data[i].status == 'finished') tmp = '완료';
+    else if (data[i].status == 'timeout') tmp = text_color('시간초과', 'red');
+    else if (data[i].status == 'terminated') tmp = text_color('중지', 'red');
+    else if (data[i].status == 'user_stop') tmp = text_color('사용자 중지', 'red');
+    //tmp += '<a href="#" class="badge badge-primary badge-sm" data-scale="hour" data-value="1">1</a>';
+    str += '<td scope="col" style="width:10%; text-align:left;">'+ tmp + '</td>';
+    tmp =  (data[i].duration != null) ? (parseInt(data[i].duration / 60) > 0 ? parseInt(data[i].duration / 60) + '분 ' : '')+ String(data[i].duration % 60).padStart(2, '0') + '초' : '--'; 
+    str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
+    tmp =  (data[i].part_append_count != null) ? data[i].part_append_count  : '--';
+    str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
+    tmp =  (data[i].part_after_count != null) ? data[i].part_after_count  : '--';
+    str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
+    str += '</tr>';
+    if (data[i].append_files != null && data[i].append_files != '') {
+      //str += '<tr class="collapse tableRowHoverOff show" style="cursor: pointer;"  id="collapse_' + i + '">';
+      str += '<tr class="collapse tableRowHoverOff" style="cursor: pointer;"  id="collapse_' + i + '">';
+      str += '<td></td><td colspan="11">';
+      tmp = '';
+      list = data[i].append_files.split('\n');
+      for(j in list) {
+        tmp2 = list[j].split('|');
+        url = 'https://app.plex.tv/desktop/#!/server/' + machine + '/details?key=%2Flibrary%2Fmetadata%2F' + tmp2[0];
+        tmp += '<a href="' + url + '" target="_blank">' + tmp2[1] + '</a><br>';
+      }
+      str += '<div id="detail_'+ i +'">';
+      str += tmp;
+      str += '</div>';
+      str += '</td>';
+      str += '</tr>'
+    }
+  }
+  str += '</table>';
+  document.getElementById("list_div").innerHTML = str;
+
+  return
+}
+
+
+$("body").on('click', '#reset_btn', function(e){
+  e.preventDefault();
+  document.getElementById("order").value = 'desc';
+  document.getElementById("option1").value = 'all';
+  document.getElementById("option2").value = 'all';
+  document.getElementById("keyword").value = '';
+  global_sub_request_search('1')
+});
+
+
+
+$("body").on('click', '#all_append_files_show_btn', function(e){
+  e.preventDefault();
+  $('.collapse').collapse('show');
+
+});
+
+$("body").on('click', '#all_append_files_hide_btn', function(e){
+  e.preventDefault();
+  $('.collapse').collapse('hide');
+});
+
+$("body").on('click', '#kill_btn', function(e){
+  e.preventDefault();
+  id = $(this).data('id');
+  console.log(id);
+  global_send_command2('kill', id);
+  
+  // 확장, 축소 방지
+  return false;
+});
+
+$("body").on('click', '#remove_no_append_data_btn', function(e){
+  e.preventDefault();
+  global_send_command2('remove_no_append_data', null, null, null, null, function(ret){
+    $('#reset_btn').click();
+  });
+});
+
+
+
+
+</script> 
+
+{% endblock %}

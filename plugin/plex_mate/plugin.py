@@ -24,7 +24,7 @@ class P(object):
     menu = {
         'main' : [package_name, u'Plex Mate'],
         'sub' : [
-            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'], ['scan', '스캔(개발중)'], ['watchdog', '파일시스템 감시(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그']
+            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'],  ['periodic', '라이브러리 주기적 스캔'], ['scan', '스캔(개발중)'], ['watchdog', '파일시스템 감시(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그']
         ], 
         'category' : 'beta',
         'sub2' : {
@@ -37,6 +37,9 @@ class P(object):
             'tool' : [
                 ['simple', '간단 명령'], ['select', 'DB Select'], ['query', 'SQL Query'],
             ],
+            'periodic' : [
+                ['task', '작업 관리'], ['list', '스캔 결과']
+            ],
             'scan' : [
                 ['manual', '수동'], ['auto', '자동'], ['list', '목록'],
             ],
@@ -47,7 +50,9 @@ class P(object):
                 ['make', '소스 DB 생성'], ['copy', '복사 설정'], ['status', '복사 상태'],
             ],
             'manual' : [
-                ['README.md', 'README'], ['file/파일정리.md', '파일정리'], ['file/라이브러리 복사.md', '라이브러리 복사']
+                ['README.md', 'README'], ['file/파일정리.md', '파일정리'], 
+                ['file/라이브러리 복사.md', '라이브러리 복사'],
+                ['file/스캔.md', 'PLEX 스캔'], ['file/라이브러리 주기적 스캔.md', '라이브러리 주기적 스캔']
             ],
         }
     }  
@@ -77,10 +82,11 @@ def initialize():
         from .logic_pm_base import LogicPMBase
         from .logic_pm_clear import LogicPMClear
         from .logic_pm_tool import LogicPMTool
+        from .logic_pm_periodic import LogicPMPeriodic
         from .logic_pm_dbcopy import LogicPMDbCopy
         from .logic_pm_scan import LogicPMScan
         from .logic_pm_watchdog import LogicPMWatchdog
-        P.module_list = [LogicPMBase(P), LogicPMClear(P), LogicPMTool(P), LogicPMDbCopy(P), LogicPMScan(P), LogicPMWatchdog(P)]
+        P.module_list = [LogicPMBase(P), LogicPMClear(P), LogicPMPeriodic(P), LogicPMTool(P), LogicPMDbCopy(P), LogicPMScan(P), LogicPMWatchdog(P)]
         P.logic = Logic(P)
         default_route(P)
     except Exception as e: 

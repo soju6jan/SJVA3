@@ -22,7 +22,7 @@ from sqlitedict import SqliteDict
 # sjva 공용
 from framework.logger import get_logger
 from framework import app, db, scheduler, path_data, socketio, path_app_root
-from framework.util import Util, AlchemyEncoder
+from framework.util import Util
 from system.logic import SystemLogic
 # 패키지
 #import plex

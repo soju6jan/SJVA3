@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ macros.m_button_group([['base_path_config_edit_btn', '작업 편집'], ['all_sched_add_btn', '모두 스케쥴링 등록'], ['all_sched_remove_btn', '모두 스케쥴링 취소']])}}
+{{ macros.m_row_start('5') }}
+{{ macros.m_row_end() }}
+
+
+{{ macros.m_hr_head_bottom() }}
+
+<div>
+  <div id="list_div"></div>
+</div>
+
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub']}}";
+var current_data = null;
+var path_app_root = "{{arg['path_app_root']}}";
+var base_path_config = "{{arg['base_path_config']}}";
+
+$(document).ready(function(){
+  refresh();
+});
+
+function refresh() {
+  global_send_command2('get_tasks', null, null, null, null, function(e) {
+    make_list(e.data);
+  });
+}
+
+
+function make_list(data) {
+  str = '';
+  str = '<table id="result_table" class="table table-sm  tableRowHover "  ><thead class="thead-dark"><tr> \
+    <th style="width:5% text-align:center;">ID</th> \
+    <th colspan="2" style="width:10% text-align:center;">스케쥴링</th> \
+    <th style="width:10% text-align:left;">섹션명</th> \
+    <th style="width:5%; text-align:center;">섹션ID</th> \
+    <th style="width:10%; text-align:center;">주기</th> \
+    <th style="width:10%; text-align:center;">모드</th> \
+    <th style="width:15%; text-align:center;">폴더</th> \
+    <th style="width:10%; text-align:left;">최대실행시간</th> \
+    <th style="width:15%; text-align:center;">설명</th> \
+    <th style="width:5%; text-align:left;">Action</th> \
+    </tr></thead><tbody id="list">';
+  
+  if (data.length == 0) str += '<tr><td colspan="6"><h4>작업이 없습니다.</h4></td></tr>';
+
+  for(i in data) {
+    console.log(data[i]);
+    str += '<tr class="chover" style="cursor: pointer;" data-toggle="collapse" data-target="#collapse_' + i + '" aria-expanded="true" >';
+
+    str += '<td scope="col" style="width:5%; text-align:left;">'+ (parseInt(i) + 1) + '</td>';
+
+    if (data[i].스케쥴링 == null || data[i].스케쥴링 == '등록') tmp1 = '등록';
+    else tmp1 = text_color('수동', 'red');
+
+    // tmp1 == '등록'
+    if (data[i].주기 != null || data[i].is_include_scheduler == 'True') tmp2 = '<input id="use_checkbox|'+i+'" name="use_checkbox|'+i+'" type="checkbox" data-idx='+i+' data-toggle="toggle" data-on="On" data-off="Off" data-onstyle="info" data-offstyle="danger" data-size="small" ' + ((data[i].is_include_scheduler == 'True') ? 'checked' : '') + '>';
+    else tmp2 = '';
+    str += '<td scope="col" style="width:5%; text-align:left;">'+ tmp1 + '</td>';
+    str += '<td scope="col" style="width:10%; text-align:left;">'+ tmp2 + '</td>';
+    
+    str += '<td scope="col" style="width:10%; text-align:left;">'+ data[i].section_title + '</td>';
+    str += '<td scope="col" style="width:5%; text-align:center;">'+ data[i].섹션ID + '</td>';
+    
+    tmp =  (data[i].주기 != null) ? data[i].주기 : '--';
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
+
+    tmp = (data[i].스캔모드 != null) ? data[i].스캔모드 : "바이너리";
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
+
+    tmp = (data[i].폴더 != null) ? data[i].폴더 : "";
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
+    
+    tmp = (data[i].최대실행시간 != null) ? data[i].최대실행시간 : "--";
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
+
+    tmp = (data[i].설명 != null) ? data[i].설명 : "";
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
+
+    tmp = '<input type="button" id="kill_btn" value="KILL" class="btn btn-sm btn-outline-danger py-0" style="font-size: 0.8em;" data-id="'+parseInt(i+1)+'">';
+    
+    tmp = m_button('execute_btn', '실행', [{'key':'idx', 'value':i}]);
+    str += '<td scope="col" style="width:10%; text-align:left;">'+ tmp + '</td>';
+
+    str += '</tr>'
+  }
+  str += '</table>';
+  document.getElementById("list_div").innerHTML = str;
+  document.getElementById("list_div").innerHTML = str;
+  $('input[id^="use_checkbox|"]').bootstrapToggle();
+}
+
+
+$("body").on('click', '#base_path_config_edit_btn', function(e){
+  e.preventDefault();
+  url = "/flaskcode" + base_path_config.replace(path_app_root, '');
+  window.location.href = url;
+});
+
+
+$("body").on('change', 'input[id^="use_checkbox|"]', function(e){
+  var flag = $(this).prop('checked');
+  var idx = $(this).data('idx');
+  global_send_command2('task_sched', idx, flag, null, null, function(e) {
+    refresh();
+  });
+});
+
+
+$("body").on('click', '#all_sched_add_btn', function(e){
+  global_send_command2('all_sched_add', null, null, null, null, function(e) {
+    refresh();
+  });
+});
+
+$("body").on('click', '#all_sched_remove_btn', function(e){
+  global_send_command2('all_sched_remove', null, null, null, null, function(e) {
+    refresh();
+  });
+});
+
+$("body").on('click', '#execute_btn', function(e){
+  global_send_command2('task_execute', $(this).data('idx'), null, null, null, function(e) {
+    console.log(e);
+    ret = e.data;
+    if (ret=='scheduler' || ret=='thread') {
+      $.notify('<strong>작업을 시작하였습니다. ('+ret+')</strong>', {
+        type: 'success'
+      });
+    } else if (ret == 'is_running') {
+      $.notify('<strong>작업중입니다.</strong>', {
+        type: 'warning'
+      });
+    } else {
+      $.notify('<strong>작업 시작에 실패하였습니다.</strong>', {
+        type: 'warning'
+      });
+    }
+  });
+});
+
+</script> 
+
+{% endblock %}

@@ -16,7 +16,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 # sjva 공용
 from framework.logger import get_logger
 from framework import app, db, scheduler, path_data, socketio, path_app_root
-from framework.util import Util, AlchemyEncoder
+from framework.util import Util
 from system.logic import SystemLogic
 # 패키지
 package_name = __name__.split('.')[0]

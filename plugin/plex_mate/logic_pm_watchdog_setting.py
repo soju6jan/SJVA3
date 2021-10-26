@@ -185,7 +185,7 @@ class WatchdogControl:
         for section_id in section_list:
             if section_id not in db_section_list:
                 logger.warning(f'스캔 : {section_id} {filepath}')
-                PlexBinaryScanner.scan_refresh(section_id, os.path.dirname(filepath))
+                PlexBinaryScanner.scan_refresh2(section_id, os.path.dirname(filepath))
 
 
         

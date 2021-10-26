@@ -77,6 +77,8 @@ var preset = null;
 var current_data = null;
 var query_library = '';
 var query_preset = '';
+var machine = "{{arg['base_machine']}}";
+
 
 $(function(){ 
   //$('#main_container').attr('class', 'container-fluid');  
@@ -108,19 +110,28 @@ $(function(){
         global_send_command_sub('refresh_web', data.metadata_items_id);
       } else if (key == 'refresh_bin') {
         global_send_command_sub('refresh_bin', data.library_section_id, data.file);
+      } else if (key == 'analyze_web') {
+        global_send_command_sub('analyze_web', data.metadata_items_id);
+      } else if (key == 'analyze_bin') {
+        global_send_command_sub('analyze_bin', data.library_section_id, data.metadata_items_id);
       } else if (key == 'remove_metadata') {
         global_send_command_sub('remove_metadata', data.metadata_type, data.metadata_items_hash);
       } else if (key == 'other') {
         global_send_command2('move_file_other', index);
       } else if (key == 'delete') {
         cm_delete(index, filename);
+      } else if (key == 'plex_go') {
+        url = 'https://app.plex.tv/desktop/#!/server/' + machine + '/details?key=%2Flibrary%2Fmetadata%2F' + data.metadata_items_id;
+        window.open(url,'_blank');
       }
     },
     items: {
         "refresh_web": {name: "메타데이터 새로 고침 (웹)", icon: "edit"},
         "refresh_bin": {name: "메타데이터 새로 고침 (Bin)", icon: "edit"},
-
+        "analyze_web": {name: "분석 (웹)", icon: "edit"},
+        "analyze_bin": {name: "분석 (Bin)", icon: "edit"},
         "remove_metadata": {name: "메타데이터 폴더 삭제", icon: "delete"},
+        "plex_go": {name: "PLEX Go", icon: "go"},
 
         //"rename": {name: "파일명 변경", icon: "edit"},
         //"delete": {name: "파일 삭제", icon: "delete"},

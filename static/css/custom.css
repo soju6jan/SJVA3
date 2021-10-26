@@ -63,3 +63,12 @@ background-color: #ffff0080 !important;
     .set-left  { text-align: right; }
 }
 
+.badge-sm {
+    min-width: 1.8em;
+    padding: .25em !important;
+    margin-left: .1em;
+    margin-right: .1em;
+    color: white !important;
+    cursor: pointer;
+}
+

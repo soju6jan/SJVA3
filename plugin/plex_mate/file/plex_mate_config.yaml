@@ -5,16 +5,13 @@
 
 # 2021-07-20
 
-######################################################################
-# 메뉴 : 파일정리 - 라이브러리
-######################################################################
-
+# SECTION START : 파일정리
 ######################################################################
 # 웹페이지에 표시할 세부 정보 갯수
 # 0 이면 제한하지 않음
 # 제한하지 않거나 너무 큰 수이면서 데이터가 많은 경우 웹 동작이 원할하지 않음.
 웹페이지에 표시할 세부 정보 갯수: 200
-
+######################################################################
 
 ######################################################################
 # 영화 쿼리 : 라이브러리별로 영화 데이터를 가져오는 SQL문장
@@ -31,9 +28,8 @@
 # ~~~ ORDER BY title LIMIT 1000;  => 천개의 데이터만 가져옴
 # ~~~ ORDER BY title LIMIT 1000 OFFSET 1000;  => 2페이지. 천개 제외 1000개의 가져옴
 # ~~~ ORDER BY title LIMIT 1000 OFFSET 2000;  => 3페이지.
-
-영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title 
-
+파일정리 영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title 
+######################################################################
 
 ######################################################################
 # 쇼 쿼리 : 라이브러리별로 영화 데이터를 가져오는 SQL문장
@@ -41,12 +37,8 @@
 #
 # 기본값 (제목순으로 모든 데이터 확인)
 # TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
-#
-TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
-
-
-영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title 
-
+파일정리 TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_section_id = ? ORDER BY title
+######################################################################
 
 ######################################################################
 # 음악 쿼리 : 라이브러리별로 음악 데이터를 가져오는 SQL문장
@@ -55,10 +47,12 @@ TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_sect
 # 기본값 (제목순으로 모든 데이터 확인)
 # 음악 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title
 #
-음악 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title
+파일정리 음악 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title
+######################################################################
+# SECTION END
 
 
-
+# SECTION START : 라이브러리 복사
 ######################################################################
 # 라이브러리 복사 영화 쿼리
 # 기본 값 : SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?)
@@ -74,6 +68,7 @@ TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_sect
 # 예) ㄱ 만 : substr(title, 1, 1) >= '가' AND substr(title, 1, 1) < '나'
 
 라이브러리 복사 영화 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 1 AND id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) ORDER BY title DESC
+######################################################################
 
 
 ######################################################################
@@ -81,8 +76,87 @@ TV 쿼리: SELECT * FROM metadata_items WHERE metadata_type = 2 AND library_sect
 # 기본 값 : SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC
 
 라이브러리 복사 TV 쿼리: SELECT * FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT parent_id FROM metadata_items WHERE id in (SELECT metadata_item_id FROM media_items WHERE section_location_id = ?) GROUP BY parent_id) GROUP BY parent_id) ORDER BY title DESC
+######################################################################
+# SECTION END
+
+# SECTION START : 라이브러리 주기적 스캔
+######################################################################
+# 특정 섹션만 주기적 스캔을 하려고 할 때 등록하여 사용
+# - 를 주어 리스트형으로 여러 건 등록
+# 스케쥴링 순서 변경시에는 "모두 스케쥴링 취소" 후 "모두 스케쥴링 등록" 
+#
+
+# =============================================================================
+# 섹션ID      : 섹션 ID
+# 스케쥴링    : 등록 or 수동. 생략시 등록
+#              - 등록 : 모듈 로딩시 자동 등록 
+#              - 수동 : 자동등록 하지 않고 유저가 GUI에서 실행
+# 주기        : 스케쥴링 항목이 '등록'인 경우에만 사용. 스케쥴링 주기. 
+#             분단위 숫자나 cron 정보
+# 스캔모드    : 웹 or 바이너리. 생략시 '바이너리'
+#             - 웹 : 사용자가 브라우저 등을 통해서 스캔 명령을 날리는 거와 같음.
+#                    이미 다른 작업중이면 큐에 추가되며 순차적으로 진행
+#             - 바이너리: 직접 바이너리 실행.
+# 최대실행시간: 바이너리 모드에서 사용. 분단위. 생략시 중단하지 않음.
+#              지정되어 있는 경우 실행시간이 지나면 프로세스 중단.
+# 폴더       : 스캔할 폴더. 생략시 섹션 전체
+# 설명       : 생략가능. 스케쥴링 목록에 표시되는 설명
+# =============================================================================
+
+#  - 섹션ID: 
+#    주기: 
+#    스케쥴링: 
+#    스캔모드: 
+#    최대실행시간:
+#    폴더:
+#    설명:
+
+# 샘플
+
+#라이브러리 주기적 스캔 목록:
+#  - 섹션ID: 8
+#    주기: 10
+#    스케쥴링: 등록
+#
+#  - 섹션ID: 9
+#    주기: 10
+#    설명: 2.예능 - 9
+#    스케쥴링: 등록
+#  
+#  - 섹션ID: 11
+#    주기: 15
+#    설명: 3.교양 - 11
+#
+#  - 섹션ID: 12
+#    주기: 5 * * * *
+#    설명: 4.어린이 - 12
+#  
+#  - 섹션ID: 13
+#    주기: 10 * * * *
+#    설명: 5.기타 - 13
+#  
+#  - 섹션ID: 23
+#    주기: 5
+#    설명: "영화 최신 2021.10 폴더만"
+#    폴더: "/mnt/gds/영화/4.최신/2021.10"
+#  
+#  - 섹션ID: 18
+#    주기: 0 5 * * *
+#    스캔모드: 웹
+#    설명: "영화 ALL - 하루에 한번"
+#
+#  - 섹션ID: 18
+#    스케쥴링: 수동
+#    설명: "영화 ALL / 수동용"
+#  
+#  - 섹션ID: 41
+#    주기: 3000
+#    스케쥴링: 수동
+#    스캔모드: 웹
+#    설명: F.외국 
+    
+라이브러리 주기적 스캔 목록: 
 
 
-
-
-
+  
+# SECTION END  

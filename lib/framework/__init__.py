@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-version = '0.2.22.11'
+version = '0.2.22.12'
 #########################################################
 # python
 import os
@@ -62,6 +62,7 @@ try:
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['config'] = {}
+    app.config['JSON_AS_ASCII'] = False
     
     config_initialize('start')
 
@@ -79,6 +80,8 @@ try:
 
     from flask_cors import CORS
     CORS(app)
+
+
 
     from flaskext.markdown import Markdown
     Markdown(app)

@@ -27,7 +27,6 @@ class Task(object):
     @staticmethod
     @celery.task(bind=True)
     def start(self, command, section_id, dryrun):
-        logger.debug('11111111111111111111111111')
         config = LogicPMBase.load_config()
         dryrun = True if dryrun == 'true'  else False
 
@@ -36,7 +35,7 @@ class Task(object):
         cur = con.cursor()
         #ce = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? ORDER BY title', (section_id,))
         #ce = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 1 AND library_section_id = ? AND user_thumb_url NOT LIKE "upload%" AND (user_thumb_url NOT LIKE "http%" OR refreshed_at is NULL) ORDER BY title', (section_id,))
-        query = config.get('음악 쿼리', 'SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title')
+        query = config.get('파일정리 음악 쿼리', 'SELECT * FROM metadata_items WHERE metadata_type = 8 AND library_section_id = ? ORDER BY title')
         #ce = con.execute(config['TV 쿼리'], (section_id,))
         ce = con.execute(query, (section_id,))
         ce.row_factory = dict_factory

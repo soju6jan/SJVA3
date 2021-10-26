@@ -19,8 +19,6 @@
       {{ macros.setting_input_text_and_buttons('base_path_data', 'Plex 데이터 경로', [['select_base_path_data_btn', '경로 선택'], ['data_folder_size_btn', '크기 확인']], value=arg['base_path_data'], desc=['Metadata, Logs, Plug-ins 등의 폴더가 있는 폴더', '', 'OS / Plex / SJVA', 'Linux / Native / Docker : /host/var/lib/plexmediaserver/Library/Application Support/Plex Media Server', 'Windows / Native / Native : C:\\Users\\사용자\\AppData\\Local\\Plex Media Server']) }}
       {{ macros.setting_button([['plex_folder_test_btn', 'Plex 경로 테스트']], left='경로 테스트', desc=['테스트 버튼 클릭 후 아래 설정 값 변경'] ) }}
       {{ macros.m_hr() }}
-      {{ macros.setting_input_int('base_bin_scanner_uid', 'Plex Server 실행 USER UID', value=arg['base_bin_scanner_uid']) }}
-      {{ macros.setting_input_int('base_bin_scanner_gid', 'Plex Server 실행 USER GID', value=arg['base_bin_scanner_gid']) }}
       {{ macros.setting_input_text_and_buttons('base_bin_scanner', '실행파일 - 스캐너', [['execute_bin_scanner_btn', 'Help 보기']], value=arg['base_bin_scanner'], disabled=True) }}
       {{ macros.setting_input_text_and_buttons('base_bin_sqlite', '실행파일 - SQLite', [['execute_bin_sqlite_btn', '버전 확인']], value=arg['base_bin_sqlite'], disabled=True) }}
       {{ macros.setting_input_text_and_buttons('base_path_db', 'DB 파일', [['get_size_db_btn', '크기 확인'], ['backup_db_btn', '백업'], ['db_test_btn', '섹션 확인']], value=arg['base_path_db'], disabled=True) }}
@@ -28,7 +26,6 @@
       {{ macros.setting_input_text_and_buttons('base_path_media', '경로 - Media', [['get_size_media_btn', '크기 확인']], value=arg['base_path_media'], disabled=True) }}
       {{ macros.setting_input_text_and_buttons('base_path_phototranscoder', '경로 - PhotoTranscoder', [['get_size_phototranscoder_btn', '크기 확인'], ['clear_phototranscoder_btn', '비우기']], value=arg['base_path_phototranscoder'], disabled=True) }}
       {{ macros.setting_input_text('base_token', 'Plex 토큰', value=arg['base_token'], desc=['윈도우는 Token 수동 입력']) }}
-      {{ macros.setting_input_text('base_machine', 'Plex Machine ID', value=arg['base_machine'], desc=['윈도우는 수동 입력']) }}
       {{ macros.setting_input_text_and_buttons('base_url', 'Plex URL', [['plex_url_test_btn', '테스트'],['version_btn', 'Agent 버전']], value=arg['base_url'], desc=['보통은 http://localhost:32400 or http://172.17.0.1:32400']) }}
     {{ macros.m_tab_content_end() }}  
     {{ macros.m_tab_content_start('etc', false) }}
@@ -73,7 +70,6 @@ $("#setting_save_btn").click(function(e) {
   formData += '&' + 'base_path_media' + '=' + $('#base_path_media').val().trim();
   formData += '&' + 'base_path_phototranscoder' + '=' + $('#base_path_phototranscoder').val().trim();
   formData += '&' + 'base_token' + '=' + $('#base_token').val().trim();
-  formData += '&' + 'base_machine' + '=' + $('#base_machine').val().trim();
   $.ajax({
     url: '/'+package_name+'/ajax/setting_save',
     type: "POST", 
@@ -132,7 +128,6 @@ $("body").on('click', '#plex_folder_test_btn', function(e){
         $('#base_path_media').val(ret.data.path_media);
         $('#base_path_phototranscoder').val(ret.data.path_phototranscoder);
         $('#base_token').val(ret.data.token);
-        $('#base_machine').val(ret.data.machine);
       }
     }
   });

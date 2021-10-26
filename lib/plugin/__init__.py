@@ -5,3 +5,4 @@ from .route import default_route, default_route_socketio, default_route_socketio
 from .logic_module_base import LogicModuleBase, LogicSubModuleBase
 from .ffmpeg_queue import FfmpegQueueEntity, FfmpegQueue
 from .plugin_util import PluginUtil
+from .model_base import ModelBase

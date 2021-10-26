@@ -62,8 +62,14 @@ class LogicPMDBToolSelect(LogicSubModuleBase):
                     PlexWebHandle.refresh_by_id(req.form['arg1'])
                     ret['msg'] = '명령을 전송하였습니다.'
                 elif command == 'refresh_bin':
-                    PlexBinaryScanner.scan_refresh(req.form['arg1'], os.path.dirname(req.form['arg2']))
+                    PlexBinaryScanner.scan_refresh2(req.form['arg1'], os.path.dirname(req.form['arg2']))
+                    ret['msg'] = '완료'
+                elif command == 'analyze_web':
+                    PlexWebHandle.analyze_by_id(req.form['arg1'])
                     ret['msg'] = '명령을 전송하였습니다.'
+                elif command == 'analyze_bin':
+                    PlexBinaryScanner.analyze(req.form['arg1'], metadata_item_id=req.form['arg2'])
+                    ret['msg'] = '완료'
                 elif command == 'remove_metadata':
                     folder_path = os.path.join(
                         ModelSetting.get('base_path_metadata'),

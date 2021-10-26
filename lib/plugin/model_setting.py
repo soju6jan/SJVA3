@@ -70,6 +70,7 @@ def get_model_setting(package_name, logger, table_name=None):
                     db.session.commit()
                 else:
                     db.session.add(ModelSetting(key, value.strip()))
+                    db.session.commit()
             except Exception as exception:
                 logger.error('Exception:%s %s', exception, key)
                 logger.error(traceback.format_exc())
