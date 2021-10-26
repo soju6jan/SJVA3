@@ -71,7 +71,9 @@ class LogicPMBase(LogicModuleBase):
     def process_menu(self, sub, req):
         arg = P.ModelSetting.to_dict()
         arg['sub'] = self.name
-        arg['path_app_root'] = path_app_root
+        logger.error(path_app_root)
+        arg['path_app_root'] = path_app_root.replace('\\', '/')
+        logger.error(arg['path_app_root'])
         try:
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e:

@@ -216,7 +216,7 @@ $("body").on('click', '#base_path_config_select_btn', function(e){
 
 $("body").on('click', '#base_path_config_edit_btn', function(e){
   e.preventDefault();
-  var config_path = $('#base_path_config').val().trim();
+  var config_path = $('#base_path_config').val().trim().replaceAll('\\', '/');
   url = "/flaskcode" + config_path.replace(path_app_root, '');
   window.location.href = url;
 });

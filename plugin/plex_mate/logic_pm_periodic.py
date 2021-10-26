@@ -41,7 +41,8 @@ class LogicPMPeriodic(LogicModuleBase):
         arg['sub'] = self.name
         arg['sub2'] = sub 
         try:
-            arg['path_app_root'] = path_app_root
+            arg['path_app_root'] = path_app_root.replace('\\', '/')
+            arg['base_path_config'] = arg['base_path_config'].replace('\\', '/')
             arg['library_list'] = PlexDBHandle.library_sections()
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e: 
