@@ -51,7 +51,7 @@ def plugin_init():
             tmps = os.listdir(server_plugin_path)
             add_plugin_list = []
             for t in tmps:
-                if not t.startswith('_'):
+                if not t.startswith('_') and os.path.isdir(os.path.join(server_plugin_path, t)):
                     add_plugin_list.append(t)
             plugins = plugins + add_plugin_list
             pass_include = pass_include + add_plugin_list
@@ -68,7 +68,7 @@ def plugin_init():
                     tmps = os.listdir(server_plugin_path)
                     add_plugin_list = []
                     for t in tmps:
-                        if not t.startswith('_'):
+                        if not t.startswith('_')  and os.path.isdir(os.path.join(server_plugin_path, t)):
                             add_plugin_list.append(t)
                             if app.config['config']['level'] < 4:
                                 break
