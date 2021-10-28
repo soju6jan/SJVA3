@@ -46,12 +46,12 @@ def plugin_init():
 
         #2019-07-17
         try:
-            server_plugin_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'custom')
-            sys.path.append(server_plugin_path)
-            tmps = os.listdir(server_plugin_path)
+            plugin_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data', 'custom')
+            sys.path.insert(1, plugin_path)
+            tmps = os.listdir(plugin_path)
             add_plugin_list = []
             for t in tmps:
-                if not t.startswith('_') and os.path.isdir(os.path.join(server_plugin_path, t)):
+                if not t.startswith('_') and os.path.isdir(os.path.join(plugin_path, t)):
                     add_plugin_list.append(t)
             plugins = plugins + add_plugin_list
             pass_include = pass_include + add_plugin_list
@@ -61,14 +61,14 @@ def plugin_init():
 
         # 2018-09-04
         try:
-            server_plugin_path = SystemModelSetting.get('plugin_dev_path')
-            if server_plugin_path != '':
-                if os.path.exists(server_plugin_path):
-                    sys.path.append(server_plugin_path)
-                    tmps = os.listdir(server_plugin_path)
+            plugin_path = SystemModelSetting.get('plugin_dev_path')
+            if plugin_path != '':
+                if os.path.exists(plugin_path):
+                    sys.path.insert(0, plugin_path)
+                    tmps = os.listdir(plugin_path)
                     add_plugin_list = []
                     for t in tmps:
-                        if not t.startswith('_')  and os.path.isdir(os.path.join(server_plugin_path, t)):
+                        if not t.startswith('_')  and os.path.isdir(os.path.join(plugin_path, t)):
                             add_plugin_list.append(t)
                             if app.config['config']['level'] < 4:
                                 break
