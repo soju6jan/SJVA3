@@ -29,8 +29,8 @@ class ModelBase(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as e:
-            cls.logger.error(f'Exception:{str(e)}')
-            cls.logger.error(traceback.format_exc())
+            self.logger.error(f'Exception:{str(e)}')
+            self.logger.error(traceback.format_exc())
 
     @classmethod
     def get_paging_info(cls, count, current_page, page_size):

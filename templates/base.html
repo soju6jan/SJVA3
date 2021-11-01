@@ -99,7 +99,19 @@
             <h4 class="modal-title" id="select_local_file_modal_title">경로 선택</h4>
           </div>
           <div class="modal-body" id="modal_body" style="word-break: break-all;">
-            {{ macros.setting_input_text_and_buttons('select_local_file_modal_path', 'Path',[['global_select_local_file_load_btn', 'Load']], desc=['입력한 경로를 불러옵니다.'], value='/') }}
+            <div class="row" style="padding-top: 10px; padding-bottom:10px; align-items: center;">
+              <div class="col-sm-1 set-left"><strong>Path</strong></div>
+              <div class="col-sm-11">
+                <div class="input-group col-sm-12">
+                  <input id="select_local_file_modal_path" name="select_local_file_modal_path" type="text" class="form-control form-control-sm" value="/">
+                  <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+                    <button id="global_select_local_file_load_btn" class="btn btn-sm btn-outline-success">Load</button>
+                    <button type="button" id='select_local_file_modal_confirm_btn' class="btn btn-success" data-dismiss="modal">선택
+                  </div>
+                </div>
+              <div style="padding-left:20px; padding-top:5px;"><em>입력한 경로를 불러옵니다.</em></div>
+            </div>
+          </div>
             <input type="hidden" id="select_local_file_modal_only_dir" value="true" />
             <input type="hidden" id="select_local_file_modal_callback" value="" />
             <div class="list-group" id="select_local_file_modal_list_group">
@@ -559,6 +571,7 @@ let listdir = (path = '/', only_dir = true) => {
       },
       dataType: 'json'
   }).done((datas) => {
+    console.log(datas)
       if (datas.length == 0) {
         return false;
       }
@@ -566,11 +579,14 @@ let listdir = (path = '/', only_dir = true) => {
       const path_spliter = (path.indexOf('/')>=0)?'/':'\\';
       $('#select_local_file_modal_list_group').empty();
       for (let dt of datas) {
-          new_obj += `<a href='#' class="list-group-item list-group-item-action item_path">${dt}</a>`;
+          tmp = dt.split('|');
+          new_obj += `<a href='#' class="list-group-item list-group-item-action item_path" data-value="${tmp[1]}">${tmp[0]}</a>`;
       }
       $('#select_local_file_modal_list_group').append(new_obj);
       $('.item_path').off('click').click((evt) => {
+          
           let new_path = '';
+          /*
           if ($(evt.currentTarget).text() === '..'){
               let split_path = '';
               split_path = path.split(path_spliter);
@@ -580,10 +596,17 @@ let listdir = (path = '/', only_dir = true) => {
                   new_path = path_spliter
               }
           } else {
-              new_path = (path !== path_spliter) ? path + path_spliter + $(evt.currentTarget).text() : path + $(evt.currentTarget).text();
+              //new_path = (path !== path_spliter) ? path + path_spliter + $(evt.currentTarget).text() : path + $(evt.currentTarget).text();
+              new_path = $(evt.currentTarget).data('value');
+              console.log(new_path)
+              console.log(evt)
+
           }
+          */
+          new_path = $(evt.currentTarget).data('value');
           $('#select_local_file_modal_path').val(new_path);
           listdir(new_path, only_dir);
+          
       });
   }).fail((datas) => {
       $.notify('<strong>경로 읽기 실패</strong><br/>${add_path}', {type: 'danger'});

@@ -153,14 +153,21 @@ def global_ajax(sub):
     #logger.debug('/global/ajax/%s', sub)
     if sub == 'listdir':
         if 'path' in request.form:
-            if os.path.isfile(request.form['path']):
-                return jsonify('')
+            #if os.path.isfile(request.form['path']):
+            #    return jsonify('')
+            path = request.form['path']
+            if os.path.isfile(path):
+                path = os.path.dirname(path)
+            result_list = os.listdir(path)
+
             if 'only_dir' in request.form and request.form['only_dir'].lower() == 'true':
-                result_list = [name for name in os.listdir(request.form['path']) if os.path.isdir(os.path.join(request.form['path'],name))]
-            else:
-                result_list = os.listdir(request.form['path'])
+                result_list = [name for name in result_list if os.path.isdir(os.path.join(path, name))]
+
             result_list.sort()
-            result_list = ['..'] + result_list
+            result_list = [f"{x}|{os.path.join(path,x)}" for x in result_list]
+            tmp = os.path.dirname(path)
+            if path != tmp:
+                result_list = [f'..|{tmp}'] + result_list
             return jsonify(result_list)
         else:
             return jsonify(None)    

@@ -9,7 +9,7 @@ from framework import db, scheduler, path_data, socketio, SystemModelSetting, ap
 from plugin import LogicModuleBase, default_route_socketio
 from tool_expand import ToolExpandFileProcess
 from tool_base import ToolShutil, d, ToolUtil, ToolBaseFile, ToolOSCommand, ToolSubprocess
-from tool_expand import EntityKtv
+from tool_expand import EntityKtv, ToolExpandDiscord
 
 from .plugin import P
 logger = P.logger
@@ -138,7 +138,7 @@ class Task(object):
 
         query = ""
 
-        if data['command'] in ['start22', 'start3']:
+        if data['command'] in ['start22', 'start3', 'start4']:
             # 쇼 http로 
             sql = 'UPDATE metadata_items SET '
             if data['process']['poster']['url'] != '':
@@ -195,7 +195,7 @@ class Task(object):
                     query += sql
 
         
-        if data['command'] in ['start21', 'start22', 'start3']:
+        if data['command'] in ['start21', 'start22', 'start3', 'start4']:
             
             for season_index, season in data['seasons'].items():
                 for episode_index, episode in season['episodes'].items():
@@ -218,29 +218,43 @@ class Task(object):
                                 #data['remove_size'] += os.stat(mediapath).st_size
                                 #os.remove(mediapath)
                                 #media://0/10c056239442666d0931c90996ff69673861d95.bundle/Contents/Thumbnails/thumb1.jpg
-
+                    # 2021-11-01
+                    # 4단계 미디어파일을 디코에 올리고 그 url로 대체한다.
+                    # 
+                    if data['command'] == 'start4' and episode['process']['thumb']['db_type'] == 'media':
+                        localpath = os.path.join(ModelSetting.get('base_path_media'), 'localhost', episode['process']['thumb']['db'].replace('media://', ''))
+                        if localpath[0] != '/':
+                            localpath = localpath.replace('/', '\\')
+                        if os.path.exists(localpath):
+                            if data['dryrun'] == False:
+                                discord_url = ToolExpandDiscord.discord_proxy_image_localfile(localpath)
+                                if discord_url is not None:
+                                    episode['process']['thumb']['url'] = discord_url
+                                    logger.warning(discord_url)
                     if episode['process']['thumb']['url'] != '':
                         query += f'UPDATE metadata_items SET user_thumb_url = "{episode["process"]["thumb"]["url"]}" WHERE id = {episode["db"]["id"]};\n'
                         try: data['use_filepath'].remove(episode['process']['thumb']['localpath'])
                         except: pass
                         try: data['use_filepath'].remove(episode['process']['thumb']['realpath'])
                         except: pass
-                        if data['command'] == 'start3':
+                        if data['command'] in ['start3', 'start4']:
                             for mediafilepath in episode['media_list']:
                                 if os.path.exists(mediapath):
                                     data['media']['remove'] += os.path.getsize(mediapath)
                                     if data['dryrun'] == False:
                                         os.remove(mediapath)
-
-
                     elif episode['process']['thumb']['db'] == '':
                         if len(episode['media_list']) > 0:
                             tmp = f"media://{episode['media_list'][0].split('localhost/')[1]}"
                             query += f'UPDATE metadata_items SET user_thumb_url = "{tmp}" WHERE id = {episode["db"]["id"]};\n'
-                            
-                            #logger.warning(tmp)
-                            #logger.warning('111111111111111')
+
                     
+                    if data['dryrun'] == False and data['command'] in ['start3', 'start4']:
+                        for mediafilepath in episode['media_list']:
+                            content_folder = os.path.dirname(os.path.dirname(mediafilepath))
+                            for base, folders, files in os.walk(content_folder):
+                                if not folders and not files:
+                                    os.removedirs(base)
 
 
         #logger.error(data['command'])
@@ -272,6 +286,7 @@ class Task(object):
                 os.removedirs(base)
 
 
+        
 
         if data['command'] == 'start1':
             return                  

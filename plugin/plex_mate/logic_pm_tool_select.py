@@ -36,7 +36,7 @@ class LogicPMDBToolSelect(LogicSubModuleBase):
         ['메타 없는 것', 'metadata_items.guid LIKE "local://%"'],
         ['미분석', '(metadata_type BETWEEN 1 and 4 AND width is null)'],
         ['불일치 상태', "(metadata_type BETWEEN 1 and 4 AND guid LIKE 'com.plexapp.agents.none%')"],
-        ['Poster가 없거나, media이거나, upload 인 경우', "(metadata_type BETWEEN 1 and 2 AND (user_thumb_url == '' OR user_thumb_url LIKE 'media%' OR user_thumb_url LIKE 'upload%'))"],
+        ['Poster가 없거나, media이거나, upload 인 경우', "(metadata_type BETWEEN 1 and 4 AND (user_thumb_url == '' OR user_thumb_url LIKE 'media%' OR user_thumb_url LIKE 'upload%'))"],
         ['Art가 없거나, media이거나, upload 인 경우', "(metadata_type BETWEEN 1 and 4 AND (user_art_url == '' OR user_art_url LIKE 'media%' OR user_art_url LIKE 'upload%'))"],
     ]
 

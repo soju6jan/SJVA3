@@ -58,7 +58,7 @@ class LogicPMBase(LogicModuleBase):
         if os.path.exists(config_path) == False or config is None:
             shutil.copyfile(config_source_filepath, config_path)
         if os.path.exists(config_path):
-            logger.warning(d(config))
+            #logger.warning(d(config))
             if '파일정리 영화 쿼리' not in config:
                 ToolUtilYaml.copy_section(config_source_filepath, config_path, '파일정리')
             if '라이브러리 복사 영화 쿼리' not in config:

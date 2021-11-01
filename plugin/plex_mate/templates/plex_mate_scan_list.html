@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<style>
-  .badge-sm {
-    min-width: 1.8em;
-    padding: .25em !important;
-    margin-left: .1em;
-    margin-right: .1em;
-    color: white !important;
-    cursor: pointer;
-}
-</style>
+
 
 
 {{ macros.m_button_group([['global_reset_db_sub_btn', 'DB 초기화'], ['remove_no_append_data_btn', '추가 파일이 없는 데이터 삭제'], ['all_append_files_show_btn', '모두 확장'], ['all_append_files_hide_btn', '모두 축소'] ])}}
@@ -42,7 +33,7 @@
           </select>
         </span>
         <span class="col-md-6">
-          <input id="keyword" name="keyword" class="form-control form-control-sm w-75" type="text" placeholder="추가된 파일 경로" aria-label="Search">
+          <input id="keyword" name="keyword" class="form-control form-control-sm w-75" type="text" placeholder="Target" aria-label="Search">
           <button id="search" class="btn btn-sm btn-outline-success">검색</button>
           <button id="reset_btn" class="btn btn-sm btn-outline-success">리셋</button>
         </span>
@@ -60,7 +51,7 @@
 var package_name = "{{arg['package_name'] }}";
 var sub = "{{arg['sub']}}";
 var current_data = null;
-var last_list_option = "{{arg['periodic_item_last_list_option']}}";
+var last_list_option = "{{arg['scan_item_last_list_option']}}";
 var machine = "{{arg['base_machine']}}";
 
 $(document).ready(function(){
@@ -139,13 +130,10 @@ function make_list(data) {
   str = '';
   str = '<table id="result_table" class="table table-sm  tableRowHover "  ><thead class="thead-dark"><tr> \
     <th style="width:5%">ID</th> \
-    <th style="width:10%; text-align:center;">시작시간</th> \
-    <th style="width:10%; text-align:center;">종료시간</th> \
-    <th style="width:20%; text-align:left;">섹션명</th> \
+    <th style="width:10%; text-align:center;">시간</th> \
+    <th style="width:5%; text-align:left;">섹션명</th> \
     <th style="width:10%; text-align:left;">상태</th> \
-    <th style="width:10%; text-align:right;">스캔시간</th> \
-    <th style="width:10%; text-align:right;">추가 파일 수</th> \
-    <th style="width:10%; text-align:right;">전체 파일 수</th> \
+    <th style="width:50%; text-align:right;">스캔시간</th> \
     </tr></thead><tbody id="list">';
   
   if (data.length == 0) str += '<tr><td colspan="6"><h4>검색된 데이터가 없습니다.</h4></td></tr>';
@@ -153,36 +141,46 @@ function make_list(data) {
   for(i in data) {
     console.log(data[i]);
     str += '<tr class="chover" style="cursor: pointer;" data-toggle="collapse" data-target="#collapse_' + i + '" aria-expanded="true" >';
-    //str += '<td class="chover"  scope="col" style="width:70%" data-index="'+ data.index+'_'+j +'" data-filename="'+data.files[j].filename.original+'">'+ data.files[j].filename.original + '</td>';
-    str += '<td scope="col" style="width:5%; text-align:left;">'+ data[i].id + '</td>';
-    //tmp =  (data[i].mode == 'scheduler') ? '자동' : '수동';
-    //str += '<td scope="col" style="width:5%; text-align:left;">'+ tmp + '</td>';
-    str += '<td scope="col" style="width:10%; text-align:center;">'+ data[i].start_time + '</td>';
-    //tmp =  data[i].finish_time;
-    //if (tmp == null && data[i].status == 'working') tmp = '실행중';
-    //else if (tmp == null && data[i].status == 'working') tmp = text_color('중지', 'red');
-    //tmp = (data[i].finish_time != null) ? data[i].finish_time : text_color("실행중", 'blue');
+    
+      str += '<td scope="col" style="width:5%; text-align:left;">'+ data[i].id + '</td>';
+
     tmp =  (data[i].finish_time != null) ? data[i].finish_time  : '--';
-    str += '<td scope="col" style="width:10%; text-align:center;">'+ tmp + '</td>';
-    str += '<td scope="col" style="width:20%; text-align:left;">'+ data[i].section_title + '</td>';
-    tmp = data[i].status;
-    if (data[i].status == 'working') {
-      tmp = text_color('실행중', 'blue');
-      tmp += '<span style="margin-left:10px"></span></span><input type="button" id="kill_btn" value="KILL" class="btn btn-sm btn-outline-danger py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'">';
-    }
-    else if (data[i].status == 'finished') tmp = '완료';
-    else if (data[i].status == 'timeout') tmp = text_color('시간초과', 'red');
-    else if (data[i].status == 'terminated') tmp = text_color('중지', 'red');
-    else if (data[i].status == 'user_stop') tmp = text_color('사용자 중지', 'red');
-    //tmp += '<a href="#" class="badge badge-primary badge-sm" data-scale="hour" data-value="1">1</a>';
-    str += '<td scope="col" style="width:10%; text-align:left;">'+ tmp + '</td>';
+    str += '<td scope="col" style="width:10%; text-align:center;">'+ data[i].created_time + '<br>' + tmp + '</td>';
+    
+    tmp = (data[i].mode == 'add') ? "추가" : "삭제";
+    tmp2 = (data[i].target_mode == 'file') ? "파일" : "폴더";
+    str += '<td scope="col" style="width:5%; text-align:center;">'+ tmp + '<br>' + tmp2 + '</td>';
+
+    
+    str += '<td scope="col" style="width:10%; text-align:left;">'+ data[i].section_title + '</td>';
+
+    status = data[i].status;
+    if (status == 'finish_add') status = text_color("완료", 'blue') + '<span style="margin-left:10px">' + '(추가)';
+    else if (status == 'finish_add') status = text_color("완료", 'blue') + '<span style="margin-left:10px">' + '(삭제)';
+
+
+    buttons = '';
+    // <span style="margin-left:10px"></span>
+    buttons += '</span><input type="button" id="kill_btn" value="KILL" class="btn btn-sm btn-danger py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'"><span style="margin-left:10px"></span>';
+    buttons += '</span><input type="button" id="plex_go_btn" value="Plex" class="btn btn-sm btn-info py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'"><span style="margin-left:10px"></span>';
+    buttons += '</span><input type="button" id="remove_db_btn" value="삭제" class="btn btn-sm btn-success py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'"><span style="margin-left:10px"></span>';
+    //buttons = m_button_group(buttons);
+
+
+    str += '<td scope="col" style="width:50%; text-align:left;">'+ status + '<br><em>' + data[i].target + '</em><br>' + buttons + '</td>';
+
+
+
+
     tmp =  (data[i].duration != null) ? (parseInt(data[i].duration / 60) > 0 ? parseInt(data[i].duration / 60) + '분 ' : '')+ String(data[i].duration % 60).padStart(2, '0') + '초' : '--'; 
+    /*
     str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
     tmp =  (data[i].part_append_count != null) ? data[i].part_append_count  : '--';
     str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
     tmp =  (data[i].part_after_count != null) ? data[i].part_after_count  : '--';
     str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
     str += '</tr>';
+
     if (data[i].append_files != null && data[i].append_files != '') {
       //str += '<tr class="collapse tableRowHoverOff show" style="cursor: pointer;"  id="collapse_' + i + '">';
       str += '<tr class="collapse tableRowHoverOff" style="cursor: pointer;"  id="collapse_' + i + '">';
@@ -200,6 +198,8 @@ function make_list(data) {
       str += '</td>';
       str += '</tr>'
     }
+    */
+    str += '</tr>';
   }
   str += '</table>';
   document.getElementById("list_div").innerHTML = str;

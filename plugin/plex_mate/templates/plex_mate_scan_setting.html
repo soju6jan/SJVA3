@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  {{ macros.m_button_group([['global_setting_save_btn', '설정 저장']])}}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_row_end() }}
+  <form id='setting'>
+  <div class="tab-content" id="nav-tabContent">
+    {{ macros.setting_checkbox('scan_start_auto', '시작시 자동실행', value=arg['scan_start_auto'], desc=None) }}
+    {{ macros.setting_input_int('scan_max_process_count', '최대 실행 프로세스 수', min=1, max=20, value=arg['scan_max_process_count']) }}
+    {{ macros.setting_input_int('scan_max_wait_time', '최대 대기 시간', value=arg['scan_max_wait_time'], desc=['파일(폴더) 대기 시간. 분단위', '추가 모드 : 파일이 나타날 때까지 대기 시작.', '삭제 모드 : 파일이 없어질 때까지 대기 시간']) }}
+
+    {{ macros.m_hr_head_bottom() }}
+
+    {{ macros.setting_input_text('scan_manual_target', '스캔 타겟 파일 또는 폴더',  value=arg['scan_manual_target']) }}
+    {{ macros.buttons([['select_target_btn', '선택'], ['add_btn', '추가 모드'], ['remove_btn', '삭제 모드']]) }}
+    {{ macros.m_hr_head_bottom() }}
+      
+      
+  </div>
+</form>
+</div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{arg['sub'] }}";
+var current_data = null;
+
+
+
+$("body").on('click', '#select_target_btn', function(e){
+  e.preventDefault();
+  var path = $('#scan_manual_target').val().trim();
+  if (path == '') path = '/'
+  m_select_local_file_modal("스캔 파일", path, false, function(result){
+    $('#scan_manual_target').val(result);
+  });
+});
+
+
+$("body").on('click', '#add_btn', function(e){
+  e.preventDefault();
+  global_send_command2('manual', 'add', $('#scan_manual_target').val().trim());
+});
+
+$("body").on('click', '#remove_btn', function(e){
+  e.preventDefault();
+  global_send_command2('manual', 'remove', $('#scan_manual_target').val().trim());
+});
+
+</script>    
+{% endblock %}

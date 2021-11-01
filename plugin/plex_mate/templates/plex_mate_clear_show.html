@@ -33,6 +33,7 @@
       <button id="movie_start21_btn" class="btn btn-sm btn-outline-info">2-1단계 시작</button>
       <button id="movie_start22_btn" class="btn btn-sm btn-outline-info">2-2단계 시작</button>
       <button id="movie_start3_btn" class="btn btn-sm btn-outline-info">3단계 시작</button>
+      <button id="movie_start4_btn" class="btn btn-sm btn-outline-info">4단계 시작</button>
     </div>
   </div>
 </div>
@@ -86,6 +87,11 @@ $("body").on('click', '#movie_start22_btn', function(e){
 $("body").on('click', '#movie_start3_btn', function(e){
   e.preventDefault();
   global_send_command_sub('start3', $('#library_select').val(), $('#dryrun').is(":checked"));
+});
+
+$("body").on('click', '#movie_start4_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('start4', $('#library_select').val(), $('#dryrun').is(":checked"));
 });
 
 $("body").on('click', '#movie_stop_btn', function(e){

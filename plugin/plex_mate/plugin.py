@@ -20,11 +20,11 @@ from plugin import get_model_setting, Logic, default_route, PluginUtil
 class P(object):
     package_name = __name__.split('.')[0]
     logger = get_logger(package_name)
-    blueprint = Blueprint(package_name, package_name, url_prefix='/%s' %  package_name, template_folder=os.path.join(os.path.dirname(__file__), 'templates'), static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+    blueprint = Blueprint(package_name, package_name, url_prefix=f'/{package_name}', template_folder=os.path.join(os.path.dirname(__file__), 'templates'), static_folder=os.path.join(os.path.dirname(__file__), 'static'))
     menu = {
         'main' : [package_name, u'Plex Mate'],
         'sub' : [
-            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'],  ['periodic', '라이브러리 주기적 스캔'], ['scan', '스캔(개발중)'], ['watchdog', '파일시스템 감시(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그']
+            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'],  ['periodic', '라이브러리 주기적 스캔'], ['scan', '스캔(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그'] #['watchdog', '파일시스템 감시(개발중)'], 
         ], 
         'category' : 'beta',
         'sub2' : {
@@ -41,7 +41,7 @@ class P(object):
                 ['task', '작업 관리'], ['list', '스캔 결과']
             ],
             'scan' : [
-                ['manual', '수동'], ['auto', '자동'], ['list', '목록'],
+                ['setting', '설정'], ['list', '작업 목록'],
             ],
             'watchdog' : [
                 ['setting', '설정'], ['list', '목록'],
@@ -58,7 +58,7 @@ class P(object):
     }  
 
     plugin_info = {
-        'version' : '0.2.0.0',
+        'version' : '1.2.0.0',
         'name' : package_name,
         'category' : menu['category'],
         'icon' : '',

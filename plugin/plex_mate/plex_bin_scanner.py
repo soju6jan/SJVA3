@@ -55,7 +55,7 @@ class PlexBinaryScanner(object):
     #su - plex -c "/usr/lib/plexmediaserver/Plex\ Media\ Scanner --section 8 --analyze --item 332875"
 
     @classmethod
-    def scan_refresh2(cls, section_id, folderpath, timeout=None, db_item=None):
+    def scan_refresh2(cls, section_id, folderpath, timeout=None, db_item=None, scan_item=None):
         def demote(user_uid, user_gid):
             def result():
                 os.setgid(user_gid)
@@ -93,6 +93,10 @@ class PlexBinaryScanner(object):
                 db_item.start_time = datetime.now()
                 db_item.status = "working"
                 db_item.save()
+            if scan_item is not None:
+                scan_item.scan_process_pid = process.pid
+                scan_item.save()
+
 
             new_ret = {'status':'finish', 'log':None}
             logger.debug(f"PLEX SCANNER COMMAND\n{' '.join(command)}")
@@ -111,12 +115,16 @@ class PlexBinaryScanner(object):
                 process.kill()
                 if db_item is not None:
                     db_item.status = 'timeout'
+                if scan_item is not None:
+                    scan_item.status = 'finish_timeout'
 
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             logger.error('command : %s', command)
-
+        finally:
+            if scan_item is not None:
+                scan_item.save()
 
 
 

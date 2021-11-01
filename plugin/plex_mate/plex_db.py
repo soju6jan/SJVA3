@@ -165,7 +165,7 @@ class PlexDBHandle(object):
             con = sqlite3.connect(db_file)
             cur = con.cursor()
             #logger.error(args)
-            if len(args) == 0:
+            if args is None or len(args) == 0:
                 ce = con.execute(query)
             else:
                 ce = con.execute(query, args)
@@ -241,3 +241,9 @@ class PlexDBHandle(object):
                 cur.close()
             if con is not None:
                 con.close()   
+
+
+    @classmethod
+    def section_location(cls, db_file=None):
+        query = """SELECT library_sections.id as section_id, name, section_type, root_path  FROM library_sections, section_locations WHERE library_sections.id == section_locations.library_section_id ORDER BY library_sections.id"""
+        return cls.select2(query, None, db_file=db_file)
