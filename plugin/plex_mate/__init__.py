@@ -15,6 +15,16 @@ except:
     try: os.system(f"{app.config['config']['pip']} install watchdog")
     except: pass
 
+try:
+    import yaml
+    a = yaml.FullLoader
+except:
+    from framework import app
+    import os
+    try: os.system(f"{app.config['config']['pip']} install --upgrade pyyaml")
+    except: pass
+
+    
 from .plugin import P
 blueprint = P.blueprint
 menu = P.menu

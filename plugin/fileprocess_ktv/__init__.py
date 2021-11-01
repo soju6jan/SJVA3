@@ -1,9 +1,10 @@
 try:
     import yaml
+    a = yaml.FullLoader
 except:
     from framework import app
     import os
-    try: os.system(f"{app.config['config']['pip']} install pyyaml")
+    try: os.system(f"{app.config['config']['pip']} install --upgrade pyyaml")
     except: pass
 
 from .plugin import P
