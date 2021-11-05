@@ -178,13 +178,13 @@ class TaskScan:
 
 
     def wait(self):
-        logger.warning("33333333333333333333")
+        #logger.warning("33333333333333333333")
         
         while True:
             self.section_locations = PlexDBHandle.section_location()
             #logger.debug(section_locations)
             time.sleep(10)
-            logger.warning(f"WAIT  : {datetime.now()}")
+            #logger.warning(f"WAIT  : {datetime.now()}")
             items = ModelScanItem.get_items('wait')
 
             for item in items:
@@ -208,7 +208,7 @@ class TaskScan:
     def enqueue(self):
         while True:
             time.sleep(10)
-            logger.warning(f"ENQUEUE  : {datetime.now()}")
+            #logger.warning(f"ENQUEUE  : {datetime.now()}")
             items = ModelScanItem.get_items('run')
             #current_queue = list(self.queue.queue)
             #logger.warning(current_queue)
