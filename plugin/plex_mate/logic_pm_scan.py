@@ -218,13 +218,14 @@ class TaskScan:
                     self.queue.put(item)
                     item.set_status(item.status.replace('run_', 'enqueue_'))
                 except Exception as e: 
-                    logger.error(f'Exception:{str(e)}')
-                    logger.error(traceback.format_exc()) 
+                    #logger.error(f'Exception:{str(e)}')
+                    #logger.error(traceback.format_exc()) 
+                    pass
                 finally:
                     item.save() 
 
-            logger.error(f"self.queue.empty() : {self.queue.empty()}")
-            logger.error(f"self.queue.empty() : {self.queue.qsize()}")
+            #logger.error(f"self.queue.empty() : {self.queue.empty()}")
+            #logger.error(f"self.queue.empty() : {self.queue.qsize()}")
             #if self.queue.empty():
             #    continue
 

@@ -86,7 +86,30 @@
         </div>
       </div>
       {{ macros.setting_bottom(['썸네일이 없거나 media인 경우 시즌이나 쇼의 Art로 변경.', '라이브러리 복사 후 사용']) }}
+
+      {{ macros.m_hr() }}
+      {{ macros.setting_top('휴지통 표시 제거') }}
+      <div class="input-group col-sm-9">
+        <select id="remove_trash_section_id" name="empty_episode_process_section_id" class="form-control form-control-sm">
+          {% for item in arg['library_list'] %}
+            {% if item['section_type'] == 2 %}
+              <option value="{{ item['id'] }}">{{item['name']}}</option>
+            {% endif %}   
+          {% endfor %}
+        </select>
+        <div class="btn-group btn-group-sm flex-wrap mr-2" role="group">
+        {% set buttons = [['remove_trash_btn', '시작']] %}
+        {% for b in buttons %}
+          <button id="{{b[0]}}" class="btn btn-sm btn-outline-success">{{b[1]}}</button>
+        {% endfor %}
+        </div>
+      </div>
+      {{ macros.setting_bottom(['섹션내 모든 휴지통 표시 제거']) }}
+    
+      {{ macros.m_hr() }}
+      {{ macros.setting_button([['vaccum_btn', 'DB파일 크기 줄이기']], left='DB파일', desc=['백업 필수.', 'Plex가 아무 일도 하지 않는 상태에서 실행'] ) }}
     {{ macros.m_tab_content_end() }}  
+    
   </div>
 </form>
 </div>
@@ -161,6 +184,18 @@ $("body").on('click', '#empty_episode_process_btn', function(e){
   e.preventDefault();
   global_send_command_sub('empty_episode_process', $('#empty_episode_process_section_id').val());
 });
+
+$("body").on('click', '#remove_trash_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('remove_trash', $('#remove_trash_section_id').val());
+});
+
+
+$("body").on('click', 'vaccum_btn', function(e){
+  e.preventDefault();
+  global_send_command_sub('vaccum');
+});
+
 
 
 </script>    
