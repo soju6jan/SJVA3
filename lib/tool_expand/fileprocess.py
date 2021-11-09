@@ -143,6 +143,12 @@ class ToolExpandFileProcess(object):
         filename = filename.replace('z_', '')
         filename = filename.replace('-c.', '.')
         filename = filename.replace('c.', '.')
+        # 2021-11-09
+        for sp in ['.com@', '.com-']:
+            tmp = filename.split(sp)
+            logger.error(tmp)
+            if len(tmp) == 2:
+                filename = tmp[1]
         
         #if file.find('@') != -1:
         #    file = file.split('@')[1]
