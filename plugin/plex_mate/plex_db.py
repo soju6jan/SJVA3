@@ -175,8 +175,9 @@ class PlexDBHandle(object):
             return data
 
         except Exception as e: 
-            logger.error(f'Exception:{str(e)}')
-            logger.error(traceback.format_exc())
+            #logger.error(f'Exception:{str(e)}')
+            #logger.error(traceback.format_exc())
+            pass
         return   
         
     @classmethod
