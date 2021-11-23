@@ -105,7 +105,7 @@ class LogViewer(SingletonClass):
             else:
                 logfile = os.path.join(path_data, 'log', filename)
             if os.path.exists(logfile):
-                ins_file = open(logfile, 'r')  ## 3)
+                ins_file = open(logfile, 'r', encoding='utf8')  ## 3)
                 line = ins_file.read()
                 socketio.emit("on_start", {'data': line}, namespace='/log')
                 logger.debug('on_start end')
