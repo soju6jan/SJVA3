@@ -667,6 +667,28 @@ $("#global_setting_save_btn").click(function(e) {
   });
 });
 
+function global_setting_save_function() {
+  var formData = get_formdata('#setting');
+  $.ajax({
+    url: '/'+package_name+'/ajax/setting_save',
+    type: "POST", 
+    cache: false,
+    data: formData,
+    dataType: "json",
+    success: function (ret) {
+      if (ret) {
+        $.notify('<strong>설정을 저장하였습니다.</strong>', {
+          type: 'success'
+        });
+      } else {
+        $.notify('<strong>설정 저장에 실패하였습니다.</strong>', {
+          type: 'warning'
+        });
+      }
+    }
+  });
+}
+
 $("#global_one_execute_btn").click(function(e) {
 //$("body").on('click', '#one_execute_btn', function(e){
   e.preventDefault();
