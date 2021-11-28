@@ -12,7 +12,6 @@ from framework import app
 from . import logger
 
 
-server_plugin_ddns = app.config['DEFINE']['METADATA_SERVER_URL']
 webhook_list = app.config['DEFINE']['WEBHOOK_LIST_FOR_IMAGE_PROXY']
 
 class ToolExpandDiscord(object):
@@ -42,6 +41,7 @@ class ToolExpandDiscord(object):
     def discord_proxy_set_target(cls, source, target):
         try:
             return
+            """
             if source is None or target is None:
                 return False
             if requests.get(target).status_code != 200:
@@ -51,6 +51,7 @@ class ToolExpandDiscord(object):
                 from system.model import ModelSetting as SystemModelSetting
                 url = '{server_plugin_ddns}/server/normal/discord_proxy/set_target?source={source}&target={target}&user={user}'.format(server_plugin_ddns=server_plugin_ddns, source=py_urllib.quote_plus(source), target=py_urllib.quote_plus(target), user=SystemModelSetting.get('sjva_me_user_id'))
                 data = requests.get(url).json()
+            """
         except Exception as exception: 
             logger.error('server disconnect..')
         return True

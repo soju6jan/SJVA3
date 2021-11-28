@@ -478,7 +478,7 @@ def first_api(sub):
             system.restart()
             return jsonify({'ret':'success'})
         elif sub == 'gds':
-            url = f"https://sjva.me/sjva/gds2.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
+            url = f"{app.config['DEFINE']['WEB_DIRECT_URL']}/sjva/gds2.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
             data = requests.get(url).json()['data']
             logger.debug(data)
             req_headers = dict(request.headers)
@@ -496,7 +496,7 @@ def first_api(sub):
             rv.headers.add('Content-Range', r.headers.get('Content-Range'))
             return rv
         elif sub == 'gds2':
-            url = f"https://sjva.me/sjva/gds.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
+            url = f"{app.config['DEFINE']['WEB_DIRECT_URL']}/sjva/gds.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
             data = requests.get(url).json()['data']
             logger.debug(data)
             req_headers = dict(request.headers)
@@ -529,7 +529,7 @@ def first_api(sub):
             logger.debug(rv.headers)
             return rv
         elif sub == 'gds_subtitle':
-            url = f"https://sjva.me/sjva/gds2.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
+            url = f"{app.config['DEFINE']['WEB_DIRECT_URL']}/sjva/gds2.php?type=file&id={request.args.get('id')}&user_id={ModelSetting.get('sjva_me_user_id')}&user_apikey={ModelSetting.get('auth_apikey')}"
             data = requests.get(url).json()['data']
             logger.debug(data)
             req_headers = dict(request.headers)

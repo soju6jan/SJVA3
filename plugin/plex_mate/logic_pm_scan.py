@@ -147,19 +147,15 @@ class TaskScan:
     def start():
         task = TaskScan()
         task._start()
-        logger.debug('aaaaaaaaaaaaaaaaa')
         logger.debug(__class__)
     
     def __init__(self):
-        logger.debug('111111111111111111111')
         self.section_locations = None
         self.run_queue = None
         self.process_count = 0
-        
         ModelScanItem.not_finished_to_ready()
 
     def _start(self):
-        logger.warning("vvvvvvvvvvvvvvvvvvvvvvvvvvv")
         t = threading.Thread(target=self.wait, args=())
         t.daemon = True
         t.start()

@@ -19,8 +19,6 @@ logger = get_logger('torrent_process')
 class TorrentProcess(object):
     @classmethod
     def is_broadcast_member(cls):
-        #if SystemModelSetting.get('ddns') == 'https://server.sjva.me':
-        #    return True
         if app.config['config']['is_server'] or app.config['config']['is_debug']:
             return True
         return False
@@ -48,7 +46,7 @@ class TorrentProcess(object):
         try:
             import requests
             import json
-            response = requests.post("https://sjva.me/sjva/torrent_%s.php" % type, data={'data':json.dumps(data.as_dict())})
+            response = requests.post(f"{app.config['DEFINE']['WEB_DIRECT_URL']}/sjva/torrent_%s.php" % type, data={'data':json.dumps(data.as_dict())})
             #logger.debug(response.text)
         except Exception as exception: 
             logger.error('Exception:%s', exception)

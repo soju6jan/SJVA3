@@ -148,7 +148,7 @@ class SystemLogicAuth(object):
                 ret['msg'] = '홈페이지 ID가 없습니다.'
                 return ret
    
-            data = requests.post('https://sjva.me/sjva/auth.php', data={'apikey':apikey,'user_id':user_id, 'sjva_id':ModelSetting.get('sjva_id')}).json()
+            data = requests.post(f"{app.config['DEFINE']['WEB_DIRECT_URL']}/sjva/auth.php", data={'apikey':apikey,'user_id':user_id, 'sjva_id':ModelSetting.get('sjva_id')}).json()
             if data['result'] == 'success':
                 ret['ret'] = True
                 ret['msg'] = u'총 %s개 등록<br>회원등급:%s, 포인트:%s' % (data['count'], data['level'], data['point'])

@@ -159,8 +159,10 @@ def init_define():
     # 이건 필요 없음
     app.config['DEFINE']['MAIN_SERVER_URL'] = 'https://server.sjva.me'
 
-
     app.config['DEFINE']['METADATA_SERVER_URL'] = 'https://meta.sjva.me'
+    
+    app.config['DEFINE']['WEB_DIRECT_URL'] = 'http://52.78.103.230:49734'
+
 
     app.config['DEFINE']['RSS_SUBTITLE_UPLOAD_WEBHOOK'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
 
