@@ -127,84 +127,39 @@ $("body").on('change', '#order', function(e){
 
 
 function make_list(data) {
-  str = '';
+  current_data = data;
   str = '<table id="result_table" class="table table-sm  tableRowHover "  ><thead class="thead-dark"><tr> \
-    <th style="width:5%">ID</th> \
+    <th style="width:5%; text-align:center;">ID</th> \
     <th style="width:10%; text-align:center;">시간</th> \
-    <th style="width:5%; text-align:left;">섹션명</th> \
+    <th style="width:15%; text-align:center;">요청</th> \
+    <th style="width:15%; text-align:left;">섹션</th> \
     <th style="width:10%; text-align:left;">상태</th> \
-    <th style="width:50%; text-align:right;">스캔시간</th> \
+    <th style="width:45%; text-align:left;">타겟</th> \
     </tr></thead><tbody id="list">';
-  
   if (data.length == 0) str += '<tr><td colspan="6"><h4>검색된 데이터가 없습니다.</h4></td></tr>';
-
   for(i in data) {
     console.log(data[i]);
     str += '<tr class="chover" style="cursor: pointer;" data-toggle="collapse" data-target="#collapse_' + i + '" aria-expanded="true" >';
-    
-      str += '<td scope="col" style="width:5%; text-align:left;">'+ data[i].id + '</td>';
-
+    str += '<td scope="col" style="width:5%; text-align:center;">'+ data[i].id + '</td>';
     tmp =  (data[i].finish_time != null) ? data[i].finish_time  : '--';
     str += '<td scope="col" style="width:10%; text-align:center;">'+ data[i].created_time + '<br>' + tmp + '</td>';
-    
     tmp = (data[i].mode == 'add') ? "추가" : "삭제";
     tmp2 = (data[i].target_mode == 'file') ? "파일" : "폴더";
-    str += '<td scope="col" style="width:5%; text-align:center;">'+ tmp + '<br>' + tmp2 + '</td>';
-
-    
+    str += '<td scope="col" style="width:5%; text-align:center;">'+ tmp + ' & ' + tmp2 + '<br>' + data[i].call_from + '</td>';
     str += '<td scope="col" style="width:10%; text-align:left;">'+ data[i].section_title + '</td>';
-
     status = data[i].status;
     if (status == 'finish_add') status = text_color("완료", 'blue') + '<span style="margin-left:10px">' + '(추가)';
     else if (status == 'finish_add') status = text_color("완료", 'blue') + '<span style="margin-left:10px">' + '(삭제)';
-
-
+    str += '<td scope="col" style="width:10%; text-align:left;">'+ status + '</td>';      
     buttons = '';
-    // <span style="margin-left:10px"></span>
     buttons += '</span><input type="button" id="kill_btn" value="KILL" class="btn btn-sm btn-danger py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'"><span style="margin-left:10px"></span>';
     buttons += '</span><input type="button" id="plex_go_btn" value="Plex" class="btn btn-sm btn-info py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'"><span style="margin-left:10px"></span>';
     buttons += '</span><input type="button" id="remove_db_btn" value="삭제" class="btn btn-sm btn-success py-0" style="font-size: 0.8em;" data-id="'+data[i].id+'"><span style="margin-left:10px"></span>';
-    //buttons = m_button_group(buttons);
-
-
-    str += '<td scope="col" style="width:50%; text-align:left;">'+ status + '<br><em>' + data[i].target + '</em><br>' + buttons + '</td>';
-
-
-
-
-    tmp =  (data[i].duration != null) ? (parseInt(data[i].duration / 60) > 0 ? parseInt(data[i].duration / 60) + '분 ' : '')+ String(data[i].duration % 60).padStart(2, '0') + '초' : '--'; 
-    /*
-    str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
-    tmp =  (data[i].part_append_count != null) ? data[i].part_append_count  : '--';
-    str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
-    tmp =  (data[i].part_after_count != null) ? data[i].part_after_count  : '--';
-    str += '<td scope="col" style="width:10%; text-align:right;">'+ tmp + '</td>';
-    str += '</tr>';
-
-    if (data[i].append_files != null && data[i].append_files != '') {
-      //str += '<tr class="collapse tableRowHoverOff show" style="cursor: pointer;"  id="collapse_' + i + '">';
-      str += '<tr class="collapse tableRowHoverOff" style="cursor: pointer;"  id="collapse_' + i + '">';
-      str += '<td></td><td colspan="11">';
-      tmp = '';
-      list = data[i].append_files.split('\n');
-      for(j in list) {
-        tmp2 = list[j].split('|');
-        url = 'https://app.plex.tv/desktop/#!/server/' + machine + '/details?key=%2Flibrary%2Fmetadata%2F' + tmp2[0];
-        tmp += '<a href="' + url + '" target="_blank">' + tmp2[1] + '</a><br>';
-      }
-      str += '<div id="detail_'+ i +'">';
-      str += tmp;
-      str += '</div>';
-      str += '</td>';
-      str += '</tr>'
-    }
-    */
+    str += '<td scope="col" style="width:45%; text-align:left;">' + data[i].target + '<br>' + buttons + '</td>';
     str += '</tr>';
   }
   str += '</table>';
-  document.getElementById("list_div").innerHTML = str;
-
-  return
+  $("#list_div").html(str);
 }
 
 

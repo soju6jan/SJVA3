@@ -194,7 +194,17 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
                         ret = {'ret':'success', 'msg':'정상적으로 처리되었습니다.'}
                     else:
                         ret = {'ret':'warning', 'msg':'실패'}
-
+                elif command == 'vacuum':
+                    P.logic.get_module('base').task_interface('size', (ModelSetting.get('base_path_db'),))
+                    query = f"""VACUUM;"""
+                    result = PlexDBHandle.execute_query(query)
+                    logger.error(result)
+                    #result = True
+                    if result:
+                        ret = {'ret':'success', 'msg':'처리중입니다.'}
+                    else:
+                        ret = {'ret':'warning', 'msg':'실패'}
+                    P.logic.get_module('base').task_interface('size', (ModelSetting.get('base_path_db'),))
             return jsonify(ret)
         except Exception as e: 
             P.logger.error(f'Exception:{str(e)}')

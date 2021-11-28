@@ -82,6 +82,8 @@ class LogicNormal(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             return False
+    
+    
 
     @staticmethod
     def get_library_key_using_bundle(filepath, section_id=-1):
@@ -209,3 +211,14 @@ class LogicNormal(object):
             logger.error(traceback.format_exc())
         return False
 
+
+
+    @staticmethod
+    def send_command(command, param1='', param2=''):
+        try:
+            url = f"{ModelSetting.get('server_url')}/:/plugins/com.plexapp.plugins.SJVA/function/command?cmd={command}&param1={param1}&param2={param2}&X-Plex-Token={ModelSetting.get('server_token')}"
+            return requests.get(url).json()
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+            return False
