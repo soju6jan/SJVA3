@@ -171,3 +171,15 @@ def global_ajax(sub):
             return jsonify(result_list)
         else:
             return jsonify(None)    
+
+
+
+@app.route('/flaskcode/<path:path>', methods=['GET', 'POST'])
+@login_required
+def temp_flaskcode(path):
+    return redirect('/system/plugin?install=flaskcode')
+
+@app.route('/flaskfilemanager', methods=['GET', 'POST'])
+@login_required
+def temp_flaskfilemanager():
+    return redirect('/system/plugin?install=flaskfilemanager')
