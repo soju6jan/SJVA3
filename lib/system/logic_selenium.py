@@ -93,16 +93,17 @@ class SystemLogicSelenium(object):
             #logger.debug('driver : %s', driver)
             driver.get(url)
             
-            WebDriverWait(driver, 30).until(lambda driver: driver.find_element_by_xpath(wait_xpath))
+            WebDriverWait(driver, 10).until(lambda driver: driver.find_element_by_xpath(wait_xpath))
             #import time
             #driver.save_screenshot('%s.png' % time.time())
-            logger.debug('return page_source')    
+            #logger.debug('return page_source')    
             return driver.page_source
         except Exception as exception: 
             #logger.debug(driver.page_source)
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc()) 
-            SystemLogicSelenium.chrome_driver = None
+            SystemLogicSelenium.close_driver()
+            #SystemLogicSelenium.chrome_driver = None
             if retry:
                 return SystemLogicSelenium.get_pagesoruce_by_selenium(url, wait_xpath, retry=False)
 
@@ -132,9 +133,18 @@ class SystemLogicSelenium(object):
     @staticmethod
     def close_driver():
         try:
+            #if SystemLogicSelenium.chrome_driver is not None:
+            #    SystemLogicSelenium.chrome_driver.quit()
+            #    SystemLogicSelenium.chrome_driver = None
             if SystemLogicSelenium.chrome_driver is not None:
-                SystemLogicSelenium.chrome_driver.quit()
+                try: SystemLogicSelenium.chrome_driver.close()
+                except: pass
+                time.sleep(2)
+                try: SystemLogicSelenium.chrome_driver.quit()
+                except: pass
                 SystemLogicSelenium.chrome_driver = None
+
+
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc()) 
@@ -177,10 +187,11 @@ class SystemLogicSelenium(object):
     @staticmethod
     def plugin_unload():
         try:
-            logger.debug(SystemLogicSelenium.chrome_driver)
-            if SystemLogicSelenium.chrome_driver is not None:
-                SystemLogicSelenium.chrome_driver.quit()
-                logger.debug(SystemLogicSelenium.chrome_driver)
+            SystemLogicSelenium.close_driver()
+            #logger.debug(SystemLogicSelenium.chrome_driver)
+            #if SystemLogicSelenium.chrome_driver is not None:
+            #    SystemLogicSelenium.chrome_driver.quit()
+            #    logger.debug(SystemLogicSelenium.chrome_driver)
 
             for tmp in SystemLogicSelenium.chrome_driver_list:
                 if tmp is not None:
