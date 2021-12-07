@@ -121,7 +121,8 @@ class Task(object):
                     ret = Task.xml_analysis(combined_xmlpath, data['seasons'][season_index], data)
                     if ret == False:
                         logger.warning(combined_xmlpath)
-                        logger.warning(f"{data['db']['title']} 시즌 분석 실패")
+                        logger.warning(f"{data['db']['title']} 시즌 분석 실패 : season_index - {season_index}")
+                        #logger.warning(combined_xmlpath)
                         #return
                     data['seasons'][season_index]['episodes'] = {}
                 data['seasons'][season_index]['episodes'][episode_index] = {'db':episode}
