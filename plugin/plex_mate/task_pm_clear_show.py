@@ -129,9 +129,9 @@ class Task(object):
                 combined_xmlpath = os.path.join(data['meta']['metapath'], 'Contents', '_combined', 'seasons', f"{season_index}", "episodes", f"{episode_index}.xml")
                 ret = Task.xml_analysis(combined_xmlpath, data['seasons'][season_index]['episodes'][episode_index], data, is_episode=True)
                 if ret == False:
-                    #logger.warning(combined_xmlpath)
-                    #logger.warning(f"{data['db']['title']} 에피소드 분석 실패")
-                    del data['seasons'][season_index]['episodes'][episode_index]
+                    logger.warning(combined_xmlpath)
+                    logger.warning(f"{data['db']['title']} 에피소드 분석 실패")
+                    #del data['seasons'][season_index]['episodes'][episode_index]
                     #return
         
         #logger.warning(d(data['use_filepath']))
@@ -304,10 +304,20 @@ class Task(object):
         #text = ToolBaseFile.read(combined_xmlpath)
         #logger.warning(text)
         if os.path.exists(combined_xmlpath) == False:
+            # 2021-12-11 4단계로 media파일을 디코 이미로 대체할때 시즌0 같이 아예 0.xml 파일이 없을 때도 동작하도록 추가
+            if is_episode:
+                data['process'] = {}
+                data['process']['thumb'] = {
+                    'db' : data['db'][f'user_thumb_url'],
+                    'db_type' : data['db'][f'user_thumb_url'].split('://')[0],
+                    'url' : '',
+                    'filename' : '',
+                }
+                #logger.error(data['process']['thumb'])
             return False
         if combined_xmlpath not in show_data['use_filepath']:
             show_data['use_filepath'].append(combined_xmlpath)
-
+            
         tree = ET.parse(combined_xmlpath)
         root = tree.getroot()
         data['xml_info'] = {}
