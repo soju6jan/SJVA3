@@ -19,7 +19,7 @@ from .logic_pm_base import LogicPMBase
 from .plex_db import PlexDBHandle, dict_factory
 
 from .task_pm_clear_movie import TAG, Task as TaskMovie
-
+from .plex_web import PlexWebHandle
 
 
 class Task(object):
@@ -130,6 +130,7 @@ class Task(object):
                 ret = Task.xml_analysis(combined_xmlpath, data['seasons'][season_index]['episodes'][episode_index], data, is_episode=True)
                 if ret == False:
                     logger.warning(combined_xmlpath)
+                    #logger.warning(d(episode))
                     logger.warning(f"{data['db']['title']} 에피소드 분석 실패")
                     #del data['seasons'][season_index]['episodes'][episode_index]
                     #return
@@ -232,6 +233,16 @@ class Task(object):
                                 if discord_url is not None:
                                     episode['process']['thumb']['url'] = discord_url
                                     logger.warning(discord_url)
+                        else:
+                            #logger.warning(episode)
+                            logger.warning(f"썸네일 없음 1: {episode['db']['id']}")
+                            PlexWebHandle.analyze_by_id(episode['db']['id'])
+                    if data['command'] == 'start4' and episode['process']['thumb']['db'] == '':
+                        logger.warning(f"썸네일 없음 분석 2: {episode['db']['id']}")
+                        PlexWebHandle.analyze_by_id(episode['db']['id'])
+
+
+
                     if episode['process']['thumb']['url'] != '':
                         query += f'UPDATE metadata_items SET user_thumb_url = "{episode["process"]["thumb"]["url"]}" WHERE id = {episode["db"]["id"]};\n'
                         try: data['use_filepath'].remove(episode['process']['thumb']['localpath'])
@@ -303,17 +314,21 @@ class Task(object):
         import xml.etree.ElementTree as ET
         #text = ToolBaseFile.read(combined_xmlpath)
         #logger.warning(text)
+        # 2021-12-11 4단계로 media파일을 디코 이미로 대체할때 시즌0 같이 아예 0.xml 파일이 없을 때도 동작하도록 추가
+        
+        if is_episode:
+            data['process'] = {}
+            data['process']['thumb'] = {
+                'db' : data['db'][f'user_thumb_url'],
+                'db_type' : data['db'][f'user_thumb_url'].split('://')[0],
+                'url' : '',
+                'filename' : '',
+            }
         if os.path.exists(combined_xmlpath) == False:
-            # 2021-12-11 4단계로 media파일을 디코 이미로 대체할때 시즌0 같이 아예 0.xml 파일이 없을 때도 동작하도록 추가
-            if is_episode:
-                data['process'] = {}
-                data['process']['thumb'] = {
-                    'db' : data['db'][f'user_thumb_url'],
-                    'db_type' : data['db'][f'user_thumb_url'].split('://')[0],
-                    'url' : '',
-                    'filename' : '',
-                }
-                #logger.error(data['process']['thumb'])
+            logger.info(f"xml 파일 없음 : {combined_xmlpath}")
+            #logger.error(data['process']['thumb'])
+            logger.debug(data)
+            logger.debug(is_episode)
             return False
         if combined_xmlpath not in show_data['use_filepath']:
             show_data['use_filepath'].append(combined_xmlpath)
@@ -343,7 +358,8 @@ class Task(object):
                 entity['provider'] = item.attrib['provider']
                 data['xml_info'][value[1]].append(entity)
 
-        data['process'] = {}
+        if 'process' not in data:
+            data['process'] = {}
         for tag, value in tags.items():
             if value[1] in data['xml_info']:
                 data['process'][tag] = {
