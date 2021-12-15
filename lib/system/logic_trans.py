@@ -18,13 +18,6 @@ from framework.util import Util
 from .plugin import package_name, logger
 from .model import ModelSetting
 
-# 외부 패키지 업데이트 확인
-try:
-    #os.system("{} install --upgrade papagopy".format(app.config['config']['pip']))
-    from papagopy import Papagopy
-except:
-    os.system("{} install papagopy".format(app.config['config']['pip']))
-
 
 class SystemLogicTrans(object):
     @staticmethod
@@ -69,8 +62,12 @@ class SystemLogicTrans(object):
     def trans_test(req):
         try:
             source = req.form['source']
-            trans_type = req.form['trans_type']
-            #logger.debug('trans_type:%s source:%s', trans_type, source)
+            try:
+                trans_type = req.form['trans_type']
+            except:
+                trans_type = '4'
+                
+            logger.debug('trans_type:%s source:%s', trans_type, source)
             if trans_type == '0':
                 return source
             elif trans_type == '1':
@@ -144,8 +141,10 @@ class SystemLogicTrans(object):
         if app.config['config']['is_py2']:
             return u'Python >=3 '
         try:
+            from papagopy import Papagopy
             translator = Papagopy()
             translate_text = translator.translate(text, sourceCode=source, targetCode=target)
+            logger.error("파파고 웹은 사용 중지 되었습니다. 다른 번역으로 변경하세요.")
             return translate_text
         except Exception as exception:
             logger.error('Exception:%s', exception)
