@@ -1,0 +1,128 @@
+<html>
+  <head lang="ko">
+    <title>{{get_web_title()}} - Terminal</title>
+    <title>Terminal</title>
+    <meta name="google" value="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/xterm@4/css/xterm.min.css"
+/>
+<style>
+  #terminal {
+    height: 100%;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/xterm@4/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-webgl@0.11.2/lib/xterm-addon-webgl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.4.0/lib/xterm-addon-web-links.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.5.0/lib/xterm-addon-fit.min.js"></script>
+
+
+<body class="body">
+
+<div id="terminal"></div>
+
+<script>
+  'use strict';
+  const package_name = '{{ arg["package_name"] }}';
+  //const sub = '{{ arg["sub"] }}';
+  //const sub2 = '{{ arg["sub2"] }}';
+
+  const base64_encode = (str) =>
+    btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
+        String.fromCharCode(parseInt(p1, 16))
+      )
+    );
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return function () {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  };
+
+  let command = '';
+  const baseTheme = {
+    foreground: '#F8F8F8',
+    background: '#2D2E2C',
+    selection: '#5DA5D533',
+    black: '#1E1E1D',
+    brightBlack: '#262625',
+    red: '#CE5C5C',
+    brightRed: '#FF7272',
+    green: '#5BCC5B',
+    brightGreen: '#72FF72',
+    yellow: '#CCCC5B',
+    brightYellow: '#FFFF72',
+    blue: '#5D5DD3',
+    brightBlue: '#7279FF',
+    magenta: '#BC5ED1',
+    brightMagenta: '#E572FF',
+    cyan: '#5DA5D5',
+    brightCyan: '#72F0FF',
+    white: '#F8F8F8',
+    brightWhite: '#FFFFFF',
+  };
+
+  const socket = io.connect(`${location.origin}/${package_name}`);
+  const term = new Terminal({
+    fontFamily: '"Cascadia Code", Menlo, monospace',
+    theme: baseTheme,
+    cursorBlink: true,
+  });
+  const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+  const fitAddon = new FitAddon.FitAddon();
+
+  term.loadAddon(webLinksAddon);
+  term.loadAddon(fitAddon);
+  term.open(document.getElementById('terminal'));
+  fitAddon.fit();
+
+  try {
+    const webglAddon = new WebglAddon.WebglAddon();
+    webglAddon.onContextLoss(() => {
+      webglAddon.dispose();
+    });
+    term.loadAddon(webglAddon);
+  } catch (e) {
+    console.log('WebGL2 랜더링을 사용할 수 없습니다.', e);
+  }
+
+  const resize = () => {
+    fitAddon.fit();
+    socket.emit('resize', { cols: term.cols, rows: term.rows });
+  };
+
+  socket.on('connect', () => {
+    console.log('connected');
+    resize();
+  });
+
+  socket.on('disconnect', () => {
+    console.log('disconnected');
+  });
+
+  socket.on('output', (data) => {
+    term.write(data);
+  });
+
+  term.onData((data) => {
+    // 이상하게 소켓으로 한글을 보내면 깨져서 전송이 되므로 base64로 인코딩 후 전송
+    socket.emit('input', base64_encode(data));
+  });
+
+  window.addEventListener('resize', debounce(resize, 100));
+
+  
+</script>
+</body>
+</html>

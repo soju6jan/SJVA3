@@ -169,6 +169,7 @@ MENU_MAP = [
             {'type':'plugin', 'plugin' : 'mod', 'name' : u'모듈'},
             {'type':'plugin', 'plugin' : 'command', 'name' : u'Command'},
             {'type':'divider'},
+            {'type':'link', 'name' : u'Terminal', 'link':'/terminal'},
             {'type':'direct', 'name' : u'파일 매니저', 'link':'/flaskfilemanager'},
             {'type':'direct', 'name' : u'편집기', 'link':'/flaskcode'},
             {'type':'divider'},
@@ -318,6 +319,21 @@ def init_menu(plugin_menus):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
 
+    
+    import platform
+    if platform.system() == 'Windows':
+        try:
+            index = -1
+            for idx, item in enumerate(MENU_MAP[-1]['list']):
+                if 'link' in item and item['link'] == '/terminal':
+                    index = idx
+                    break
+            if index != -1:
+                del MENU_MAP[-1]['list'][index]
+        except Exception as exception: 
+            import traceback
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
 
     try:
         ## 선 제거

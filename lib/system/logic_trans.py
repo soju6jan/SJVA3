@@ -65,7 +65,7 @@ class SystemLogicTrans(object):
             try:
                 trans_type = req.form['trans_type']
             except:
-                trans_type = '4'
+                trans_type = '5'
                 
             logger.debug('trans_type:%s source:%s', trans_type, source)
             if trans_type == '0':
@@ -77,6 +77,8 @@ class SystemLogicTrans(object):
             elif trans_type == '3':
                 return SystemLogicTrans.trans_google_web(source)
             elif trans_type == '4':
+                return SystemLogicTrans.trans_google_web2(source)
+            elif trans_type == '5':
                 return SystemLogicTrans.trans_papago_web(source)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
@@ -96,6 +98,8 @@ class SystemLogicTrans(object):
             elif trans_type == '3':
                 return SystemLogicTrans.trans_google_web(text, source, target) 
             elif trans_type == '4':
+                return SystemLogicTrans.trans_google_web2(text, source, target) 
+            elif trans_type == '5':
                 return SystemLogicTrans.trans_papago_web(text, source, target)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
@@ -234,3 +238,35 @@ class SystemLogicTrans(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             return text
+
+    @staticmethod
+    def trans_google_web2(text, source='ja', target='ko'):
+        try:
+            from translatepy.translators.google import GoogleTranslateV2
+        except:
+            try: os.system("{} install translatepy".format(app.config['config']['pip']))
+            except: pass
+            from translatepy.translators.google import GoogleTranslateV2
+        try:
+            translator = GoogleTranslateV2()
+            translate_text = str(translator.translate(text, source_language=source, destination_language=target))
+            return translate_text
+        except Exception as exception:
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())       
+    
+
+    @staticmethod
+    def get_trans_func(index):
+        index = str(index)
+        if index == '1':
+            return SystemLogicTrans.trans_google
+        elif index == '2':
+            return SystemLogicTrans.trans_papago
+        elif index == '3':
+            return SystemLogicTrans.trans_google_web
+        elif index == '4':
+            return SystemLogicTrans.trans_google_web2
+        elif index == '5':
+            return SystemLogicTrans.trans_papago_web
+        
