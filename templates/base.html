@@ -982,4 +982,12 @@ function text_color(text, color='red') {
   return '<span style="color:'+color+'; font-weight:bold">' + text + '</span>';
 }
 
+
+function make_log(key, value, left=2, right=10) {
+  row = m_col(left, key, aligh='right');
+  row += m_col(right, value, aligh='left');
+  return row;
+}
+
+
 </script>

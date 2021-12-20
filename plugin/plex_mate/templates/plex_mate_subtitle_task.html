@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='row' style="padding-top: 5px; padding-bottom:5px; align-items: center;">
+  <div class='col-sm-1 set-left'>
+    <strong>Library</strong>
+  </div>
+  <div class="input-group col-sm-3">
+    <select id="library_select" name="library_select" class="form-control form-control-sm">
+      {% if arg['library_list'] is not none %}
+      {% for item in arg['library_list'] %}
+        {% if loop.counter == 0 %}
+        <option value="{{ item['id'] }}" selected>{{item['name']}}</option>
+        {% else %}
+        <option value="{{ item['id'] }}">{{item['name']}}</option>
+        {% endif %}
+      {% endfor %}
+      {% endif %}
+    </select>
+  </div>
+  <div class='col-sm-1 set-left'>
+    <strong>경로</strong>
+  </div>
+  <div class="input-group col-sm-3">
+    <div id="section_location_div"></div>
+  </div>
+  
+  <div class="input-group col-sm-4" style="padding-left:0px; padding-top:5px">
+    <div class="btn-group btn-group-sm flex-wrap mr-2" role="group" style="padding-left:5px; padding-top:0px">
+      <button id="stop_btn" class="btn btn-sm btn-outline-info">중지</button>
+      <button id="start0_btn" class="btn btn-sm btn-outline-info">파일시스템 기준</button>
+      <button id="start1_btn" class="btn btn-sm btn-outline-info">DB 기준(개발중)</button>
+    </div>
+  </div>
+</div>
+
+<div class='row' style="padding-top: 5px; padding-bottom:0px; align-items: center;">
+  <div class='col-sm-1 set-left'>
+    <strong>상태</strong>
+  </div>
+  <div id='status_div' class="col-sm-11">
+    대기중
+  </div>
+</div>
+
+
+{{ macros.m_hr_head_top() }}
+{{ macros.m_row_start('0') }}
+{{ macros.m_col(12,  macros.m_strong('Log')) }}
+{{ macros.m_row_end() }}
+{{ macros.m_hr_head_bottom() }}
+<div id="list_div"></div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name'] }}";
+var sub = "{{ arg['sub'] }}";
+var current_data = null;
+
+$(document).ready(function(){
+  //$('#main_container').attr('class', 'container-fluid');  
+  socket_init(package_name, sub);
+  global_send_command2('section_location', $('#library_select').val(), null, null, null, function(ret) {
+    make_locations_list(ret);
+  });
+});
+
+$("body").on('click', '#start0_btn', function(e){
+  e.preventDefault();
+  global_send_command2('start0', $('#library_select').val(), $('#section_location').val());
+});
+
+$("body").on('click', '#start1_btn', function(e){
+  e.preventDefault();
+  global_send_command2('start1', $('#library_select').val(), $('#section_location').val());
+});
+
+$("body").on('click', '#stop_btn', function(e){
+  e.preventDefault();
+  global_send_command2('stop');
+});
+
+
+$("body").on('change', '#library_select', function(e){
+  e.preventDefault();
+  global_send_command2('section_location', $('#library_select').val(), null, null, null, function(ret) {
+    make_locations_list(ret);
+  });
+});
+
+function make_locations_list(data) {
+  console.log(data);
+  data = data.data;
+  str = '<select id="section_location" name="section_location" class="form-control form-control-sm">';
+  str += '<option value="all">전체</option>';
+  for (i in data) {
+    str += '<option value="'+ data[i].root_path +'">'+data[i].root_path+'</option>';
+  }
+  str += '</select>';
+  $('#section_location_div').html(str);
+}
+
+
+
+function make_one(data) {
+  console.log(data);
+  //if (data.ret.find_meta)
+  //  return
+  row = m_row_start_hover();
+  row += make_log("폴더", data.dir);
+  row += make_log("파일", data.filename);
+  if (data.ret.find_meta) {
+    if (data.section_type == 'movie') {
+      row += make_log('메타', text_color(data.meta_subtitle.title, 'blue'));
+    } else {
+      row += make_log('메타', text_color(data.meta_subtitle.show_title + ' 시즌:' + data.meta_subtitle.season_index + ' 에피소드:' + data.meta_subtitle.episode_index, 'blue'));
+    }
+  } else {
+
+    ret = 'DB에 자막 정보 없음. ';
+    if (data.ret.find_video) {
+      ret += '비디오 파일 있음. '
+      row += make_log('비디오파일', data.ret.find_videofilename);
+      if (data.ret.meta_by_videofile) {
+        if (data.section_type == 'movie') {
+          row += make_log('메타', text_color(data.meta_videofile.title, 'blue'));
+        } else {
+          row += make_log('비디오파일 메타', text_color(data.meta_videofile.show_title + ' 시즌:' + data.meta_videofile.season_index + ' 에피소드:' + data.meta_videofile.episode_index, 'blue'));
+        }
+      } else {
+        ret += '비디오파일 메타 없음. '
+      }
+    } else {
+      ret += '비디오 파일 없음. '
+    }
+
+    row += make_log('결과', text_color(ret));
+    row += make_log('JSON', '<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+    
+  }
+  
+
+  if (data.smi2srt != null) {
+    if (data.smi2srt['ret'] == 'success') {
+      row += make_log('smi2srt 결과', '<pre>' + JSON.stringify(data.smi2srt) + '</pre>');
+    } else {
+      row += make_log('smi2srt 결과', '<pre>' + text_color(JSON.stringify(data.smi2srt, null, 2)) + '</pre>');
+    }
+  }
+  btn = '';
+  btn += m_button('open_filemanager_btn', 'Open Filemanager', [{'key':'path', 'value':data.dir}]);
+  row += make_log('', btn);
+  
+  /*
+  if (data.ret.smi2srt) {
+    row += make_log('smi2srt', text_color(data.meta_subtitle.title));
+  }
+  row += make_log("HASH / GUID", data.db.hash + ' - ' + data.db.guid);
+  str = "크기 : " + color(humanFileSize(data.meta.total), 'blue');
+  str += " / 삭제 : " + color(humanFileSize(data.meta.remove));
+  row += make_log("Metadata", str);
+  if (data.media != null) {
+    str = "크기 : " + color(humanFileSize(data.media.total), 'blue');
+    str += " / 삭제 : " + color(humanFileSize(data.media.remove));
+    row += make_log("Media", str);
+  }
+  row += make_log("thumb", data.db.user_thumb_url);
+  row += make_log("art", data.db.user_art_url);
+  if (data.file_count != 0) {
+    row += make_log("파일", '전체 파일 : ' + data.file_count + ' / 삭제 파일 : ' + data.remove_count);
+  }
+  if (data.use_filepath != null) {
+    row += make_log("사용파일", '<pre>' + data.use_filepath.join('\n') + '</pre>');
+  }
+  if (data.remove_filepath != null) {
+    row += make_log("삭제파일", '<pre>' + data.remove_filepath.join('\n') + '</pre>');
+  }
+  */
+  row += m_row_end();
+  return row;
+}
+
+
+function make_log2(key, value, empty=0, left=6) {
+  row = '';
+  if (empty !=0 ) row += m_col(empty, '', aligh='left');
+  left = left - empty;
+  right = 12 - empty - left;
+  row += m_col(left, key, aligh='left');
+  row += m_col(right, value, aligh='left');
+  return row;
+}
+
+
+
+
+
+function make_status(data) {
+  console.log('status')
+  console.log(data);
+  
+  str = '';
+  if (data.is_working == 'run')  tmp = '실행중';
+  else if (data.is_working == 'stop')  tmp = '사용자 중지';
+  else tmp = '대기중';
+  str += m_row_start_hover();
+  str += make_log2("상태", text_color(tmp));
+  if (data.subtitle_count != null) {
+    str += make_log2("자막파일 수", data.subtitle_count);
+    str += make_log2("DB에 자막 정보 있음", data.subtitle_exist_in_meta_count);
+    str += make_log2("DB에 자막 정보 없음", data.not_subtitle_exist_in_meta_count);
+    str += make_log2("자막에 맞는 비디오 파일 없음", data.not_videofile_exist_count, 1);
+    str += make_log2("자막에 맞는 비디오 파일 있음", data.videofile_exist_count, 1);
+    str += make_log2("비디오 파일이 DB에 없음 - 스캔", text_color(data.videofile_exist_not_in_meta_count), 2);
+    str += make_log2("비디오 파일이 DB에 있음 - 메타새로고침", text_color(data.videofile_exist_in_meta_count), 2);
+    str += make_log2('smi 파일 수', data.smi_count);
+    str += make_log2('변환 후 메타새로고침', data.smi2srt_count, 1);
+    str += make_log2('Show 단위 메타새로고침 수', data.meta_refresh_show_count);
+  }
+  str += m_row_end();
+  $('#status_div').html(str);
+}
+
+
+
+function socket_init(package_name, sub) {
+  socket = io.connect(window.location.protocol + "//" + document.domain + ":" + location.port + "/" + package_name + '/' + sub);
+
+  socket.on('start', function(data){
+    global_send_command2('refresh');
+  });
+
+  socket.on('refresh_all', function(data){
+      make_list(data);
+      make_status(data.status);
+  });
+  socket.on('refresh_status', function(data){
+      make_status(data);
+  });
+  
+
+  socket.on('refresh_one', function(data){
+    one = make_one(data.one);
+    //if (row == null)
+    //  return;
+    make_status(data.status);
+    id = 'data_'+data.one.index;
+    if ($('#' + id).length) {
+      $('#' + id).html(one);
+      current_data.list[parseInt(data.one.index)] = data.one;
+    } else {
+      console.log('2222');
+      if (id == 'data_0') {
+
+      }
+      row = '<div id="' + id + '">' + row + '</div>';
+      document.getElementById("list_div").innerHTML += m_hr() + one;
+      if (current_data == null)
+          current_data = []
+      if (current_data.list == null)
+          current_data.list = []
+      current_data.list.push(data.one);
+      //[parseInt(data.index)] = data;
+    }
+  });
+
+}
+
+
+
+function make_list(data2) {
+  current_data = data2;
+  
+  data = data2.list;
+  str = '';
+  //if (data == null || data.length == 0) str += '<br><h4>목록이 없습니다.</h4>'
+  for (i in data) {
+    row = make_one(data[i]);
+    //if (row == null) continue;
+    str += '<div id="data_' + data[i].index + '">';
+    str += row;
+    str += '</div>';
+    str += m_hr();
+    
+  }
+  document.getElementById("list_div").innerHTML = str;
+}
+
+
+
+$("body").on('click', '#open_filemanager_btn', function(e){
+  e.preventDefault();
+  path = $(this).data('path');
+  url = window.location.protocol + "//" + document.domain + ":" + location.port + "/flaskfilemanager/?go=" + path;
+
+  window.open(url, "_blank");
+  
+  
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script> 
+
+{% endblock %}

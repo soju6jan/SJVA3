@@ -245,6 +245,9 @@ class PlexDBHandle(object):
 
 
     @classmethod
-    def section_location(cls, db_file=None):
-        query = """SELECT library_sections.id as section_id, name, section_type, root_path  FROM library_sections, section_locations WHERE library_sections.id == section_locations.library_section_id ORDER BY library_sections.id"""
+    def section_location(cls, db_file=None, library_id=None):
+        if library_id == None:
+            query = """SELECT library_sections.id as section_id, name, section_type, root_path  FROM library_sections, section_locations WHERE library_sections.id == section_locations.library_section_id ORDER BY library_sections.id"""
+        else:
+            query = f"""SELECT library_sections.id as section_id, name, section_type, root_path  FROM library_sections, section_locations WHERE library_sections.id == section_locations.library_section_id AND library_sections.id = {library_id} ORDER BY library_sections.id"""
         return cls.select2(query, None, db_file=db_file)

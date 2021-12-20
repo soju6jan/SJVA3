@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
-#########################################################
-# python
-import os, traceback
-
-# third-party
-import requests
-from flask import Blueprint, request, send_file, redirect
-
-# sjva 공용
-from framework import app, path_data, check_api, py_urllib, SystemModelSetting
+import os, sys, traceback, re
+from datetime import datetime, timedelta
+from flask import Blueprint, render_template, jsonify, redirect
+from framework import app, path_data, path_app_root, db, scheduler, SystemModelSetting, socketio, celery
 from framework.logger import get_logger
 from framework.util import Util
-from plugin import get_model_setting, Logic, default_route, PluginUtil
+from plugin import LogicModuleBase, get_model_setting, Logic, default_route, PluginUtil
 
 # 패키지
 #########################################################
@@ -24,7 +17,7 @@ class P(object):
     menu = {
         'main' : [package_name, u'Plex Mate'],
         'sub' : [
-            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'],  ['periodic', '라이브러리 주기적 스캔'], ['scan', '스캔(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그'] #['watchdog', '파일시스템 감시(개발중)'], 
+            ['base', u'설정'], ['clear', u'파일 정리'], ['tool', 'DB 툴'],  ['periodic', '라이브러리 주기적 스캔'], ['subtitle', '자막 처리'], ['scan', '스캔(개발중)'], ['dbcopy', '라이브러리 복사'],['manual', '매뉴얼'], ['log', u'로그'] #['watchdog', '파일시스템 감시(개발중)'], 
         ], 
         'category' : 'beta',
         'sub2' : {
@@ -40,6 +33,9 @@ class P(object):
             'periodic' : [
                 ['task', '작업 관리'], ['list', '스캔 결과']
             ],
+            'subtitle' : [
+                ['setting', '설정'], ['task', '작업'],
+            ],
             'scan' : [
                 ['setting', '설정'], ['list', '작업 목록'],
             ],
@@ -52,7 +48,7 @@ class P(object):
             'manual' : [
                 ['README.md', 'README'], ['file/파일정리.md', '파일정리'], 
                 ['file/라이브러리 복사.md', '라이브러리 복사'],
-                ['file/스캔.md', 'PLEX 스캔'], ['file/라이브러리 주기적 스캔.md', '라이브러리 주기적 스캔']
+                ['file/스캔.md', 'PLEX 스캔'], ['file/라이브러리 주기적 스캔.md', '라이브러리 주기적 스캔'], ['file/자막 정리.md', '자막 정리'], ['file/팁.md', '팁']
             ],
         }
     }  
@@ -64,7 +60,7 @@ class P(object):
         'icon' : '',
         'developer' : u'soju6jan',
         'description' : u'Plex Mate',
-        'home' : 'https://github.com/soju6jan/%s' % package_name,
+        'home' : f'https://github.com/soju6jan/{package_name}',
         'more' : '',
         #'policy_level' : 10,
     }
@@ -72,6 +68,12 @@ class P(object):
     logic = None
     module_list = None
     home_module = 'server'
+
+
+from tool_base import d
+logger = P.logger
+package_name = P.package_name
+ModelSetting = P.ModelSetting
 
 
 def initialize():
@@ -85,14 +87,13 @@ def initialize():
         from .logic_pm_periodic import LogicPMPeriodic
         from .logic_pm_dbcopy import LogicPMDbCopy
         from .logic_pm_scan import LogicPMScan
-        from .logic_pm_watchdog import LogicPMWatchdog
-        P.module_list = [LogicPMBase(P), LogicPMClear(P), LogicPMPeriodic(P), LogicPMTool(P), LogicPMDbCopy(P), LogicPMScan(P), LogicPMWatchdog(P)]
+        from .logic_pm_subtitle import LogicPMSubtitle
+        P.module_list = [LogicPMBase(P), LogicPMClear(P), LogicPMPeriodic(P), LogicPMTool(P), LogicPMDbCopy(P), LogicPMScan(P), LogicPMSubtitle(P)]
         P.logic = Logic(P)
         default_route(P)
     except Exception as e: 
         P.logger.error('Exception:%s', e)
         P.logger.error(traceback.format_exc())
-
 
 initialize()
 
