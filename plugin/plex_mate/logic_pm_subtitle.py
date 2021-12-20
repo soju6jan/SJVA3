@@ -128,7 +128,7 @@ class LogicPMSubtitle(LogicModuleBase):
                 if self.list_max != 0:
                     if len(self.data['list']) == self.list_max:
                         self.data['list'] = []
-                if result['ret']['find_meta'] == False:
+                if result['ret']['find_meta'] == False or ('smi2srt' in result['ret']):
                     result['index'] = len(self.data['list'])
                     self.data['list'].append(result)
                     self.refresh_data(index=result['index'])
