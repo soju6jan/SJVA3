@@ -53,10 +53,12 @@ class LogicPMBase(LogicModuleBase):
 
     def plugin_load(self):
         config_path = ModelSetting.get(f'{name}_path_config')
-        config_source_filepath = os.path.join(os.path.dirname(__file__), 'file', os.path.basename(config_path))
-        config = LogicPMBase.load_config()
-        if os.path.exists(config_path) == False or config is None:
+        config_source_filepath = os.path.join(os.path.dirname(__file__), 'file', os.path.basename(config_path))        
+        try:
+            config = LogicPMBase.load_config()
+        except FileNotFoundError:
             shutil.copyfile(config_source_filepath, config_path)
+            config = LogicPMBase.load_config()
         if os.path.exists(config_path):
             #logger.warning(d(config))
             if '파일정리 영화 쿼리' not in config:
