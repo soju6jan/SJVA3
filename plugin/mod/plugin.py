@@ -10,7 +10,8 @@ from flask import Blueprint, request, send_file, redirect
 from framework import app, path_data, check_api, py_urllib, SystemModelSetting
 from framework.logger import get_logger
 from framework.util import Util
-from plugin import get_model_setting, Logic, default_route
+from plugin import get_model_setting, Logic, default_route, LogicModuleBase
+from tool_base import ToolUtil, d
 
 # 패키지
 #########################################################
@@ -41,6 +42,12 @@ class ModLogic(Logic):
     def plugin_load(self):
         P.module_list[0].init_mod_list()
         super().plugin_load()
+
+from tool_base import d
+logger = P.logger
+package_name = P.package_name
+ModelSetting = P.ModelSetting
+
 
 def initialize():
     try:
