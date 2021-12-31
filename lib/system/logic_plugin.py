@@ -79,6 +79,8 @@ class LogicPlugin(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
     
+
+    """
     @staticmethod
     def plugin_install(plugin_name):
         logger.debug('plugin_name : %s', plugin_name)
@@ -102,7 +104,7 @@ class LogicPlugin(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-
+    """
 
     @staticmethod
     def plugin_uninstall(plugin_name):
@@ -201,6 +203,19 @@ class LogicPlugin(object):
                 if flag:
                     command = ['git', '-C', custom_path, 'clone', plugin_git + '.git', '--depth', '1']
                     log = Util.execute_command(command)
+                    logger.debug(plugin_info)
+                    # 2021-12-31
+                    if 'dependency' in plugin_info:
+                        for dep in plugin_info['dependency']:
+                            for installed in LogicPlugin.get_plugin_list():
+                                if installed == dep['name']:
+                                    logger.debug(f"Dependency 설치 - 이미 설치됨 : {dep['name']}")
+                                    break
+                            else:
+                                logger.debug(f"Dependency 설치 : {dep['home']}")
+                                LogicPlugin.plugin_install_by_api(dep['home'])
+                                #command = ['git', '-C', custom_path, 'clone', dep['home'], '--depth', '1']
+                                #ret = Util.execute_command(command)
                     ret['ret'] = 'success'
                     ret['log'] = [u'정상적으로 설치하였습니다. 재시작시 적용됩니다.', log]
                     ret['log'] = '<br>'.join(ret['log'])
