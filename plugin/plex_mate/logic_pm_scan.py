@@ -80,7 +80,7 @@ class LogicPMScan(LogicModuleBase):
         try:
             import sqlite3
             db_file = app.config['SQLALCHEMY_BINDS'][package_name].replace('sqlite:///', '')
-            logger.error(db_file)
+            #logger.error(db_file)
             if ModelSetting.get(f'{name}_db_version') == '1':
                 connection = sqlite3.connect(db_file)
                 cursor = connection.cursor()

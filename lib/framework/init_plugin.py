@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #########################################################
 # python
-import os, sys, traceback, threading
+import os, sys, traceback, threading, platform
 from framework import app, db, logger, plugin_instance_list, plugin_menu
 import system
 
@@ -83,13 +83,15 @@ def plugin_init():
 
         logger.debug(plugins)
         for plugin_name in plugins:
-            logger.debug(len(system.LogicPlugin.current_loading_plugin_list))
+            #logger.debug(len(system.LogicPlugin.current_loading_plugin_list))
             if plugin_name.startswith('_'):
+                continue
+            if plugin_name == 'terminal' and platform.system() == 'Windows':
                 continue
             if plugin_name in except_plugin_list:
                 logger.debug('Except plugin : %s' % plugin_menu)
                 continue
-            logger.debug('plugin_name:%s', plugin_name)
+            logger.debug(f'[+] PLUGIN LOADING Start.. [{plugin_name}]') 
             try:
                 mod = __import__('%s' % (plugin_name), fromlist=[])
                 mod_plugin_info = None
@@ -116,12 +118,17 @@ def plugin_init():
                 except Exception as exception:
                     #logger.error('Exception:%s', exception)
                     #logger.error(traceback.format_exc())
-                    logger.debug('no plugin_info : %s', plugin_name)
+                    logger.debug(f'[!] PLUGIN_INFO not exist : [{plugin_name}]') 
 
-                mod_blue_print = getattr(mod, 'blueprint')
-                if mod_blue_print:
-                    if plugin_name in pass_include or is_include_menu(plugin_name):
-                        app.register_blueprint(mod_blue_print)
+                try:
+                    mod_blue_print = getattr(mod, 'blueprint')
+                    if mod_blue_print:
+                        if plugin_name in pass_include or is_include_menu(plugin_name):
+                            app.register_blueprint(mod_blue_print)
+                except Exception as exception:
+                    #logger.error('Exception:%s', exception)
+                    #logger.error(traceback.format_exc())
+                    logger.debug(f'[!] BLUEPRINT not exist : [{plugin_name}]') 
                 plugin_instance_list[plugin_name] = mod
                 system.LogicPlugin.current_loading_plugin_list[plugin_name]['status'] = 'success'
                 system.LogicPlugin.current_loading_plugin_list[plugin_name]['info'] = mod_plugin_info
@@ -142,9 +149,9 @@ def plugin_init():
             #logger.warning('module plugin_load in celery ')
             plugin_instance_list['mod'].plugin_load()
         except Exception as exception:
-            logger.error('module plugin_load error')
-            logger.error('Exception:%s', exception)
-            logger.error(traceback.format_exc())
+            logger.debug(f'mod plugin_load error!!') 
+            #logger.error('Exception:%s', exception)
+            #logger.error(traceback.format_exc())
 
         # import가 끝나면 DB를 만든다.
         # 플러그인 로드시 DB 초기화를 할 수 있다.
@@ -176,9 +183,9 @@ def plugin_init():
                 if mod_plugin_load and (key in pass_include or is_include_menu(key)):
                     def func(mod, key):
                         try:
-                            logger.debug('### plugin_load threading start : %s', key)
+                            logger.debug(f'[!] plugin_load threading start : [{key}]') 
                             mod.plugin_load()
-                            logger.debug('### plugin_load threading end : %s', key)
+                            logger.debug(f'[!] plugin_load threading end : [{key}]') 
                         except Exception as exception:
                             logger.error('### plugin_load exception : %s', key)
                             logger.error('Exception:%s', exception)
@@ -191,9 +198,10 @@ def plugin_init():
                     #if key == 'mod':
                     #    t.join()
             except Exception as exception:
-                logger.error('Exception:%s', exception)
-                logger.error(traceback.format_exc())
-                logger.debug('no init_scheduler') 
+                logger.debug(f'[!] PLUGIN_LOAD function not exist : [{key}]') 
+                #logger.error('Exception:%s', exception)
+                #logger.error(traceback.format_exc())
+                #logger.debug('no init_scheduler') 
             try:
                 mod_menu = getattr(mod, 'menu')
                 if mod_menu and (key in pass_include or is_include_menu(key)):
