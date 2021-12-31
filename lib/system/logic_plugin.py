@@ -31,8 +31,12 @@ logger = get_logger(package_name)
 class LogicPlugin(object):
     plugin_loading = False
     
-    custom_plugin_list = []
     
+
+    current_loading_plugin_list = {}
+    
+    """
+    custom_plugin_list = []
     @staticmethod
     def loading():
         try:
@@ -56,9 +60,12 @@ class LogicPlugin(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-    
+    """
+
     @staticmethod
     def get_plugin_list():
+        return LogicPlugin.current_loading_plugin_list
+        """
         try:
             if not LogicPlugin.plugin_loading:
                 LogicPlugin.loading()
@@ -67,14 +74,16 @@ class LogicPlugin(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
+        """
+
     
     @staticmethod
     def get_plugin_info(plugin_name):
         try:
             lists = LogicPlugin.get_plugin_list()
-            for l in lists:
-                if l['plugin_name'] == plugin_name:
-                    return l
+            for key, value in lists.items():
+                if key == plugin_name:
+                    return value['info']
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
@@ -207,8 +216,8 @@ class LogicPlugin(object):
                     # 2021-12-31
                     if 'dependency' in plugin_info:
                         for dep in plugin_info['dependency']:
-                            for installed in LogicPlugin.get_plugin_list():
-                                if installed == dep['name']:
+                            for key, value in LogicPlugin.get_plugin_list().items():
+                                if key == dep['name']:
                                     logger.debug(f"Dependency 설치 - 이미 설치됨 : {dep['name']}")
                                     break
                             else:

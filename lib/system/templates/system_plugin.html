@@ -31,11 +31,11 @@
 
       {{ macros.m_hr_head_top() }}
       {{ macros.m_row_start('0') }}
-      {{ macros.m_col(2,  macros.m_strong('Name')) }}
+      {{ macros.m_col(3,  macros.m_strong('Name')) }}
       {{ macros.m_col(1,  macros.m_strong('Dev.')) }}
       {{ macros.m_col(1,  macros.m_strong('Category')) }}
       {{ macros.m_col(1,  macros.m_strong('Version')) }}
-      {{ macros.m_col(7,  macros.m_strong('Description')) }}
+      {{ macros.m_col(6,  macros.m_strong('Description')) }}
       {{ macros.m_row_end() }}
       {{ macros.m_hr_head_bottom() }}
       <div id="plugin_list_div"></div>
@@ -103,25 +103,27 @@ function setting_save_func(formData, noti) {
 
 function make_plugin_list() {
   str = ''
+  console.log(current_data)
   for (i in current_data) {
+    console.log(i)
+    console.log(current_data[i])
     str += m_row_start();
-    str += m_col(2, current_data[i].name)
-    str += m_col(1, (current_data[i].local_info != null) ? current_data[i].local_info.developer : "")
-    str += m_col(1, (current_data[i].local_info != null) ? current_data[i].local_info.category_name : "")
-    str += m_col(1, (current_data[i].local_info != null) ? current_data[i].local_info.version : "")
+    str += m_col(3, i)
     
-    tmp = ''
-    tmp += m_button('plugin_uninstall_btn', '삭제', [{'key':'plugin_name', 'value':current_data[i].plugin_name}]);
+    if (current_data[i].info != null) {
+      str += m_col(1, current_data[i].info.developer);
+      str += m_col(1, current_data[i].info.category);
+      str += m_col(1, current_data[i].info.version);
+      tmp = ''
+      tmp += m_button('plugin_uninstall_btn', '삭제', [{'key':'plugin_name', 'value':current_data[i].info.name}]);
+      if (current_data[i].info.local_info != null) {
+      tmp += m_button('global_link_btn', 'GIT', [{'key':'url', 'value':current_data[i].info.local_info.home}]);
+      if (current_data[i].info.local_info.home != current_data[i].info.local_info.more && current_data[i].info.local_info.more.startsWith('http'))
+        tmp += m_button('global_link_btn', 'MORE', [{'key':'url', 'value':current_data[i].info.local_info.more}]);
+      }
 
-    if (current_data[i].local_info != null) {
-    tmp += m_button('global_link_btn', 'GIT', [{'key':'url', 'value':current_data[i].local_info.home}]);
-    if (current_data[i].local_info.home != current_data[i].local_info.more && current_data[i].local_info.more.startsWith('http'))
-      tmp += m_button('global_link_btn', 'MORE', [{'key':'url', 'value':current_data[i].local_info.more}]);
-    }
-
-    tmp = m_button_group(tmp)
-    if (current_data[i].local_info != null) {
-      str += m_col(7, current_data[i].local_info.description +'<br><br>'+ tmp)
+      tmp = m_button_group(tmp)
+      str += m_col(6, current_data[i].info.description +'<br><br>'+ tmp)
     }
     str += m_row_end();
     if (i != current_data.length -1) str += m_hr(0);
