@@ -362,7 +362,7 @@ def ajax(sub):
             try:
                 #plugin_name = request.form['plugin_name']
                 plugin_git = request.form['plugin_git']
-                return jsonify(LogicPlugin.plugin_install_by_api(plugin_git))
+                return jsonify(LogicPlugin.plugin_install_by_api(plugin_git, request.form.get('zip_url'), request.form.get('zip_filename')))
             except Exception as exception: 
                 logger.error('Exception:%s', exception)
                 logger.error(traceback.format_exc())
@@ -470,7 +470,7 @@ def first_api(sub):
         if sub == 'plugin_add':
             plugin_git = request.form['plugin_git']
             from system.logic_plugin import LogicPlugin
-            ret = LogicPlugin.plugin_install_by_api(plugin_git)
+            ret = LogicPlugin.plugin_install_by_api(plugin_git, request.form.get('zip_url'), request.form.get('zip_filename'))
             return jsonify(ret)
         elif sub == 'restart':
             logger.debug('web restart')

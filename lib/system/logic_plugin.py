@@ -165,23 +165,36 @@ class LogicPlugin(object):
                         os.remove(os.path.join(plugin_path, 'info.json'))
                 except:
                     pass
-
-                command = ['git', '-C', plugin_path, 'reset', '--hard', 'HEAD']
-                ret = Util.execute_command(command)
-                command = ['git', '-C', plugin_path, 'pull']
-                ret = Util.execute_command(command)
-                logger.debug("%s\n%s", plugin_path, ret)
+                if t.startswith('_'):
+                    continue
+                if os.path.exists(os.path.join(plugin_path, '.git')):
+                    command = ['git', '-C', plugin_path, 'reset', '--hard', 'HEAD']
+                    ret = Util.execute_command(command)
+                    command = ['git', '-C', plugin_path, 'pull']
+                    ret = Util.execute_command(command)
+                    logger.debug("%s\n%s", plugin_path, ret)
+                else:
+                    logger.debug(f"plugin_path is not git repo")
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
     
 
     @staticmethod
-    def plugin_install_by_api(plugin_git):
-        logger.debug('plugin_name : %s', plugin_git)
+    def plugin_install_by_api(plugin_git, zip_url, zip_filename):
+        logger.debug('plugin_git : %s', plugin_git)
+        logger.debug('zip_url : %s', zip_url)
+        logger.debug('zip_filename : %s', zip_filename)
+
+        
+        is_git = True if plugin_git != None and plugin_git != '' else False
+        
         ret = {}
         try:
-            name = plugin_git.split('/')[-1]
+            if is_git:
+                name = plugin_git.split('/')[-1]
+            else:
+                name = zip_filename.split('.')[0]
             
             custom_path = os.path.join(path_data, 'custom')
             plugin_path = os.path.join(custom_path, name)
@@ -190,28 +203,62 @@ class LogicPlugin(object):
                 ret['ret'] = 'already_exist'
                 ret['log'] = '이미 설치되어 있습니다.'
             else:
-                for tag in ['master', 'main']:
-                    try:
-                        info_url = plugin_git.replace('github.com', 'raw.githubusercontent.com') + '/%s/info.json' % tag
-                        plugin_info = requests.get(info_url).json()
-                        if plugin_info is not None:
-                            break
-                    except:
-                        pass
+                if is_git:
+                    for tag in ['master', 'main']:
+                        try:
+                            info_url = plugin_git.replace('github.com', 'raw.githubusercontent.com') + '/%s/info.json' % tag
+                            plugin_info = requests.get(info_url).json()
+                            if plugin_info is not None:
+                                break
+                        except:
+                            pass
+                else:
+                    import zipfile
+                    from tool_base import ToolBaseFile
+                    zip_filepath = os.path.join(path_data, 'tmp', zip_filename)
+                    extract_filepath = os.path.join(path_data, 'tmp', name)
+                    logger.error(zip_url)
+                    logger.warning(zip_filepath)
+                    if ToolBaseFile.download(zip_url, zip_filepath):
+                        logger.warning(os.path.exists(zip_filepath))
+                        with zipfile.ZipFile(zip_filepath, 'r') as zip_ref:
+                            zip_ref.extractall(extract_filepath)
+                        plugin_info_filepath = os.path.join(extract_filepath, 'info.json')
+                        if os.path.exists(plugin_info_filepath):
+                            plugin_info = ToolBaseFile.read_json(plugin_info_filepath)
+                        else:
+                            plugin_info = {}
+
                 flag = True
                 if 'platform' in plugin_info:
                     if platform.system() not in plugin_info['platform']:
                         ret['ret'] = 'not_support_os'
                         ret['log'] = '설치 가능한 OS가 아닙니다.'
                         flag = False
-                elif 'running_type' in  plugin_info:
+                if flag and 'running_type' in  plugin_info:
                     if app.config['config']['running_type'] not in plugin_info['running_type']:
                         ret['ret'] = 'not_support_running_type'
                         ret['log'] = '설치 가능한 실행타입이 아닙니다.'
                         flag = False
+                if flag and 'policy_level' in plugin_info:
+                    if plugin_info['policy_level'] > app.config['config']['level']:
+                        ret['ret'] = 'policy_level'
+                        ret['log'] = '설치 가능 회원등급보다 낮습니다.'
+                        flag = False
+                if flag and 'policy_point' in plugin_info:
+                    if plugin_info['policy_level'] > app.config['config']['point']:
+                        ret['ret'] = 'policy_level'
+                        ret['log'] = '설치 가능 포인트보다 낮습니다.'
+                        flag = False
+
                 if flag:
-                    command = ['git', '-C', custom_path, 'clone', plugin_git + '.git', '--depth', '1']
-                    log = Util.execute_command(command)
+                    if is_git :
+                        command = ['git', '-C', custom_path, 'clone', plugin_git + '.git', '--depth', '1']
+                        log = Util.execute_command(command)
+                    else:
+                        import shutil
+                        shutil.move(extract_filepath, plugin_path)
+                        log = ''
                     logger.debug(plugin_info)
                     # 2021-12-31
                     if 'dependency' in plugin_info:
@@ -222,16 +269,20 @@ class LogicPlugin(object):
                                     break
                             else:
                                 logger.debug(f"Dependency 설치 : {dep['home']}")
-                                LogicPlugin.plugin_install_by_api(dep['home'])
+                                LogicPlugin.plugin_install_by_api(dep['home'], dep.get('zip_url'), dep.get('zip_filename'))
                                 #command = ['git', '-C', custom_path, 'clone', dep['home'], '--depth', '1']
                                 #ret = Util.execute_command(command)
                     ret['ret'] = 'success'
                     ret['log'] = [u'정상적으로 설치하였습니다. 재시작시 적용됩니다.', log]
                     ret['log'] = '<br>'.join(ret['log'])
+                
+                    
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             ret['ret'] = 'exception'
             ret['log'] = str(exception)
+        
+            
         return ret
         

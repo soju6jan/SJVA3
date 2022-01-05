@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #########################################################
-import os, traceback, io, re
+import os, traceback, io, re, json
 from . import logger
 
 class ToolBaseFile(object):
@@ -23,9 +23,16 @@ class ToolBaseFile(object):
     @classmethod
     def download(cls, url, filepath):
         try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+                'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Connection': 'Keep-Alive',
+            }
+
             import requests
             with open(filepath, "wb") as file_is:   # open in binary mode
-                response = requests.get(url)               # get request
+                response = requests.get(url, headers=headers)               # get request
                 file_is.write(response.content)      # write to file
                 return True
         except Exception as exception:
@@ -140,3 +147,24 @@ class ToolBaseFile(object):
         except:
             return False
           
+    
+    @classmethod
+    def write_json(filepath, data):
+        try:
+            if os.path.exists(os.path.dirname(filepath)) == False:
+                os.makedirs(os.path.dirname(filepath))
+            with open(filepath, "w", encoding='utf8') as json_file:
+                json.dump(data, json_file, indent=4, ensure_ascii=False)
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc()) 
+
+    @classmethod
+    def read_json(cls, filepath):
+        try:
+            with open(filepath, "r", encoding='utf8') as json_file:
+                data = json.load(json_file)
+                return data
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc()) 
