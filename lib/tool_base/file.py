@@ -149,7 +149,7 @@ class ToolBaseFile(object):
           
     
     @classmethod
-    def write_json(filepath, data):
+    def write_json(cls, filepath, data):
         try:
             if os.path.exists(os.path.dirname(filepath)) == False:
                 os.makedirs(os.path.dirname(filepath))
