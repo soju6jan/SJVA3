@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #########################################################
-import os, traceback, io, re, json
+import os, traceback, io, re, json, codecs
 from . import logger
 
 class ToolBaseFile(object):
