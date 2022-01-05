@@ -121,7 +121,6 @@ class LogicTerminal:
     @staticmethod
     def plugin_unload():
         for key, value in LogicTerminal.pty_list.items():
-            logger.error('1111111111111111')
             try:
                 popen = value['popen']
                 if popen.poll():
