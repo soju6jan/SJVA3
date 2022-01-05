@@ -18,7 +18,7 @@ class ToolBaseFile(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-
+            
 
     @classmethod
     def download(cls, url, filepath):
@@ -168,3 +168,26 @@ class ToolBaseFile(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc()) 
+    
+
+    @classmethod
+    def write_file(cls, filename, data):
+        try:
+            import codecs
+            ofp = codecs.open(filename, 'w', encoding='utf8')
+            ofp.write(data)
+            ofp.close()
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc()) 
+
+    @classmethod
+    def read_file(cls, filename):
+        try:
+            ifp = codecs.open(filename, 'r', encoding='utf8')
+            data = ifp.read()
+            ifp.close()
+            return data
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
