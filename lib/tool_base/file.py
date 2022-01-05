@@ -191,3 +191,28 @@ class ToolBaseFile(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
+
+    
+
+    @classmethod
+    def makezip_simple(cls, zip_path, zip_extension='cbz', remove_zip_path=True):
+        import zipfile, shutil
+        try:
+            if os.path.exists(zip_path) == False:
+                return False
+            zipfilepath = os.path.join(os.path.dirname(zip_path), f"{os.path.basename(zip_path)}.{zip_extension}")
+            if os.path.exists(zipfilepath):
+                return True
+            zip = zipfile.ZipFile(zipfilepath, 'w')
+            for f in os.listdir(zip_path):
+                src = os.path.join(zip_path, f)
+                zip.write(src, f, compress_type = zipfile.ZIP_DEFLATED)
+            zip.close()
+            if remove_zip_path:
+                shutil.rmtree(zip_path)
+            return zipfilepath
+        except Exception as e:
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+        return None
+        
