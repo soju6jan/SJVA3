@@ -134,6 +134,7 @@ class SupportTving:
                 info['play_info'] = ret
             else:
                 info['play_info'] = {'hls':info['stream']['broadcast']['broad_url']}
+                info['broad_url'] = info['stream']['broadcast']['broad_url']
             return info
         except Exception as e:
             logger.error(f"Exception:{str(e)}")
@@ -201,5 +202,4 @@ class SupportTving:
         elif quality == 'stream25':
             return '270p'
         return '1080p'
-        
         
