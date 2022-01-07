@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-#########################################################
-# python
 import os, sys, platform
 
 from framework import app, logger, args
