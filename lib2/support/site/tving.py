@@ -10,7 +10,7 @@ class SupportTving:
     }
     """
 
-    default_param = '&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
+    default_param = '&screenCode=CSSD0100&networkCode=CSND01900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
@@ -44,11 +44,11 @@ class SupportTving:
             info = requests.get(url, headers=self.headers, proxies=self.proxies).json()
             logger.debug('json message : %s', info['body']['result']['message'])
             if 'drm_yn' in info['body']['stream'] and info['body']['stream']['drm_yn'] == 'Y':
-                info = self.get_stream_info_by_web(code, quality)
-                info['drm'] = True
+                info = {'body':self.get_stream_info_by_web(code, quality)}
+                info['body']['drm'] = True
             else:
                 url = info['body']['stream']['broadcast']['broad_url']
-                decrypted_url = self.decrypt(code, ts, url)
+                decrypted_url = self.__decrypt(code, ts, url)
                 if decrypted_url.find('m3u8') == -1:
                     decrypted_url = decrypted_url.replace('rtmp', 'http')
                     decrypted_url = decrypted_url.replace('?', '/playlist.m3u8?')
@@ -57,16 +57,16 @@ class SupportTving:
                     tmps = decrypted_url.split('playlist.m3u8')
                     r = requests.get(decrypted_url, headers=self.headers, proxies=self.proxies)
                     lines = r.text.split('\n')
-                    logger.debug(lines)
+                    #logger.debug(lines)
                     i = -1
                     last = ''
                     while len(last) == 0:
                         last = lines[i].strip()
                         i -= 1
                     decrypted_url = '%s%s' % (tmps[0], last)
-                info['broad_url'] = decrypted_url
-                info['drm'] = False
-            info['filename'] = self.__get_filename(info)
+                info['body']['broad_url'] = decrypted_url
+                info['body']['drm'] = False
+            info['body']['filename'] = self.__get_filename(info)
             return info
         except Exception as e:
             logger.error(f"Exception:{str(e)}")
@@ -159,19 +159,19 @@ class SupportTving:
 
     def __get_filename(self, episode_data):
         try:
-            title = episode_data["content"]["program_name"]
+            title = episode_data['body']["content"]["program_name"]
             title = title.replace("<", "").replace(">", "").replace("\\", "").replace("/", "").replace(":", "").replace("*", "").replace("\"", "").replace("|", "").replace("?", "").replace("  ", " ").strip()
-            episodeno = episode_data["content"]["frequency"]
-            airdate = str(episode_data["content"]["info"]["episode"]["broadcast_date"])[2:]
+            episodeno = episode_data['body']["content"]["frequency"]
+            airdate = str(episode_data['body']["content"]["info"]["episode"]["broadcast_date"])[2:]
 
             currentQuality = None
-            if episode_data["stream"]["quality"] is None:
+            if episode_data['body']["stream"]["quality"] is None:
                 currentQuality = "stream40"
             else:
-                qualityCount = len(episode_data["stream"]["quality"])
+                qualityCount = len(episode_data['body']["stream"]["quality"])
                 for i in range(qualityCount):
-                    if episode_data["stream"]["quality"][i]["selected"] == "Y":
-                        currentQuality = episode_data["stream"]["quality"][i]["code"]
+                    if episode_data['body']["stream"]["quality"][i]["selected"] == "Y":
+                        currentQuality = episode_data['body']["stream"]["quality"][i]["code"]
                         break
             if currentQuality is None:
                 return
@@ -181,7 +181,7 @@ class SupportTving:
                 episodeno_str = '0' + episodeno_str
             
             ret = '%s.E%s.%s.%s-ST.mp4' % (title, episodeno_str, airdate, qualityRes)
-            if episode_data['drm']:
+            if episode_data['body']['drm']:
                 ret = ret.replace('.mp4', '.mkv')
             return ret
         except Exception as e:
