@@ -1,7 +1,7 @@
 import os, traceback, io, re, json, codecs
 from . import logger
 
-class ToolFile(object):
+class SupportFile(object):
 
     @classmethod
     def read(cls, filepath, mode='r'):
@@ -178,6 +178,7 @@ class ToolFile(object):
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc()) 
+    
 
     @classmethod
     def read_file(cls, filename):
@@ -213,4 +214,10 @@ class ToolFile(object):
             logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())
         return None
-        
+    
+
+    @classmethod
+    def write_yaml(cls, filepath, data):
+        import yaml
+        with open(filepath, 'w', encoding='utf8') as f:
+            yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
