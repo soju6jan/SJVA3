@@ -10,7 +10,7 @@ class SupportTving:
     }
     """
 
-    default_param = '&screenCode=CSSD0100&networkCode=CSND01900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
+    default_param = '&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
@@ -33,16 +33,24 @@ class SupportTving:
     def get_stream_info(self, code, quality):
         ts = int(time.time())
         try:
-            if quality == 'stream70':
-                tmp_param = self.default_param.replace('CSSD0100', 'CSSD1200')
-                url = f"http://api.tving.com/v2/media/stream/info?info=y{tmp_param}&noCache={ts}&mediaCode={code}&streamCode={quality}&callingFrom=FLASH"
-            else:
-                url = f"http://api.tving.com/v2/media/stream/info?info=y{self.default_param}&noCache={ts}&mediaCode={code}&streamCode={quality}&callingFrom=FLASH"
+            if code[0] == 'E':
+                if quality == 'stream70':
+                    tmp_param = self.default_param.replace('CSSD0100', 'CSSD1200')
+                    url = f"http://api.tving.com/v2/media/stream/info?info=y{tmp_param}&noCache={ts}&mediaCode={code}&streamCode={quality}&callingFrom=FLASH"
+                else:
+                    url = f"http://api.tving.com/v2/media/stream/info?info=y{self.default_param}&noCache={ts}&mediaCode={code}&streamCode={quality}&callingFrom=FLASH"
+            elif code[0] == 'M':
+                if quality == 'stream70':
+                    tmp_param = self.default_param.replace('CSSD0100', 'CSSD1200')
+                    url = f"http://api.tving.com/v1/media/stream/info?info=y{tmp_param}&noCache={ts}&mediaCode={code}&streamCode={quality}&callingFrom=FLASH"
+                else:
+                    url = f"http://api.tving.com/v1/media/stream/info?info=y{self.default_param}&noCache={ts}&mediaCode={code}&streamCode={quality}&callingFrom=FLASH"
             
             if self.token != None:
                 self.headers['Cookie'] = f"_tving_token={self.token}"
             info = requests.get(url, headers=self.headers, proxies=self.proxies).json()
             logger.debug('json message : %s', info['body']['result']['message'])
+            logger.debug(d(info))
             if 'drm_yn' in info['body']['stream'] and info['body']['stream']['drm_yn'] == 'Y':
                 info = {'body':self.get_stream_info_by_web(code, quality)}
                 info['body']['drm'] = True
