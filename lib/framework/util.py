@@ -9,13 +9,8 @@ import subprocess
 # third-party
 from sqlalchemy.ext.declarative import DeclarativeMeta
 # sjva 공용
-from framework.logger import get_logger
-from framework import app
-# 패키지
+from framework import app, logger
 
-# 로그
-package_name = __name__.split('.')[0]
-logger = get_logger(package_name)
 #########################################################
 
 class Util(object):
