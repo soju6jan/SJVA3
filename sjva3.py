@@ -1,5 +1,6 @@
 import os, sys, platform, traceback, shutil
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
+sys.path.insert(1, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib2'))
 print('[SJVA3] sys.path : %s' % sys.path)
 print('[SJVA3] sys.argv : %s' % sys.argv)
 
