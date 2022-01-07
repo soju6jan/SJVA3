@@ -16,6 +16,8 @@ from .discord import SupportDiscord
 from .image import SupportImage
 from .process import SupportProcess
 from .ffmpeg import SupportFfmpeg
+from .string import SupportString
+from .util import SupportUtil
 
 
 

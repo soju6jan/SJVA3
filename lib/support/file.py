@@ -92,7 +92,7 @@ class SupportFile(object):
             logger.debug('Exception:%s', exception)
             logger.debug(traceback.format_exc())
 
-
+    """
     @classmethod
     def makezip(cls, zip_path, zip_folder=None, zip_extension='zip', remove_folder=False):
         import zipfile
@@ -118,6 +118,8 @@ class SupportFile(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
         return
+    """
+
 
     @classmethod
     def rmtree(cls, folderpath):
@@ -194,7 +196,7 @@ class SupportFile(object):
     
 
     @classmethod
-    def makezip_simple(cls, zip_path, zip_extension='cbz', remove_zip_path=True):
+    def makezip(cls, zip_path, zip_extension='zip', remove_zip_path=True):
         import zipfile, shutil
         try:
             if os.path.exists(zip_path) == False:

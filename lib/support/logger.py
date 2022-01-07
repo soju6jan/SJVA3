@@ -1,5 +1,4 @@
-from genericpath import exists
-import os, logging, logging.handlers
+import os, sys, logging, logging.handlers
 from datetime import datetime
 from pytz import timezone, utc
 """
@@ -46,7 +45,9 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def get_logger(name, log_path=None):
+def get_logger(name=None, log_path=None):
+    if name == None:
+        name = sys.argv[0].rsplit('.', 1)[0]
     logger = logging.getLogger(name)
     if not logger.handlers:
         level = logging.DEBUG
