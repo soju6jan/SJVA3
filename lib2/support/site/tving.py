@@ -50,7 +50,8 @@ class SupportTving:
                 self.headers['Cookie'] = f"_tving_token={self.token}"
             info = requests.get(url, headers=self.headers, proxies=self.proxies).json()
             #logger.debug(d(info))
-            logger.debug('json message : %s', info['body']['result']['message'])
+            if info['body']['result']['message'] != None:
+                logger.debug('json message : %s', info['body']['result']['message'])
             if 'drm_yn' in info['body']['stream'] and info['body']['stream']['drm_yn'] == 'Y':
                 info = {'body':self.get_stream_info_by_web(code, quality)}
                 info['body']['drm'] = True
