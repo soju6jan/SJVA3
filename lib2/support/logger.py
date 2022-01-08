@@ -29,7 +29,7 @@ class CustomFormatter(logging.Formatter):
     reset = "\x1b[0m"
     green = "\x1B[32m"
     #format = "[%(asctime)s|%(name)s|%(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
-    format = u'[%(asctime)s|%(name)s %(pathname)s %(lineno)s] %(message)s'
+    format = u'[%(asctime)s|%(name)s %(pathname)s:%(lineno)s] %(message)s'
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,

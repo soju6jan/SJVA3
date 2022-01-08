@@ -49,8 +49,8 @@ class SupportTving:
             if self.token != None:
                 self.headers['Cookie'] = f"_tving_token={self.token}"
             info = requests.get(url, headers=self.headers, proxies=self.proxies).json()
+            #logger.debug(d(info))
             logger.debug('json message : %s', info['body']['result']['message'])
-            logger.debug(d(info))
             if 'drm_yn' in info['body']['stream'] and info['body']['stream']['drm_yn'] == 'Y':
                 info = {'body':self.get_stream_info_by_web(code, quality)}
                 info['body']['drm'] = True
@@ -170,9 +170,6 @@ class SupportTving:
         try:
             title = episode_data['body']["content"]["program_name"]
             title = title.replace("<", "").replace(">", "").replace("\\", "").replace("/", "").replace(":", "").replace("*", "").replace("\"", "").replace("|", "").replace("?", "").replace("  ", " ").strip()
-            episodeno = episode_data['body']["content"]["frequency"]
-            airdate = str(episode_data['body']["content"]["info"]["episode"]["broadcast_date"])[2:]
-
             currentQuality = None
             if episode_data['body']["stream"]["quality"] is None:
                 currentQuality = "stream40"
@@ -185,13 +182,14 @@ class SupportTving:
             if currentQuality is None:
                 return
             qualityRes = self.__get_quality_to_res(currentQuality)
-            episodeno_str = str(episodeno)
-            if episodeno < 10:
-                episodeno_str = '0' + episodeno_str
-            
-            ret = '%s.E%s.%s.%s-ST.mp4' % (title, episodeno_str, airdate, qualityRes)
-            if episode_data['body']['drm']:
-                ret = ret.replace('.mp4', '.mkv')
+
+
+            if 'frequency' in episode_data['body']["content"]:
+                episodeno = episode_data['body']["content"]["frequency"]
+                airdate = str(episode_data['body']["content"]["info"]["episode"]["broadcast_date"])[2:]
+                ret = f"{title}.E{str(episodeno).zfill(2)}.{airdate}.{qualityRes}-ST.mp4"
+            else:
+                ret = f"{title}.{qualityRes}-ST.mp4"
             return ret
         except Exception as e:
             logger.error(f"Exception:{str(e)}")
