@@ -197,13 +197,13 @@ class LogicPlugin(object):
             custom_path = os.path.join(path_data, 'custom')
             plugin_path = os.path.join(custom_path, name)
             logger.debug(plugin_path)
-            plugin_info = {}
+            plugin_info = None
             if os.path.exists(plugin_path):
                 ret['ret'] = 'already_exist'
                 ret['log'] = '이미 설치되어 있습니다.'
             else:
                 if plugin_git and plugin_git.startswith('http'):
-                    for tag in ['master', 'main']:
+                    for tag in ['main', 'master']:
                         try:
                             info_url = plugin_git.replace('github.com', 'raw.githubusercontent.com') + '/%s/info.json' % tag
                             plugin_info = requests.get(info_url).json()
@@ -225,9 +225,8 @@ class LogicPlugin(object):
                         plugin_info_filepath = os.path.join(extract_filepath, 'info.json')
                         if os.path.exists(plugin_info_filepath):
                             plugin_info = ToolBaseFile.read_json(plugin_info_filepath)
-                        else:
-                            plugin_info = {}
-
+                if plugin_info == None:
+                    plugin_info = {}
                 flag = True
                 if 'platform' in plugin_info:
                     if platform.system() not in plugin_info['platform']:
