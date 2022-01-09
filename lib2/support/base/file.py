@@ -183,6 +183,16 @@ class SupportFile(object):
     
 
     @classmethod
+    def write_binary(cls, filename, data):
+        try:
+            with open(filename, 'wb') as f:
+                f.write(data)
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc()) 
+
+
+    @classmethod
     def read_file(cls, filename):
         try:
             ifp = codecs.open(filename, 'r', encoding='utf8')
