@@ -5,5 +5,5 @@ from .file import SupportFile
 from .image import SupportImage
 from .process import SupportProcess
 from .string import SupportString
-from .util import SupportUtil, pt
+from .util import SupportUtil, pt, default_headers
 
