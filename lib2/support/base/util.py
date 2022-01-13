@@ -1,6 +1,20 @@
 import os, traceback, io, re, json, codecs
 from . import logger
 
+from functools import wraps
+import time
+def pt(f):
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        start = time.time()
+        #logger.debug(f"FUNC START [{f.__name__}]")
+        result = f(*args, **kwds)
+        elapsed = time.time() - start
+        logger.info(f"FUNC END [{f.__name__}] {elapsed}")
+        return result
+    return wrapper
+
+
 class SupportUtil(object):
 
     @classmethod
@@ -19,4 +33,6 @@ class SupportUtil(object):
         except Exception as e: 
             logger.error(f"Exception:{str(e)}")
             logger.error(traceback.format_exc())
-      
+    
+
+    
