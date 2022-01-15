@@ -147,6 +147,10 @@ class SupportDiscord(object):
                 target = data['attachments'][0]['url']
                 if requests.get(target).status_code == 200:
                     return target
+            logger.error(f"discord webhook error : {webhook_url}")
+            if retry:
+                time.sleep(1)
+                return cls.discord_proxy_image_bytes(bytes, retry=False)
         except Exception as exception: 
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
