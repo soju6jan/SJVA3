@@ -151,8 +151,8 @@ class SupportFile(object):
     @classmethod
     def write_json(cls, filepath, data):
         try:
-            if os.path.exists(os.path.dirname(filepath)) == False:
-                os.makedirs(os.path.dirname(filepath))
+            if os.path.dirname(filepath) != '':
+                os.makedirs(os.path.dirname(filepath), exist_ok=True)
             with open(filepath, "w", encoding='utf8') as json_file:
                 json.dump(data, json_file, indent=4, ensure_ascii=False)
         except Exception as exception: 
