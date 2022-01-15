@@ -167,27 +167,28 @@ def init_define():
     app.config['DEFINE']['RSS_SUBTITLE_UPLOAD_WEBHOOK'] = 'https://discordapp.com/api/webhooks/689800985887113329/GBTUBpP9L0dOegqL4sH-u1fwpssPKq0gBOGPb50JQjim22gUqskYCtj-wnup6BsY3vvc'
 
     app.config['DEFINE']['WEBHOOK_LIST_FOR_IMAGE_PROXY'] = [
-        'https://discord.com/api/webhooks/931778138344656926/B-S2IKYy298W2NXUk8aBrRYzE9JKKB21BuZfJpa08-A2D_rEy78rgqtqNHGOUF4wmQ-A', #1
-        'https://discord.com/api/webhooks/931778228840960010/Yyo_pOH9DFaz1e2jfVHGjjQbVqSYgDtYX1bE0dbEkdXXO3S9uIZa-BBYGNXssMIxhSBb', #2
-        'https://discord.com/api/webhooks/794660932386029589/XfehQxY7gLJgKNlZCAP5RQv6vMVXfroWa9SiXBqiNN84no5Hrsukoo5_dS-ZrOApTSRo', #3
-        'https://discord.com/api/webhooks/794661043863027752/A9O-vZSHIgfQ3KX7wO5_e2xisqpLw5TJxg2Qs1stBHxyd5PK-Zx0IJbAQXmyDN1ixZ-n', #4
-        'https://discord.com/api/webhooks/810373348776476683/h_uJLBBlHzD0w_CG0nUajFO-XEh3fvy-vQofQt1_8TMD7zHiR7a28t3jF-xBCP6EVlow', #5
-        'https://discord.com/api/webhooks/810373405508501534/wovhf-1pqcxW5h9xy7iwkYaf8KMDjHU49cMWuLKtBWjAnj-tzS1_j8RJ7tsMyViDbZCE', #6
-        'https://discord.com/api/webhooks/796558388326039552/k2VV356S1gKQa9ht-JuAs5Dqw5eVkxgZsLUzFoxmFG5lW6jqKl7zCBbbKVhs3pcLOetm', #7
-        'https://discord.com/api/webhooks/810373566452858920/Qf2V8BoLOy2kQzlZGHy5HZ1nTj7lK72ol_UFrR3_eHKEOK5fyR_fQ8Yw8YzVh9EQG54o', #8
-        'https://discord.com/api/webhooks/810373654411739157/SGgdO49OCkTNIlc_BSMSy7IXQwwXVonG3DsVfvBVE6luTCwvgCqEBpEk30WBeMMieCyI', #9
-        'https://discord.com/api/webhooks/810373722341900288/FwcRJ4YxYjpyHpnRwF5f2an0ltEm8JPqcWeZqQi3Qz4QnhEY-kR2sjF9fo_n6stMGnf_', #10
-        'https://discord.com/api/webhooks/931779811691626536/vvwCm1YQvE5tW4QJ4SNKRmXhQQrmOQxbjsgRjbTMMXOSiclB66qipiZaax5giAqqu2IB' # 11,
-        'https://discord.com/api/webhooks/931779905631420416/VKlDwfxWQPJfIaj94-ww_hM1MNEayRKoMq0adMffCC4WQS60yoAub_nqPbpnfFRR3VU5' # 12,
-        'https://discord.com/api/webhooks/931779947914231840/22amQuHSOI7wPijSt3U01mXwd5hTo_WHfVkeaowDQMawCo5tXVfeEMd6wAWf1n7CseiG' # 13,
-        'https://discord.com/api/webhooks/810374294416654346/T3-TEdKIg7rwMZeDzNr46KPDvO7ZF8pRdJ3lfl39lJw2XEZamAG8uACIXagbNMX_B0YN' # 14,
-        'https://discord.com/api/webhooks/810374337403289641/_esFkQXwlPlhxJWtlqDAdLg2Nujo-LjGPEG3mUmjiRZto69NQpkBJ0F2xtSNrCH4VAgb' # 15,
-        'https://discord.com/api/webhooks/810374384736534568/mH5-OkBVpi7XqJioaQ8Ma-NiL-bOx7B5nYJpL1gZ03JaJaUaIW4bCHeCt5O_VGLJwAtj' # 16,
-        'https://discord.com/api/webhooks/810374428604104724/Z1Tdxz3mb0ytWq5LHWi4rG5CeJnr9KWXy5aO_waeD0NcImQnhRXe7h7ra7UrIDRQ2jOg' # 17,
-        'https://discord.com/api/webhooks/810374475773509643/QCPPN4djNzhuOmbS3DlrGBunK0SVR5Py9vMyCiPL-0T2VPgitFZS4YM6GCLfM2fkrn4-' # 18,
-        'https://discord.com/api/webhooks/810374527652855819/5ypaKI_r-hYzwmdDlVmgAU6xNgU833L9tFlPnf3nw4ZDaPMSppjt77aYOiFks4KLGQk8' # 19,
-        'https://discord.com/api/webhooks/810374587917402162/lHrG7CEysGUM_41DMnrxL2Q8eh1-xPjJXstYE68WWfLQbuUAV3rOfsNB9adncJzinYKi' # 20,
+        'https://discord.com/api/webhooks/931778138344656926/B-S2IKYy298W2NXUk8aBrRYzE9JKKB21BuZfJpa08-A2D_rEy78rgqtqNHGOUF4wmQ-A', # 1
+        'https://discord.com/api/webhooks/931778228840960010/Yyo_pOH9DFaz1e2jfVHGjjQbVqSYgDtYX1bE0dbEkdXXO3S9uIZa-BBYGNXssMIxhSBb', # 2
+        'https://discord.com/api/webhooks/794660932386029589/XfehQxY7gLJgKNlZCAP5RQv6vMVXfroWa9SiXBqiNN84no5Hrsukoo5_dS-ZrOApTSRo', # 3
+        'https://discord.com/api/webhooks/794661043863027752/A9O-vZSHIgfQ3KX7wO5_e2xisqpLw5TJxg2Qs1stBHxyd5PK-Zx0IJbAQXmyDN1ixZ-n', # 4
+        'https://discord.com/api/webhooks/810373348776476683/h_uJLBBlHzD0w_CG0nUajFO-XEh3fvy-vQofQt1_8TMD7zHiR7a28t3jF-xBCP6EVlow', # 5
+        'https://discord.com/api/webhooks/810373405508501534/wovhf-1pqcxW5h9xy7iwkYaf8KMDjHU49cMWuLKtBWjAnj-tzS1_j8RJ7tsMyViDbZCE', # 6
+        'https://discord.com/api/webhooks/796558388326039552/k2VV356S1gKQa9ht-JuAs5Dqw5eVkxgZsLUzFoxmFG5lW6jqKl7zCBbbKVhs3pcLOetm', # 7
+        'https://discord.com/api/webhooks/810373566452858920/Qf2V8BoLOy2kQzlZGHy5HZ1nTj7lK72ol_UFrR3_eHKEOK5fyR_fQ8Yw8YzVh9EQG54o', # 8
+        'https://discord.com/api/webhooks/810373654411739157/SGgdO49OCkTNIlc_BSMSy7IXQwwXVonG3DsVfvBVE6luTCwvgCqEBpEk30WBeMMieCyI', # 9
+        'https://discord.com/api/webhooks/810373722341900288/FwcRJ4YxYjpyHpnRwF5f2an0ltEm8JPqcWeZqQi3Qz4QnhEY-kR2sjF9fo_n6stMGnf_', # 10
+        'https://discord.com/api/webhooks/931779811691626536/vvwCm1YQvE5tW4QJ4SNKRmXhQQrmOQxbjsgRjbTMMXOSiclB66qipiZaax5giAqqu2IB', # 11
+        'https://discord.com/api/webhooks/931779905631420416/VKlDwfxWQPJfIaj94-ww_hM1MNEayRKoMq0adMffCC4WQS60yoAub_nqPbpnfFRR3VU5', # 12
+        'https://discord.com/api/webhooks/931779947914231840/22amQuHSOI7wPijSt3U01mXwd5hTo_WHfVkeaowDQMawCo5tXVfeEMd6wAWf1n7CseiG', # 13
+        'https://discord.com/api/webhooks/810374294416654346/T3-TEdKIg7rwMZeDzNr46KPDvO7ZF8pRdJ3lfl39lJw2XEZamAG8uACIXagbNMX_B0YN', # 14
+        'https://discord.com/api/webhooks/810374337403289641/_esFkQXwlPlhxJWtlqDAdLg2Nujo-LjGPEG3mUmjiRZto69NQpkBJ0F2xtSNrCH4VAgb', # 15
+        'https://discord.com/api/webhooks/810374384736534568/mH5-OkBVpi7XqJioaQ8Ma-NiL-bOx7B5nYJpL1gZ03JaJaUaIW4bCHeCt5O_VGLJwAtj', # 16
+        'https://discord.com/api/webhooks/810374428604104724/Z1Tdxz3mb0ytWq5LHWi4rG5CeJnr9KWXy5aO_waeD0NcImQnhRXe7h7ra7UrIDRQ2jOg', # 17
+        'https://discord.com/api/webhooks/810374475773509643/QCPPN4djNzhuOmbS3DlrGBunK0SVR5Py9vMyCiPL-0T2VPgitFZS4YM6GCLfM2fkrn4-', # 18
+        'https://discord.com/api/webhooks/810374527652855819/5ypaKI_r-hYzwmdDlVmgAU6xNgU833L9tFlPnf3nw4ZDaPMSppjt77aYOiFks4KLGQk8', # 19
+        'https://discord.com/api/webhooks/810374587917402162/lHrG7CEysGUM_41DMnrxL2Q8eh1-xPjJXstYE68WWfLQbuUAV3rOfsNB9adncJzinYKi', # 20
     ]
+        
     
     #2020-05-27 23번방부터 32번방 삭제
     #2020-08-31 29, 30, 31번 삭제
