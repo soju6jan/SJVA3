@@ -130,7 +130,8 @@ class SupportDiscord(object):
     @classmethod
     def discord_proxy_image_bytes(cls, bytes, retry=True):
         data = None
-        webhook_url =  webhook_list[random.randint(0,len(webhook_list)-1)]
+        idx = random.randint(0,len(webhook_list)-1)
+        webhook_url =  webhook_list[idx]
         try:
             webhook = DiscordWebhook(url=webhook_url, content='')
             webhook.add_file(file=bytes, filename='image.jpg')
@@ -148,6 +149,7 @@ class SupportDiscord(object):
                 if requests.get(target).status_code == 200:
                     return target
             logger.error(f"discord webhook error : {webhook_url}")
+            logger.error(f"discord webhook error : {idx}")
             if retry:
                 time.sleep(1)
                 return cls.discord_proxy_image_bytes(bytes, retry=False)
