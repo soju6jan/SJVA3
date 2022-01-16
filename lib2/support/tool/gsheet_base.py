@@ -43,6 +43,7 @@ class GoogleSheetBase:
         doc_url = f'https://docs.google.com/spreadsheets/d/{doc_id}'
         gsp = gspread.authorize(self.credentials)
         doc = gsp.open_by_url(doc_url)
+        self.tab_index = tab_index
         self.ws = doc.get_worksheet(tab_index)
         self.header_info = None
         self.header_info_reverse = None
