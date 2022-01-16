@@ -51,6 +51,7 @@ class GoogleSheetBase:
 
     def get_credentials(self, project_filepath=None):
         if os.path.exists(self.credentials_filepath) == False:
+            logger.info(f"credentials_filepath : {self.credentials_filepath}")
             url = self.__make_token_cli(project_filepath)
             logger.debug(f"Auth URL : {url}")
             code = input("Input Code : ")
@@ -145,6 +146,12 @@ class GoogleSheetBase:
 
     def set_color(self, sheet_row, sheet_col1, sheet_col2, color):
         format_cell_range(self.ws, gspread.utils.rowcol_to_a1(sheet_row,sheet_col1)+':' + gspread.utils.rowcol_to_a1(sheet_row,sheet_col2), color)
+    
+    def set_color_row(self, sheet_row, color):
+        format_cell_range(self.ws, gspread.utils.rowcol_to_a1(sheet_row,1)+':' + gspread.utils.rowcol_to_a1(sheet_row,len(self.header_info)), color)
+
+    def set_color_cell(self, sheet_row, sheet_col, color):
+        format_cell_range(self.ws, gspread.utils.rowcol_to_a1(sheet_row,sheet_col)+':' + gspread.utils.rowcol_to_a1(sheet_row,sheet_col), color)
 
     def write_data(self, total_data, data):
         find_row_index = self.find_row_index(total_data, data)
