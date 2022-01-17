@@ -3,9 +3,9 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 from . import logger
 
 webhook_list = [
-    'https://discord.com/api/webhooks/932385414474522654/kiqWgXDrGSg3REJE8RLaC6242CdhrqjgzXrIfPfVYNFhqEHLw_hUWECB8wYuajtriusC', # 1
-    'https://discord.com/api/webhooks/932385650597048320/2iXqYIAZ_lc2xx32eDt6oI5CtlsfX7jGhteIChreQknklOsvyUmPJfkD1d42d77NpWVr', # 2
-    'https://discord.com/api/webhooks/932385573090504722/FKviM1Hkmw_WelAcdRNOt5hRvyh6PoqE_sKyT701lFbD83Ig3fuLCQQwqXGZiXja00YN', # 3
+    'https://discord.com/api/webhooks/932496245208019045/06r-t38tsqRmkoGBoiVu7DPg7iZSV_GGLiu5Xabu1PMmpVwI0XBbUxtbgxWb-om2XUrO', # 1
+    'https://discord.com/api/webhooks/932496308990795786/Fq9oyf7s3T0T0oHG43VgXn2VeCYcrKFQOqcm3ggLVvjYpkuc0hBVYULmoUU07atA7wt6', # 2
+    'https://discord.com/api/webhooks/932496173690912808/CIj598UpSPHbgVpfBhothVIGIT8Phr3pJia5tD5z6ntF8qjG__F05XQ9cjBMAHUxox6t', # 3
     'https://discord.com/api/webhooks/794661043863027752/A9O-vZSHIgfQ3KX7wO5_e2xisqpLw5TJxg2Qs1stBHxyd5PK-Zx0IJbAQXmyDN1ixZ-n', # 4
     'https://discord.com/api/webhooks/810373348776476683/h_uJLBBlHzD0w_CG0nUajFO-XEh3fvy-vQofQt1_8TMD7zHiR7a28t3jF-xBCP6EVlow', # 5
     'https://discord.com/api/webhooks/810373405508501534/wovhf-1pqcxW5h9xy7iwkYaf8KMDjHU49cMWuLKtBWjAnj-tzS1_j8RJ7tsMyViDbZCE', # 6
