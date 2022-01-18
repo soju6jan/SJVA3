@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .plugin import P
+from .plugin import P, package_name, logger
 blueprint = P.blueprint
 menu = P.menu
 plugin_load = P.logic.plugin_load
