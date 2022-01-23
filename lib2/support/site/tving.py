@@ -1,16 +1,8 @@
 from support import d, logger
-import os, sys, traceback, time, urllib.parse, requests, json
+import os, sys, traceback, time, urllib.parse, requests, json, base64, re
 
 class SupportTving:
-    """
-    config = {
-        'param' : "&free=all&lastFrequency=n&order=broadDate", #최신
-        'program_param' : '&free=all&order=frequencyDesc&programCode=%s',
-        'default_param' : '&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
-    }
-    """
-
-    default_param = '&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
+    default_param = '&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=95a64ebcd8e154aeb96928bf34848826'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
@@ -81,7 +73,7 @@ class SupportTving:
             logger.error(f"Exception:{str(e)}")
             logger.error(traceback.format_exc())
 
-
+    """
     def get_stream_info_by_web(self, code, quality):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36',
@@ -149,6 +141,7 @@ class SupportTving:
             logger.error(f"Exception:{str(e)}")
             logger.error(traceback.format_exc())
 
+    """
 
     def __decrypt(self, code, key, value):
         try:
@@ -209,4 +202,69 @@ class SupportTving:
         elif quality == 'stream25':
             return '270p'
         return '1080p'
+        
+
+
+    def api_info(self, mediaCode, streamCode):
+        ts = int(time.time())
+        try:
+            url = f"http://api.tving.com/v1/media/stream/info?info=y{self.default_param}&noCache={ts}&mediaCode={mediaCode}&streamCode={streamCode}"
+            logger.warning(url)
+            if self.token != None:
+                self.headers['Cookie'] = f"_tving_token={self.token}"
+            info = requests.get(url, headers=self.headers, proxies=self.proxies).json()
+            logger.debug(d(self.headers))
+            #logger.debug(d(info))
+            if info['body']['result']['message'] != None:
+                logger.debug('json message : %s', info['body']['result']['message'])
+            if 'drm_yn' in info['body']['stream'] and info['body']['stream']['drm_yn'] == 'Y':
+                info['body']['drm'] = True
+                info['play_info'] = {
+                    'uri' : self.__decrypt2(mediaCode, ts, info['body']['stream']['broadcast']['widevine']['broad_url']),
+                    'drm_scheme' : 'widevine',
+                    'drm_license_uri' : 'http://cj.drmkeyserver.com/widevine_license',
+                    'drm_key_request_properties': {
+                        'origin' : 'https://www.tving.com',
+                        'sec-fetch-site' : 'cross-site',
+                        'sec-fetch-mode' : 'cors',
+                        'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36',
+                        'Host' : 'cj.drmkeyserver.com',
+                        'referer' : 'https://www.tving.com/',
+                        'AcquireLicenseAssertion' : info['body']['stream']['drm_license_assertion'],
+                    }
+                }
+
+
+            else:
+                url = info['body']['stream']['broadcast']['broad_url']
+                decrypted_url = self.__decrypt2(mediaCode, ts, url)
+                if decrypted_url.find('m3u8') == -1:
+                    decrypted_url = decrypted_url.replace('rtmp', 'http')
+                    decrypted_url = decrypted_url.replace('?', '/playlist.m3u8?')
+                #2020-06-12
+                if decrypted_url.find('smil/playlist.m3u8') != -1 and decrypted_url.find('content_type=VOD') != -1 :
+                    tmps = decrypted_url.split('playlist.m3u8')
+                    r = requests.get(decrypted_url, headers=self.headers, proxies=self.proxies)
+                    lines = r.text.split('\n')
+                    #logger.debug(lines)
+                    i = -1
+                    last = ''
+                    while len(last) == 0:
+                        last = lines[i].strip()
+                        i -= 1
+                    decrypted_url = '%s%s' % (tmps[0], last)
+                info['body']['broad_url'] = decrypted_url
+                info['body']['drm'] = False
+            #info['body']['filename'] = self.__get_filename(info)
+            return info
+        except Exception as e:
+            logger.error(f"Exception:{str(e)}")
+            logger.error(traceback.format_exc())
+
+
+
+    def __decrypt2(self, mediacode, ts, url):
+        data = {'url':url, 'code':mediacode, 'ts':ts}
+        ret = requests.post('https://sjva.me/sjva/tving.php', data=data).json()
+        return ret['url']
         

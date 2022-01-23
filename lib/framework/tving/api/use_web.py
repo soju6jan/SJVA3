@@ -68,6 +68,7 @@ def get_stream_info_by_web(content_type, media_code, quality):
             headers['referer'] = 'https://www.tving.com/%s/player/%s' % (content_type, media_code)
             url = 'https://www.tving.com/streaming/info'
             res = requests.post(url, data=data, headers=headers, cookies=cookies, proxies=get_proxies())
+            logger.error(res.text)
             data = res.json()
             #logger.debug(json.dumps(data, indent=4))
              

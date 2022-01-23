@@ -10,6 +10,7 @@ import base64
 from framework import app, py_urllib, SystemModelSetting
 from framework.logger import get_logger
 from framework.util import Util
+from support.base import d
 logger = get_logger('tving_api')
 
 #session = requests.session()
@@ -83,7 +84,7 @@ def get_vod_list(p=None, page=1):
 
 
 def get_episode_json_default(episode_code, quality):
-    #logger.debug('get_episode_json_default :%s, %s', episode_code, quality)
+    logger.debug('get_episode_json_default :%s, %s', episode_code, quality)
     ts = '%d' % time.time()
     try:
         if quality == 'stream70':
@@ -140,26 +141,33 @@ def get_episode_json_default_live(episode_code, quality, inc_quality=True):
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
         r = requests.get(url, headers=headers, proxies=get_proxies())
         data = r.json()
+        logger.debug(d(data))
 
-        #logger.debug(url)
-        if 'broad_url' in data['body']['stream']['broadcast']:
-            url = data['body']['stream']['broadcast']['broad_url']
-        else:
-            #return get_stream_info(episode_code, quality)
-            #return data, None
-            #url = data['body']['stream']['broadcast']['widevine']['broad_url']
-            return
+        logger.debug(url)
+        if data['body']['stream']['drm_yn'] == 'N':
+            if 'broad_url' in data['body']['stream']['broadcast']:
+                url = data['body']['stream']['broadcast']['broad_url']
+            else:
+                #return get_stream_info(episode_code, quality)
+                #return data, None
+                #url = data['body']['stream']['broadcast']['widevine']['broad_url']
+                return
 
-        decrypted_url = decrypt(episode_code, ts, url)
-        if decrypted_url.find('.mp4') != -1 and decrypted_url.find('/VOD/') != -1:
+            decrypted_url = decrypt(episode_code, ts, url)
+            if decrypted_url.find('.mp4') != -1 and decrypted_url.find('/VOD/') != -1:
+                return data, decrypted_url
+            if decrypted_url.find('Policy=') == -1:
+                data, ret = get_episode_json_default_live(episode_code, quality, inc_quality=False)
+                if quality == 'stream50' and ret.find('live2000.smil'):
+                    ret = ret.replace('live2000.smil', 'live5000.smil')
+                    return data, ret
+            #logger.debug('decrypted_url : %s', decrypted_url)
             return data, decrypted_url
-        if decrypted_url.find('Policy=') == -1:
-            data, ret = get_episode_json_default_live(episode_code, quality, inc_quality=False)
-            if quality == 'stream50' and ret.find('live2000.smil'):
-                ret = ret.replace('live2000.smil', 'live5000.smil')
-                return data, ret
-        #logger.debug('decrypted_url : %s', decrypted_url)
-        return data, decrypted_url
+        else:
+            url = data['body']['stream']['broadcast']['widevine']['broad_url']
+            logger.error(url)
+            decrypted_url = decrypt(episode_code, ts, url)
+            logger.error(decrypted_url)
 
 
     except Exception as exception:
@@ -378,21 +386,6 @@ def get_prefer_url(url):
 
 
 
-
-##http://api.tving.com/v2/media/stream/info?info=y&adReq=none&mediaCode=M000243234&noCache=1576026260380&streamCode=stream70&screenCode=CSSD1200&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=aeef9047f92b9dc4ebabc71fe4b124bf&pocType=APP_Z_TVING_1.0&deviceId=7e119fff-416b-4208-ad9b-ecd79f09dddb&apiUserToken=GZ2lHPOGpKyNhJY8FZgFmw%3D%3D&callback=__jp14&callingFrom=FLASH
-
-#http://api.tving.com/v2/media/stream/info?info=y&adReq=none&mediaCode=M000203036&noCache=1576026045784&streamCode=stream30&screenCode=CSSD1200&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=aeef9047f92b9dc4ebabc71fe4b124bf&pocType=APP_Z_TVING_1.0&deviceId=7e119fff-416b-4208-ad9b-ecd79f09dddb&apiUserToken=GZ2lHPOGpKyNhJY8FZgFmw%3D%3D&callback=__jp31
-
-
-#http://jtbc2-ondemand-mcdn.tving.com/jtbc2/live5000.smil/playlist.m3u8?dvr&Policy=eyJTdGF0ZW1lbnQiOiBbeyJSZXNvdXJjZSI6IioiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE1OTU2MTE4NDd9LCJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiMC4wLjAuMC8wIn19fV19&Signature=JnieNYDs9XQie39nBJaVzmO2As1wkdG-NetNj2uLQOMm9tRlcNMClNgcbnDpIpVea6mqpOyFUl7NX0d1BBsUVxvejldssOfHYIR187N1gagPWxsmBRD6ZmDTkyY6f3xtzDaekA~D3Sp-C0qJAEIsLs27rEPy5OXmiHhu4B0vTTNco6dXN-dRItUBV9Dk9LO-QyIJUzNkbbSoYMU~Dk9QCCVJr1RovIizSBNHkBQNxV1T9S3cVSZeQn2MzSRC0RRw9ENswiIL26Hu7yt3yCpyTXCzTVuAxKsubqPfZSQpmzx0J9Kj7Ym2y4GRvToaoTzv8Eiep~qUQC22eU-lGntkLQ__&Key-Pair-Id=APKAIXCIJCFRGOUEZDWA
-
-
-
-
-#https://api.tving.com/v2/media/episodes?pageNo=1&pageSize=24&order=new&adult=all&free=all&guest=all&scope=all&categoryCode=PCD&lastFrequency=y&personal=N&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603041009944
-
-#https://api.tving.com/v2/media/episodes?pageNo=1&pageSize=24&order=new&adult=all&free=all&guest=all&scope=all&categoryCode=PCA&lastFrequency=y&personal=N&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603041009950
-
 def get_vod_list2(param=None, page=1, genre='all'):
     try:
         url = 'https://api.tving.com/v2/media/episodes?pageNo=%s&pageSize=24&order=new&adult=all&free=all&guest=all&scope=all&lastFrequency=n&personal=N' % (page)
@@ -401,9 +394,7 @@ def get_vod_list2(param=None, page=1, genre='all'):
         if param is not None: 
             url += param
         url += config['default_param']
-        #'default_param' : '&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610'
         res = requests.get(url)
-        #logger.debug(url)
         return res.json()
     except Exception as exception:
         logger.error('Exception:%s', exception)
@@ -423,8 +414,6 @@ def get_program_programid(programid):
         logger.error(traceback.format_exc())
 
 
-# 에피소드 목록
-
 def get_frequency_programid(programid, page=1):
     try:
         url = 'https://api.tving.com/v2/media/frequency/program/%s?pageNo=%s&pageSize=10&order=new&free=all&adult=all&scope=all' % (programid, page)
@@ -437,14 +426,6 @@ def get_frequency_programid(programid, page=1):
         logger.error(traceback.format_exc())
 
 
-#https://api.tving.com/v2/media/frequency/program/P001343061?callback=jQuery1123049790275565939357_1603045057026&pageNo=1&pageSize=10&order=new&free=all&adult=all&scope=all&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603045057027
-
-
-# 방송정보
-#https://api.tving.com/v2/media/program/P001343061?callback=jQuery1123049790275565939357_1603045057030&pageNo=1&pageSize=10&order=name&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603045057031
-
-
-#
 def get_movies(page=1, category='all'):
     try:
         url = 'https://api.tving.com/v2/media/movies?pageNo=%s&pageSize=24&order=viewDay&free=all&adult=all&guest=all&scope=all&productPackageCode=338723&personal=N&diversityYn=N' % (page)
@@ -457,19 +438,7 @@ def get_movies(page=1, category='all'):
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
 
-"""
-https://api.tving.com/v2/media/movies?pageNo=1&pageSize=24&order=viewDay&free=all&adult=all&guest=all&scope=all&personal=N&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603081489117&drm_yn=N
 
-https://api.tving.com/v2/media/movies?callback=jQuery112307642887056924332_1603081489114&pageNo=1&pageSize=24&order=viewDay&free=all&adult=all&guest=all&scope=all&productPackageCode=1513561%2C338723&personal=N&diversityYn=N&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603081489120
-
-
-https://api.tving.com/v2/media/movies?callback=jQuery112307642887056924332_1603081489114&pageNo=1&pageSize=24&order=viewDay&free=all&adult=all&guest=all&scope=all&productPackageCode=338723&multiCategoryCode=MG100%2CMG190%2CMG230%2CMG270%2CMG290&personal=N&diversityYn=N&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603081489122
-
-https://api.tving.com/v2/media/movies?callback=jQuery112307642887056924332_1603081489114&pageNo=1&pageSize=24&order=new&free=all&adult=all&guest=all&scope=all&productPackageCode=338723&personal=N&diversityYn=N&screenCode=CSSD0100&networkCode=CSND0900&osCode=CSOD0900&teleCode=CSCD0900&apiKey=1e7952d0917d6aab1f0293a063697610&_=1603081489123
-
-&multiCategoryCode=MG100%2CMG190%2CMG230%2CMG270%2CMG290  %2C = ,
-
-"""
 
 def get_movie_json2(code, quality='stream50'):
     ts = '%d' % time.time()
@@ -479,21 +448,7 @@ def get_movie_json2(code, quality='stream50'):
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
         r = requests.get(url, headers=headers, proxies=get_proxies())
         data = r.json()
-        
-        logger.debug(url)
         return data
-        #logger.debug(data)
-        #logger.debug('json message : %s', data['body']['result']['message'])
-        
-        """
-        if data['body']['stream']['drm_yn'] == 'N':
-            if 'broad_url' in data['body']['stream']['broadcast']:
-                #decrypted_url = decrypt(code, ts, data['body']['stream']['broadcast']['broad_url'])
-                data['body']['decrypted_url'] = decrypt(code, ts, data['body']['stream']['broadcast']['broad_url'])
-            return data
-        elif data['body']['stream']['drm_yn'] == 'Y':
-            pass
-        """
         
     except Exception as exception:
         logger.error('Exception:%s', exception)
@@ -501,13 +456,10 @@ def get_movie_json2(code, quality='stream50'):
 
 
 def get_schedules(code, date, start_time, end_time):
-    #logger.debug('date : %s, start_time : %s, end_time : %s', date, start_time, end_time)
     try:
-        #url = 'https://api.tving.com/v2/media/schedules?pageNo=1&pageSize=20&order=chno&scope=all&adult=n&free=all&broadDate=%s&broadcastDate=%s&startBroadTime=%s&endBroadTime=%s&channelCode=%s' % (date, date, start_time, end_time, ','.join(code))
         url = 'https://api.tving.com/v2/media/schedules?pageNo=1&pageSize=20&order=chno&scope=all&adult=n&free=all&broadDate=%s&broadcastDate=%s&startBroadTime=%s&endBroadTime=%s&channelCode=%s' % (date, date, start_time, end_time, ','.join(code))
         url += config['default_param']
         res = requests.get(url)
-        #logger.debug(url)
         return res.json()
     except Exception as exception:
         logger.error('Exception:%s', exception)
@@ -531,6 +483,7 @@ def get_device_id(token):
     except Exception as exception:
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
+
 
 def get_device_list(token):
     try:
