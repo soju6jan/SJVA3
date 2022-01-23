@@ -141,9 +141,8 @@ def get_episode_json_default_live(episode_code, quality, inc_quality=True):
         headers['Cookie'] = SystemModelSetting.get('site_tving_token')
         r = requests.get(url, headers=headers, proxies=get_proxies())
         data = r.json()
-        logger.debug(d(data))
-
-        logger.debug(url)
+        #logger.debug(d(data))
+        #logger.debug(url)
         if data['body']['stream']['drm_yn'] == 'N':
             if 'broad_url' in data['body']['stream']['broadcast']:
                 url = data['body']['stream']['broadcast']['broad_url']
