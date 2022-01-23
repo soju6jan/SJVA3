@@ -209,11 +209,11 @@ class SupportTving:
         ts = int(time.time())
         try:
             url = f"http://api.tving.com/v1/media/stream/info?info=y{self.default_param}&noCache={ts}&mediaCode={mediaCode}&streamCode={streamCode}"
-            logger.warning(url)
+            #logger.warning(url)
             if self.token != None:
                 self.headers['Cookie'] = f"_tving_token={self.token}"
             info = requests.get(url, headers=self.headers, proxies=self.proxies).json()
-            logger.debug(d(self.headers))
+            #logger.debug(d(self.headers))
             #logger.debug(d(info))
             if info['body']['result']['message'] != None:
                 logger.debug('json message : %s', info['body']['result']['message'])
