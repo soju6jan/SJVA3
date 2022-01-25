@@ -123,9 +123,9 @@ class SupportTving:
                     url = info['stream']['broadcast']['broad_url']
                 decrypted_url = self.__decrypt2(mediacode, ts, url)
                 #logger.error(decrypted_url)
-                if decrypted_url.find('m3u8') == -1:
-                    decrypted_url = decrypted_url.replace('rtmp', 'http')
-                    decrypted_url = decrypted_url.replace('?', '/playlist.m3u8?')
+                #if decrypted_url.find('m3u8') == -1:
+                #    decrypted_url = decrypted_url.replace('rtmp', 'http')
+                #    decrypted_url = decrypted_url.replace('?', '/playlist.m3u8?')
                 #2020-06-12
                 if decrypted_url.find('smil/playlist.m3u8') != -1 and decrypted_url.find('content_type=VOD') != -1 :
                     tmps = decrypted_url.split('playlist.m3u8')
@@ -139,6 +139,20 @@ class SupportTving:
                         i -= 1
                     decrypted_url = '%s%s' % (tmps[0], last)
                     #logger.debug(f"VOD : {decrypted_url}")
+                if 'manifest.m3u8' in decrypted_url: #QVOD
+                    r = requests.get(decrypted_url, headers=self.headers, proxies=self.proxies)
+                    lines = r.text.split('\n')
+                    i = -1
+                    last = ''
+                    while len(last) == 0:
+                        last = lines[i].strip()
+                        i -= 1
+                    tmps = decrypted_url.split('//')
+                    tmps2 = tmps[1].split('/', 1)
+                    tmps3 = tmps2[1].rsplit('/', 1)
+                    tmps3[1] = re.sub(r'manifest\.m3u8\?start=(\d|-|:)+&end=(\d|-|:)+', '', tmps3[1])
+                    decrypted_url = f"{tmps[0]}//{tmps2[0]}{last}{tmps3[1]}"
+                    
                 info['broad_url'] = decrypted_url
                 info['drm'] = False
                 info['play_info'] = {
