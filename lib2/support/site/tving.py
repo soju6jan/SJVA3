@@ -101,7 +101,6 @@ class SupportTving:
             if 'drm_yn' in info['stream'] and info['stream']['drm_yn'] == 'Y' and '4k_nondrm_url' not in info['stream']['broadcast']:
                 info['drm'] = True
                 info['play_info'] = {
-                    'drm' : True,
                     'uri' : self.__decrypt2(mediacode, ts, info['stream']['broadcast']['widevine']['broad_url']),
                     'drm_scheme' : 'widevine',
                     'drm_license_uri' : 'http://cj.drmkeyserver.com/widevine_license',
@@ -152,11 +151,9 @@ class SupportTving:
                     tmps3 = tmps2[1].rsplit('/', 1)
                     tmps3[1] = re.sub(r'manifest\.m3u8\?start=(\d|-|:)+&end=(\d|-|:)+', '', tmps3[1])
                     decrypted_url = f"{tmps[0]}//{tmps2[0]}{last}{tmps3[1]}"
-                    
                 info['broad_url'] = decrypted_url
                 info['drm'] = False
                 info['play_info'] = {
-                    'drm': False, 
                     'hls': decrypted_url,
                     'url': decrypted_url,
                 }
@@ -333,7 +330,7 @@ class SupportTving:
                     ret = f"{title}.{airdate}.{qualityRes}-ST.mp4"
             else:
                 ret = f"{title}.{qualityRes}-ST.mp4"
-            #if episode_data['play_info']['drm']:
+            #if episode_data['drm']:
             #    ret = ret.replace('.mp4', '.mkv')
             from support.base import SupportFile
             return SupportFile.text_for_filename(ret)
@@ -409,7 +406,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     info = SupportTving(token=args.token, proxy=args.proxy, deviceid=args.deviceid).get_info(args.code, args.quality)
     logger.debug(d(info['play_info']))
-    if info['play_info']['drm']:
+    if info['drm']:
         SupportTving.headers['Cookie'] = f"_tving_token={args.token}"
         downloader = WVDownloader({
             'logger' : logger,
