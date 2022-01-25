@@ -244,7 +244,7 @@ class SupportTving:
 
 
     def get_program_programid(self, programid):
-        url = f'https://api.tving.com/v2/media/program/{programid}?pageNo=1&pageSize=10&order=name{self.default_headers}'
+        url = f'https://api.tving.com/v2/media/program/{programid}?pageNo=1&pageSize=10&order=name{self.default_param}'
         return self.api_get(url)
         
 
