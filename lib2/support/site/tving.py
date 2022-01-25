@@ -114,7 +114,8 @@ class SupportTving:
                         'AcquireLicenseAssertion' : info['stream']['drm_license_assertion'],
                     }
                 }
-                info['play_info']['url'] = info['play_info']['uri']
+                info['url'] = info['play_info']['uri']
+                #info['play_info']['url'] = info['play_info']['uri']
             else:
                 if '4k_nondrm_url' in info['stream']['broadcast']:
                     url = info['stream']['broadcast']['4k_nondrm_url']
@@ -153,9 +154,9 @@ class SupportTving:
                     decrypted_url = f"{tmps[0]}//{tmps2[0]}{last}{tmps3[1]}"
                 info['broad_url'] = decrypted_url
                 info['drm'] = False
+                info['url'] = decrypted_url
                 info['play_info'] = {
                     'hls': decrypted_url,
-                    'url': decrypted_url,
                 }
             if mediacode[0] in ['E', 'M']:
                 info['filename'] = self.get_filename(info)
