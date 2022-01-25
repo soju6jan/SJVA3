@@ -347,12 +347,12 @@ class SupportTving:
 
     def __decrypt2(self, mediacode, ts, url):
         try:
-            raise Exception('test')
+            #raise Exception('test')
             import sc
             ret = sc.td1(mediacode, str(ts), url).strip()
             #data = sc.td1(code, ts, url)
             ret = re.sub('[^ -~]+', '', ret)
-            #logger.error(ret)
+            #logger.error(f"[{ret}]")
             return ret
         except Exception as e:
             logger.error(f"Exception:{str(e)}")
