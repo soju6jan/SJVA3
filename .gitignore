@@ -14,4 +14,6 @@ false/
 *.txt
 *.code-workspace
 *.pem
+*.log.*
 C/
+lib/sc_source/

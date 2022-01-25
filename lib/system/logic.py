@@ -309,6 +309,7 @@ class SystemLogic(object):
             set_level(int(db.session.query(ModelSetting).filter_by(key='log_level').first().value))
             from .logic_site import SystemLogicSite
             SystemLogicSite.get_daum_cookies(force=True)
+            SystemLogicSite.create_tving_instance()
             return True                  
         except Exception as exception: 
             logger.error('Exception:%s', exception)

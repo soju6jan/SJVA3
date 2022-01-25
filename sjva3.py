@@ -1,6 +1,15 @@
 import os, sys, platform, traceback, shutil
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib2'))
+if platform.system() == 'Linux':
+    if (platform.platform().find('86') == -1 and platform.platform().find('64') == -1) or platform.platform().find('arch') != -1 or platform.platform().find('arm') != -1:
+        sys.path.insert(2, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib', 'sc', 'LinuxArm'))
+    else:
+        sys.path.insert(2, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib', 'sc', 'Linux'))
+if platform.system() == 'Windows':
+    sys.path.insert(2, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib', 'sc', 'Windows'))
+
+
 print('[SJVA3] sys.path : %s' % sys.path)
 print('[SJVA3] sys.argv : %s' % sys.argv)
 

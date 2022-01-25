@@ -52,8 +52,8 @@ class SystemLogicSite(object):
                 return jsonify(go)
             elif sub == 'tving_login':
                 try:
-                    import framework.tving.api as Tving
-                    token = Tving.do_login(req.form['tving_id'], req.form['tving_pw'], req.form['tving_login_type'])
+                    from support.site.tving import SupportTving
+                    token = SupportTving().do_login(req.form['tving_id'], req.form['tving_pw'], req.form['tving_login_type'])
                     if token is None:
                         ret['ret'] = False
                     else:
@@ -65,8 +65,8 @@ class SystemLogicSite(object):
                     logger.error(traceback.format_exc())
             elif sub == 'tving_deviceid':
                 try:
-                    import framework.tving.api as Tving
-                    device_list = Tving.get_device_list(req.form['tving_token'])
+                    from support.site.tving import SupportTving
+                    device_list = SupportTving(token=req.form['tving_token']).get_device_list()
                     if device_list is None:
                         ret['ret'] = False
                     else:
@@ -100,10 +100,21 @@ class SystemLogicSite(object):
 
     @staticmethod
     def plugin_load():
+        SystemLogicSite.create_tving_instance()
         return
         SystemLogicSite.get_daum_cookies(force=True)
         if ModelSetting.get_bool('site_daum_auto_start'):
             SystemLogicSite.scheduler_start()
+
+    @staticmethod
+    def create_tving_instance():
+        from support.site.tving import SupportTving
+        proxy = None
+        if ModelSetting.get_bool('site_tving_use_proxy'):
+            proxy = ModelSetting.get('site_tving_proxy_url')
+        SupportTving.ins = SupportTving(token=ModelSetting.get('site_tving_token'), proxy=proxy, deviceid=ModelSetting.get('site_tving_deviceid'), uuid=ModelSetting.get('site_tving_uuid'))
+
+
 
     @staticmethod
     def scheduler_start():

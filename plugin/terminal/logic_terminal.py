@@ -20,6 +20,7 @@ from framework import socketio, login_required, current_user
 
 class LogicTerminal:
     pty_list = {}
+    sid_list = []
 
     @P.blueprint.route('/')
     @login_required
@@ -34,8 +35,8 @@ class LogicTerminal:
     @socketio.on('connect', namespace=f'/{package_name}')
     def connect():
         try:
-            logger.debug(current_user)
-            logger.debug(current_user.authenticated)
+            #logger.debug(current_user)
+            #logger.debug(current_user.authenticated)
 
             logger.debug('socketio: /%s/%s, connect, %s',
                          package_name, name, request.sid)
@@ -47,6 +48,7 @@ class LogicTerminal:
             logger.debug('cmd: %s, child pid: %s', cmd, popen.pid)
             LogicTerminal.pty_list[request.sid] = {
                 'popen': popen, 'master': master, 'slave': slave}
+            LogicTerminal.sid_list.append(request.sid)
             socketio.start_background_task(
                 LogicTerminal.output_emit, master, request.sid)
         except Exception as e:
@@ -130,4 +132,3 @@ class LogicTerminal:
             except Exception as e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
-        
