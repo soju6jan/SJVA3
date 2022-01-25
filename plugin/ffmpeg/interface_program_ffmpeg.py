@@ -138,7 +138,10 @@ class Ffmpeg(object):
                         else:
                             headers_command.append('-headers')
                             #headers_command.append('\'%s: "%s"\''%(key,value))
-                            headers_command.append('\'%s:%s\''%(key,value))
+                            if platform.system() == 'Windows':
+                                headers_command.append('\'%s:%s\''%(key,value))
+                            else:
+                                headers_command.append(f'{key}:{value}')
                     command = [ModelSetting.get('ffmpeg_path'), '-y'] + headers_command + ['-i', self.url, '-c', 'copy', '-bsf:a', 'aac_adtstoasc', '-metadata', 'network=%s' % user]
             else:
                 command = [ModelSetting.get('ffmpeg_path'), '-y', '-http_proxy', self.proxy, '-i', self.url, '-c', 'copy', '-bsf:a', 'aac_adtstoasc', '-metadata', 'network=%s' % user]
@@ -158,6 +161,7 @@ class Ffmpeg(object):
                 
             try:
                 logger.debug(' '.join(command))
+                #logger.debug(command)
                 if os.path.exists(self.temp_fullpath):
                     for f in Ffmpeg.instance_list:
                         if f.idx != self.idx and f.temp_fullpath == self.temp_fullpath and f.status in [Status.DOWNLOADING, Status.READY]:
