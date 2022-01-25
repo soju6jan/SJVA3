@@ -215,14 +215,21 @@ class SupportTving:
 
 
 
-    def get_vod_list(self, program_code=None, page=1, genre=None):
+    def get_vod_list(self, program_code=None, page=1):
         url = f'http://api.tving.com/v2/media/episodes?pageNo={page}&pageSize=18&adult=all&guest=all&scope=all&personal=N{self.default_param}'
         if program_code is not None: 
             url += f'&free=all&order=frequencyDesc&programCode={program_code}'
         else:
             url += "&free=all&lastFrequency=n&order=broadDate"
-        if genre != None:
-            url += f'&categoryCode={genre}'
+        return self.api_get(url)
+    
+
+    def get_vod_list_genre(self, genre, page=1):
+        url = f'http://api.tving.com/v2/media/episodes?pageNo={page}&pageSize=18&adult=all&guest=all&scope=all&personal=N{self.default_param}'
+        if genre != None and genre != 'all':
+            url += f"&free=all&lastFrequency=y&order=broadDate&categoryCode={genre}"
+        else:
+            url += "&free=all&lastFrequency=y&order=broadDate"
         return self.api_get(url)
 
     
