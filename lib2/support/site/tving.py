@@ -327,7 +327,10 @@ class SupportTving:
             if 'frequency' in episode_data["content"]:
                 episodeno = episode_data["content"]["frequency"]
                 airdate = str(episode_data["content"]["info"]["episode"]["broadcast_date"])[2:]
-                ret = f"{title}.E{str(episodeno).zfill(2)}.{airdate}.{qualityRes}-ST.mp4"
+                if episodeno > 0:
+                    ret = f"{title}.E{str(episodeno).zfill(2)}.{airdate}.{qualityRes}-ST.mp4"
+                else:
+                    ret = f"{title}.{airdate}.{qualityRes}-ST.mp4"
             else:
                 ret = f"{title}.{qualityRes}-ST.mp4"
             #if episode_data['play_info']['drm']:
