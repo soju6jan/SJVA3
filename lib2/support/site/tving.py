@@ -267,12 +267,13 @@ class SupportTving:
         return self.api_get(url)
         
 
-    def search(keyword):
+    def search(self, keyword):
         # gubun VODBC, VODMV
         try:
             import urllib.parse
             url = 'https://search.tving.com/search/common/module/getAkc.jsp?kwd=' + urllib.parse.quote(str(keyword))
-            data = self.api_get(url)
+            data = requests.get(url, headers=self.headers).json()
+            #logger.debug(d(data))
             if 'dataList' in data['akcRsb']:
                 return data['akcRsb']['dataList']
         except Exception as exception:
