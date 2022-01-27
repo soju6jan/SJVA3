@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #########################################################
 # python
-import os
+import os, platform
 import traceback
 import logging
 import threading
