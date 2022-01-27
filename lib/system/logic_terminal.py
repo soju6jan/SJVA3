@@ -39,7 +39,7 @@ class SystemLogicTerminal(object):
         if os.path.exists(cls.yaml_path) == False:
             with open(cls.yaml_path, 'w', encoding='utf8') as f:
                 f.write(yaml_templete)
-        with open(cls.yaml_path) as f:
+        with open(cls.yaml_path, 'r', encoding='utf8') as f:
             info = yaml.load(f, Loader=yaml.FullLoader)
         return info
 
