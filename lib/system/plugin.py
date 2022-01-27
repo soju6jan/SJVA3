@@ -67,6 +67,10 @@ menu = {
     },
 }   
 
+if platform.system() == 'Windows':
+    del menu['sub2']['setting'][-1]
+
+
 def plugin_load():
     logger.debug('plugin_load:%s', package_name)
     SystemLogic.plugin_load()
