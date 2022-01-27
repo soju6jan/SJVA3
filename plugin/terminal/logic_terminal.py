@@ -1,4 +1,4 @@
-import traceback
+import traceback, threading, time
 import os
 import platform
 import pty
@@ -132,3 +132,20 @@ class LogicTerminal:
             except Exception as e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
+    
+
+    @staticmethod
+    def wait_input(command):
+        def func(command):
+            current = len(LogicTerminal.sid_list)
+            while True:
+                if len(LogicTerminal.sid_list) != current:
+                    break
+                time.sleep(0.1)
+            fd = LogicTerminal.pty_list[LogicTerminal.sid_list[-1]]['master']
+            command += "\n"
+            os.write(fd, command.encode('utf8'))
+        
+        t = threading.Thread(target=func, args=(command,))
+        t.setDaemon(True)
+        t.start()

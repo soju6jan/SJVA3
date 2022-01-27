@@ -33,6 +33,7 @@ from .logic_notify import SystemLogicNotify
 from .logic_telegram_bot import SystemLogicTelegramBot
 from .logic_auth import SystemLogicAuth
 from .logic_tool_crypt import SystemLogicToolDecrypt
+from .logic_terminal import SystemLogicTerminal
 # celery 때문에 import
 from .logic_env import SystemLogicEnv
 from .logic_site import SystemLogicSite
@@ -47,11 +48,11 @@ blueprint = Blueprint(package_name, package_name, url_prefix='/%s' % package_nam
 menu = {
     'main' : [package_name, u'설정'],
     'sub' : [
-        ['setting', u'일반설정'], ['plugin', u'플러그인'], ['information', u'정보'], ['tool', u'Tool'], ['log', u'로그']
+        ['setting', u'일반설정'], ['plugin', u'플러그인'], ['tool', u'Tool'], ['log', u'로그']
     ], 
     'sub2' : {
         'setting' : [
-            ['basic', u'기본'], ['auth', u'인증'], ['env', u'시스템'], ['notify', u'알림'], ['telegram_bot', u'텔레그램 봇'], ['selenium', u'Selenium'], ['trans', u'번역'], ['site', u'Site'], ['memo', u'메모']
+            ['basic', u'기본'], ['auth', u'인증'], ['env', u'시스템'], ['notify', u'알림'], ['telegram_bot', u'텔레그램 봇'], ['selenium', u'Selenium'], ['trans', u'번역'], ['site', u'Site'], ['memo', u'메모'], ['terminal', 'Terminal']
         ],
 
         'rss' : [
@@ -184,6 +185,9 @@ def second_menu(sub, sub2):
                 return render_template('%s_%s_%s.html' % (package_name, sub, sub2), arg=arg)
             elif sub2 == 'memo':
                 return render_template('%s_%s_%s.html' % (package_name, sub, sub2), arg=arg)
+            elif sub2 == 'terminal':
+                arg['yaml_path'] = SystemLogicTerminal.yaml_path.replace(path_app_root, '')
+                return render_template('%s_%s_%s.html' % (package_name, sub, sub2), arg=arg)
         elif sub == 'tool':
             arg = ModelSetting.to_dict()
             arg['sub'] = sub2
@@ -261,6 +265,8 @@ def second_ajax(sub, sub2):
             return SystemLogicSite.process_ajax(sub2, request)
         elif sub == 'crypt':
             return SystemLogicToolDecrypt.process_ajax(sub2, request)
+        elif sub == 'terminal':
+            return SystemLogicTerminal.process_ajax(sub2, request)
     except Exception as exception: 
         logger.error('Exception:%s', exception)
         logger.error(traceback.format_exc())
