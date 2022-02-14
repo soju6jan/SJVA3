@@ -73,9 +73,9 @@ class LogicPMBase(LogicModuleBase):
     def process_menu(self, sub, req):
         arg = P.ModelSetting.to_dict()
         arg['sub'] = self.name
-        logger.error(path_app_root)
+        #logger.error(path_app_root)
         arg['path_app_root'] = path_app_root.replace('\\', '/')
-        logger.error(arg['path_app_root'])
+        #logger.error(arg['path_app_root'])
         try:
             return render_template(f'{package_name}_{name}_{sub}.html', arg=arg)
         except Exception as e:
@@ -213,8 +213,14 @@ class LogicPMBase(LogicModuleBase):
             ret = func(*args)
 
         if command == 'size':
-            noti_data = {'type':'info', 'msg' : f"경로 : {ret['target']}<br>크기 : {ret['sizeh']}"}
-            socketio.emit("notify", noti_data, namespace='/framework', broadcast=True)    
+            #noti_data = {'type':'info', 'msg' : f"경로 : {ret['target']}<br>크기 : {ret['sizeh']}"}
+            #socketio.emit("notify", noti_data, namespace='/framework', broadcast=True)    
+            modal_data = {
+                'title' : 'Size',
+                'data' : f"경로 : {ret['target']}\n크기 : {ret['sizeh']}",
+            }
+            logger.debug(d(modal_data))
+            socketio.emit("modal", modal_data, namespace='/framework', broadcast=True)    
         elif command == 'size_ret':
             return ret
         elif command == 'backup':
