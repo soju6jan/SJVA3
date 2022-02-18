@@ -1,7 +1,6 @@
 from .file import *
 from .env import *
 from .aes_cipher import AESCipher
-from .sjva_support_handle import SJVASupportControl
 from .vtt_to_srt import convert_vtt_to_srt
 
 headers = {
