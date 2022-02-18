@@ -5,9 +5,14 @@ from apiclient.discovery import build
 from oauth2client.file import Storage
 from oauth2client import tools
 from oauth2client.client import flow_from_clientsecrets
-import gspread, time
-from gspread_formatting  import cellFormat, textFormat, color, format_cell_range
-
+try:
+    import gspread, time
+    from gspread_formatting  import cellFormat, textFormat, color, format_cell_range
+except:
+    os.system('pip install gspread')
+    os.system('pip install gspread_formatting')
+    import gspread, time
+    from gspread_formatting  import cellFormat, textFormat, color, format_cell_range
 from support.base import get_logger, d
 
 logger = get_logger()
