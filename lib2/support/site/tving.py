@@ -184,6 +184,9 @@ class SupportTving:
                     try:
                         # 2020-11-10 현재 /v1 에서는 drm채널인지 알려주지않고, 방송이 drm 적용인지 알려줌. 그냥 fix로..
                         info = {'is_drm':self.is_drm_channel(item['live_code'])}
+                        if include_drm == False and info['is_drm']:
+                            continue
+
                         info['id'] = item["live_code"]
                         info['title'] = item['schedule']['channel']['name']['ko']
                         info['episode_title'] = ' '
