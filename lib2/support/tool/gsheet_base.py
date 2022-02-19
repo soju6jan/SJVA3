@@ -9,8 +9,8 @@ try:
     import gspread, time
     from gspread_formatting  import cellFormat, textFormat, color, format_cell_range
 except:
-    os.system('pip install gspread')
-    os.system('pip install gspread_formatting')
+    os.system('pip3 install gspread')
+    os.system('pip3 install gspread_formatting')
     import gspread, time
     from gspread_formatting  import cellFormat, textFormat, color, format_cell_range
 from support.base import get_logger, d
