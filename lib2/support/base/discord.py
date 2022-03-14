@@ -1,4 +1,10 @@
 import os, io, traceback, time, random, requests
+try:
+    from discord_webhook import DiscordWebhook, DiscordEmbed
+except:
+    os.system('pip3 install discord-webhook')
+
+from support.base import get_logger, d
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from . import logger
 
