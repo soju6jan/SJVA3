@@ -1,10 +1,21 @@
 import os, sys, traceback
+try:
+    import oauth2client
+except:
+    os.system('pip install oauth2client')
+    import oauth2client
 
-import oauth2client
-from apiclient.discovery import build
+
 from oauth2client.file import Storage
 from oauth2client import tools
 from oauth2client.client import flow_from_clientsecrets
+
+try:
+    from apiclient.discovery import build
+except:
+    os.system('pip install google-api-python-client')
+    from apiclient.discovery import build
+
 try:
     import gspread, time
     from gspread_formatting  import cellFormat, textFormat, color, format_cell_range
