@@ -151,7 +151,7 @@ class MovieSearch(object):
                 pass
             if movie is None:
                 logger.error("Daum Movie search fail!!")
-                logger.error(lxml.etree.tostring(html))
+                #logger.error(lxml.etree.tostring(html))
                 return None
             
             title_tag = movie.get_element_by_id('movieTitle')
@@ -174,7 +174,7 @@ class MovieSearch(object):
             country = ''
             if country_tag:
                 country = country_tag[0].text_content().split('|')[0].strip()
-                logger.debug(country)
+                #logger.debug(country)
             more['poster'] = movie.xpath('//*[@id="nmovie_img_0"]/a/img')[0].attrib['src']
             more['title'] = movie.xpath('//*[@id="movieTitle"]/span')[0].text_content()
             tmp = movie.xpath('//*[@id="movieEColl"]/div[3]/div/div[1]/div[2]/dl')
@@ -185,7 +185,7 @@ class MovieSearch(object):
             more['info'].append(country_tag[0].text_content().strip())
 
             #2019-09-07
-            logger.debug(more['info'][0])
+            #logger.debug(more['info'][0])
             tmp = more['info'][0].split('|')
             if len(tmp) == 5:
                 more['country'] = tmp[0].replace(u'외', '').strip()
