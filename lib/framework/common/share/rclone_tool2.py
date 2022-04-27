@@ -150,7 +150,7 @@ class RcloneTool2(object):
     @staticmethod
     def can_use_share(rclone_path, config_path, remote_path):
         try:
-            size_data = RcloneTool2.size(rclone_path, config_path, '%s:{1XFTIbU6FrKCUnuBM6TXQmChQUUMYxZA4}' % remote_path.split(':')[0])
+            size_data = RcloneTool2.size(rclone_path, config_path, '%s:{1PwFA8w365qiPHtVQpqy_qmkQmRtklT5x}' % remote_path.split(':')[0])
             if size_data['count'] == 1 and size_data['bytes'] == 7:
                 return True
         except Exception as exception: 
