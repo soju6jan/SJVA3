@@ -13,7 +13,7 @@ if platform.system() == 'Windows':
 print('[SJVA3] sys.path : %s' % sys.path)
 print('[SJVA3] sys.argv : %s' % sys.argv)
 
-def prepare_starting():
+def prepare_starting(): 
     try:
         from gevent import monkey;monkey.patch_all()
         print('[SJVA3] gevent mokey patch!!')
