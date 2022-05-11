@@ -9,7 +9,8 @@ from framework import db, scheduler, path_data, socketio, SystemModelSetting, ap
 from plugin import LogicModuleBase, default_route_socketio
 from tool_expand import ToolExpandFileProcess
 from tool_base import ToolShutil, d, ToolUtil, ToolBaseFile, ToolOSCommand, ToolSubprocess
-from tool_expand import EntityKtv
+from tool_expand import EntityKtv, ToolExpandDiscord
+from support.base import d
 
 from .plugin import P
 logger = P.logger
@@ -52,6 +53,7 @@ class Task(object):
                 data['db'] = artist
 
                 Task.artist_process(data, con, cur)
+                #return
             
                 data['status']['total_size'] += data['meta']['total']
                 data['status']['remove_size'] += data['meta']['remove']
@@ -100,27 +102,37 @@ class Task(object):
             logger.warning(f"{data['db']['title']} 아티스트 분석 실패")
             return
         
-        album_cs = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 9 and parent_id = ? ORDER BY "index"', (data['db']['id'],))
+        # 2022-05-11 앨범은 인덱스 모두 1임.
+        # 트랙은 순서대로 있음
+        #album_cs = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 9 and parent_id = ? ORDER BY "index"', (data['db']['id'],))
+        album_cs = con.execute('SELECT * FROM metadata_items WHERE metadata_type = 9 and parent_id = ?', (data['db']['id'],))
         album_cs.row_factory = dict_factory
+        data['albums'] = []
         for album in album_cs.fetchall():
-            album_index = album['index']
+            #album_index = album['index']
+            #logger.warning(album_index)
 
-            if album_index not in data['albums']:
-                data['albums'][album_index] = {'db':album, 'use_filepath':[], 'remove_filepath':[]}
-                album_data = data['albums'][album_index]
-                album_data['meta'] = {'remove':0}
-                album_data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'Albums', album_data['db']['hash'][0], f"{album_data['db']['hash'][1:]}.bundle")
-                data['meta']['total'] += ToolBaseFile.size(start_path=album_data['meta']['metapath'])
-                
-                combined_xmlpath = os.path.join(album_data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
+            #if album_index not in data['albums']:
+            
+            #data['albums'][album_index] = {'db':album, 'use_filepath':[], 'remove_filepath':[]}
+            album_data = {'db':album, 'use_filepath':[], 'remove_filepath':[]}
+            album_data['meta'] = {'remove':0}
+            album_data['meta']['metapath'] = os.path.join(ModelSetting.get('base_path_metadata'), 'Albums', album_data['db']['hash'][0], f"{album_data['db']['hash'][1:]}.bundle")
+            data['meta']['total'] += ToolBaseFile.size(start_path=album_data['meta']['metapath'])
+            
+            combined_xmlpath = os.path.join(album_data['meta']['metapath'], 'Contents', '_combined', 'Info.xml')
 
-                ret = Task.xml_analysis(combined_xmlpath, album_data)
-                if ret == False:
-                    logger.warning(combined_xmlpath)
-                    logger.warning(f"{album_data['db']['title']} 앨범 분석 실패")
-                
+            ret = Task.xml_analysis(combined_xmlpath, album_data)
+            if ret == False:
+                logger.warning(combined_xmlpath)
+                logger.warning(f"{album_data['db']['title']} 앨범 분석 실패")
+            else:
+                data['albums'].append(album_data)
+
 
         query = ""
+
+        #logger.debug(d(data))
 
         if data['command'] == 'start2':
             # 쇼 http로 
@@ -143,16 +155,32 @@ class Task(object):
                 sql += '  WHERE id = {} ;\n'.format(data['db']['id'])
                 query += sql
 
-            for album_index, album in data['albums'].items():
+            for album in data['albums']:
                 if 'process' not in album:
                     continue
                 sql = 'UPDATE metadata_items SET '
-                if album['process']['poster']['url'] != '':
+                # localmedia 로 생성된 파일은 url이 셋된다.
+                #if album['process']['poster']['url'] != '':
+                # 2022-05-11 태그로 생성된 앨범은 디스코드에 올리고 셋
+                if album['process']['poster']['url'] != '' and album['process']['poster']['url'].startswith('http') == False:
+                    if 'localpath' in album['process']['poster'] and album['process']['poster']['localpath'] != '':
+                        localpath = album['process']['poster']['localpath']
+                        if localpath[0] != '/':
+                            localpath = localpath.replace('/', '\\')
+                        if os.path.exists(localpath):
+                            if data['dryrun'] == False:
+                                discord_url = ToolExpandDiscord.discord_proxy_image_localfile(localpath)
+                                if discord_url is not None:
+                                    album['process']['poster']['url'] = discord_url
+                                    logger.warning(discord_url)
+
+                if album['process']['poster']['url'].startswith('http'):
                     sql += ' user_thumb_url = "{}", '.format(album['process']['poster']['url'])
                     try: data['use_filepath'].remove(album['process']['poster']['localpath'])
                     except: pass
                     try: data['use_filepath'].remove(album['process']['poster']['realpath'])
                     except: pass
+
                 if album['process']['art']['url'] != '':
                     sql += ' user_art_url = "{}", '.format(album['process']['art']['url'])
                     try: data['use_filepath'].remove(album['process']['art']['localpath'])
@@ -171,7 +199,7 @@ class Task(object):
             PlexDBHandle.execute_query(query)
 
 
-        #logger.error(data['meta']['remove'] )
+        #logger.warning(data['meta']['remove'] )
 
         for base, folders, files in os.walk(data['meta']['metapath']):
             for f in files:
@@ -190,7 +218,7 @@ class Task(object):
                             os.remove(filepath)
 
         
-        for album_index, album in data['albums'].items():
+        for album in data['albums']:
             for base, folders, files in os.walk(album['meta']['metapath']):
                 for f in files:
                     #logger.warning(data['file_count'])
@@ -213,7 +241,7 @@ class Task(object):
         for base, folders, files in os.walk(data['meta']['metapath']):
             if not folders and not files:
                 os.removedirs(base)
-        for album_index, album in data['albums'].items():
+        for album in data['albums']:
             for base, folders, files in os.walk(album['meta']['metapath']):
                 if not folders and not files:
                     os.removedirs(base)
@@ -248,6 +276,7 @@ class Task(object):
                 continue
             data['xml_info'][value[1]] = []
             for item in root.find(value[1]).findall('item'):
+                #logger.warning(d(item))
                 entity = {}
                 if 'url' not in item.attrib:
                     continue
