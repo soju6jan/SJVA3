@@ -46,7 +46,7 @@ def start_app():
    
     for i in range(10):
         try:
-            framework.socketio.run(app, host='0.0.0.0', port=app.config['config']['port'])
+            framework.socketio.run(app, host='127.0.0.1', port=app.config['config']['port'])
             print('EXIT CODE : %s' % framework.exit_code)
             # 2021-05-18
             if app.config['config']['running_type'] in ['termux', 'entware']:
