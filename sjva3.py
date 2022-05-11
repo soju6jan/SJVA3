@@ -1,4 +1,4 @@
-import os, sys, platform, traceback, shutil
+import os, sys, platform, traceback, shutil, time
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 sys.path.insert(1, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib2'))
 if platform.system() == 'Linux':
@@ -43,10 +43,10 @@ def start_app():
     
     app = framework.app
     celery = framework.celery
-   
+    host = '0.0.0.0'
     for i in range(10):
         try:
-            framework.socketio.run(app, host='127.0.0.1', port=app.config['config']['port'])
+            framework.socketio.run(app, host=host, port=app.config['config']['port'])
             print('EXIT CODE : %s' % framework.exit_code)
             # 2021-05-18
             if app.config['config']['running_type'] in ['termux', 'entware']:
@@ -58,8 +58,8 @@ def start_app():
                     print('framework.exit_code is -1')
             break
         except Exception as exception:
-            print(str(exception))
-            import time
+            print(f'SJVA Start ERROR : {str(exception)}')
+            host = '127.0.0.1'
             time.sleep(10*i)
             continue
         except KeyboardInterrupt:
