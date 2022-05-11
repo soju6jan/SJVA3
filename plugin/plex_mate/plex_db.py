@@ -63,6 +63,7 @@ class PlexDBHandle(object):
     @classmethod
     def execute_query(cls, sql, sql_filepath=None):
         try:
+            sql += f"{sql}\ncommit;"
             if sql_filepath is None:
                 sql_filepath = os.path.join(path_data, 'tmp', f"{str(time.time()).split('.')[0]}.sql")
             ToolBaseFile.write(sql, sql_filepath)
