@@ -31,6 +31,8 @@ class SupportFile(object):
             import requests
             with open(filepath, "wb") as file_is:   # open in binary mode
                 response = requests.get(url, headers=headers)               # get request
+                if len(response.content) == 0:
+                    return False
                 file_is.write(response.content)      # write to file
                 return True
         except Exception as exception:
