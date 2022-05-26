@@ -127,17 +127,31 @@ class SupportTving:
                 #    decrypted_url = decrypted_url.replace('rtmp', 'http')
                 #    decrypted_url = decrypted_url.replace('?', '/playlist.m3u8?')
                 #2020-06-12
+                # 2022-05-26
+                # smil/playlist.m3u8 이거 영화만 탐??
+                #logger.error(decrypted_url)
                 if decrypted_url.find('smil/playlist.m3u8') != -1 and decrypted_url.find('content_type=VOD') != -1 :
                     tmps = decrypted_url.split('playlist.m3u8')
                     r = requests.get(decrypted_url, headers=self.headers, proxies=self.proxies)
                     lines = r.text.split('\n')
-                    #logger.debug(lines)
-                    i = -1
-                    last = ''
-                    while len(last) == 0:
-                        last = lines[i].strip()
-                        i -= 1
-                    decrypted_url = '%s%s' % (tmps[0], last)
+                    #logger.debug(d(lines))
+                    # 2022-05-26 이전까지는 고화질이 마지막에 나왔을텐데 영화에서 맨 처음에 나온다고 함. 당연히 확인했을테니 마지막이었겠지?
+                    #i = -1
+                    #last = ''
+                    #while len(last) == 0:
+                    #    last = lines[i].strip()
+                    #    i -= 1
+                    max_bandwidth = 0
+                    max_url = None
+                    while len(lines) > 0: #for line in lines:
+                        line = lines.pop(0)
+                        match = re.search('BANDWIDTH=(?P<bw>\d+)', line)
+                        if match:
+                            bw = int(match.group('bw'))
+                            if bw > max_bandwidth:
+                                max_bandwidth = bw
+                                max_url = lines.pop(0)
+                    decrypted_url = '%s%s' % (tmps[0], max_url)
                     #logger.debug(f"VOD : {decrypted_url}")
                 if 'manifest.m3u8' in decrypted_url: #QVOD
                     r = requests.get(decrypted_url, headers=self.headers, proxies=self.proxies)
@@ -160,6 +174,7 @@ class SupportTving:
                 }
             if mediacode[0] in ['E', 'M']:
                 info['filename'] = self.get_filename(info)
+            #logger.warning(d(info))
             return info
         except Exception as e:
             logger.error(f"Exception:{str(e)}")
