@@ -236,3 +236,28 @@ class SupportFile(object):
         import yaml
         with open(filepath, 'w', encoding='utf8') as f:
             yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+
+    
+
+    @classmethod
+    def makezip_all(cls, zip_path, zip_filepath=None, zip_extension='zip', remove_zip_path=True):
+        import zipfile, shutil
+        try:
+            if os.path.exists(zip_path) == False:
+                return False
+            if zip_filepath == None:
+                zipfilepath = os.path.join(os.path.dirname(zip_path), f"{os.path.basename(zip_path)}.{zip_extension}")
+            if os.path.exists(zipfilepath):
+                os.remove(zipfilepath)
+            zip = zipfile.ZipFile(zipfilepath, 'w')
+            for (path, dir, files) in os.walk(zip_path):
+                for file in files:
+                    zip_file.write(os.path.join(path, file), compress_type=zipfile.ZIP_DEFLATED)
+            zip.close()
+            if remove_zip_path:
+                shutil.rmtree(zip_path)
+            return zipfilepath
+        except Exception as e:
+            logger.error(f'Exception:{str(e)}')
+            logger.error(traceback.format_exc())
+        return None
