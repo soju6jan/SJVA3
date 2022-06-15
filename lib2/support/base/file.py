@@ -253,6 +253,11 @@ class SupportFile(object):
             zip = zipfile.ZipFile(zipfilepath, 'w')
             for file_path in Path(zip_path).rglob("*"):
                 zip.write(file_path, file_path.name)
+
+
+            for (path, dir, files) in os.walk(zip_path):
+                for file in files:
+                    zip.write(os.path.join(path.replace(zip_path+'/', '').replace(zip_path+'\\', ''), file), compress_type=zipfile.ZIP_DEFLATED)
             zip.close()
             if remove_zip_path:
                 shutil.rmtree(zip_path)
