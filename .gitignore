@@ -17,3 +17,4 @@ false/
 *.log.*
 C/
 lib/sc_source/
+rclone2/
