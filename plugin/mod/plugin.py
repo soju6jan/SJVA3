@@ -2,8 +2,6 @@ import os, sys, traceback, re, json, threading, time, shutil, platform
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, jsonify, redirect, request
 from framework import app, path_data, path_app_root, db, scheduler, SystemModelSetting, socketio, celery
-from framework.logger import get_logger
-from framework.util import Util
 from plugin import LogicModuleBase, get_model_setting, Logic, default_route, PluginUtil
 from support import get_logger, d
 
