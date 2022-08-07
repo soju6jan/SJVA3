@@ -1,20 +1,10 @@
-#########################################################
-# python
-import os, traceback
-
-# third-party
-import requests
-from flask import Blueprint, request, send_file, redirect
-
-# sjva 공용
-from framework import app, path_data, check_api, py_urllib, SystemModelSetting
+import os, sys, traceback, re, json, threading, time, shutil, platform
+from datetime import datetime, timedelta
+from flask import Blueprint, render_template, jsonify, redirect, request
+from framework import app, path_data, path_app_root, db, scheduler, SystemModelSetting, socketio, celery
 from framework.logger import get_logger
 from framework.util import Util
-from plugin import get_model_setting, Logic, default_route, LogicModuleBase
-from tool_base import ToolUtil, d
-
-# 패키지
-#########################################################
+from plugin import LogicModuleBase, get_model_setting, Logic, default_route, PluginUtil
 
 class P(object):
     package_name = __name__.split('.')[0]
