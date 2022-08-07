@@ -56,7 +56,7 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
                     else:
                         ret = {'ret':'warning', 'msg':'실패'}
                 elif command == 'remove_collection':
-                    query = f"DELETE FROM metadata_items WHERE metadata_type = 18 AND library_section_id = {req.form['arg1']};"
+                    query = f"DELETE FROM metadata_items WHERE metadata_type = 18 AND library_section_id = {req.form['arg1']}; commit;"
                     result = PlexDBHandle.execute_query(query)
                     if result:
                         ret = {'ret':'success', 'msg':'정상적으로 처리되었습니다.'}
@@ -70,7 +70,7 @@ class LogicPMDBToolSimple(LogicSubModuleBase):
                     else:
                         ret = {'ret':'warning', 'msg':'실패'}
                 elif command == 'remove_sjva_extra':
-                    query = f"DELETE FROM metadata_items WHERE metadata_type = 12 AND guid LIKE 'sjva://sjva.me%';"
+                    query = f"DELETE FROM metadata_items WHERE metadata_type = 12 AND guid LIKE 'sjva://sjva.me%'; commit;"
                     result = PlexDBHandle.execute_query(query)
                     if result:
                         ret = {'ret':'success', 'msg':'정상적으로 처리되었습니다.'}
