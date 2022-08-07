@@ -5,6 +5,7 @@ from framework import app, path_data, path_app_root, db, scheduler, SystemModelS
 from framework.logger import get_logger
 from framework.util import Util
 from plugin import LogicModuleBase, get_model_setting, Logic, default_route, PluginUtil
+from support import get_logger, d
 
 class P(object):
     package_name = __name__.split('.')[0]
