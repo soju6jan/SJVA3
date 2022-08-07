@@ -66,6 +66,11 @@ class LogicPMWebhook(LogicModuleBase):
 
             #if data['mode'] == 'start':
             self.start(data)
+        elif sub == 'plex':
+            data = json.loads(req.form['payload'])
+            data = req.form
+            logger.error(d(data))
+
 
 
         return "OK"
@@ -98,131 +103,61 @@ class TaskMakeCache:
         logger.debug(args)
         logger.debug(kwargs)
 
-        #task = TaskScan()
-        #task._start()
-        #logger.debug(__class__)
+        TaskMakeCache(kwargs).process()
+
+
+    def __init__(self, data):
+        self.data = data
+
+
+    def process(self):
+        if self.data['mode'] == 'start':
+            self.fileread_start()
     
-    def __init__(self):
-        self.section_locations = None
-        self.run_queue = None
-        self.process_count = 0
-        ModelScanItem.not_finished_to_ready()
+    def fileread_start(self):
 
-    def _start(self):
-        t = threading.Thread(target=self.wait, args=())
-        t.daemon = True
-        t.start()
-
-        self.queue = queue.Queue()
-
-
-        t = threading.Thread(target=self.enqueue, args=())
+        t = threading.Thread(target=self.fileread, args=())
         t.daemon = True
         t.start()
 
 
-        t = threading.Thread(target=self.run, args=())
-        t.daemon = True
-        t.start()
+    def fileread(self):
 
-
-    def wait(self):
-        #logger.warning("33333333333333333333")
+        logger.error(d(self.data))
         
-        while True:
-            self.section_locations = PlexDBHandle.section_location()
-            #logger.debug(section_locations)
-            time.sleep(10)
-            #logger.warning(f"WAIT  : {datetime.now()}")
-            items = ModelScanItem.get_items('wait')
+        original_size = os.stat(self.data['file']).st_size
+        logger.warning(f"오리지널 크기: {original_size}")
+        logger.warning(f"오리지널 크기: {original_size}")
+        action_flag = True
+        if platform.system() != 'Windows':
+            cache_filepath = self.data['file'].replace("/mnt/gds", "/mnt/cache/vfs/gds{2O0mA}")
+            logger.debug(cache_filepath)
+            cache_size = os.stat(cache_filepath).st_size
+            logger.warning(f"캐시 크기: {cache_size}")
 
-            for item in items:
-                try:
-                    logger.debug(d(item.as_dict()))
-                    if item.status == 'ready':
-                        self.process_ready(item)
-                    if item.status == 'wait_add_not_find':
-                        self.process_add(item)
+            #tmp = os.system(f'du {cache_filepath}')
+            from support.base import SupportProcess
+            tmp = SupportProcess.execute(['du', '-B', '1', cache_filepath])
+            logger.error (tmp)
+            cache_size = tmp.split(' ')[0]
+            match = re.match(r'^\d+', tmp)
+            cache_size = match.group(0)
+            logger.info(cache_size)
 
-                                
-                except ScanException as e:
-                    logger.error(f'Known Exception :{str(e)}')
-                except Exception as e: 
-                    logger.error(f'Exception:{str(e)}')
-                    logger.error(traceback.format_exc())   
-                finally:
-                    item.save()
-
-
-    def enqueue(self):
-        while True:
-            time.sleep(10)
-            #logger.warning(f"ENQUEUE  : {datetime.now()}")
-            items = ModelScanItem.get_items('run')
-            #current_queue = list(self.queue.queue)
-            #logger.warning(current_queue)
-            for item in items:
-                try:
-                    logger.warning(d(item.as_dict()))
-                    self.queue.put(item)
-                    item.set_status(item.status.replace('run_', 'enqueue_'))
-                except Exception as e: 
-                    #logger.error(f'Exception:{str(e)}')
-                    #logger.error(traceback.format_exc()) 
-                    pass
-                finally:
-                    item.save() 
-
-            #logger.error(f"self.queue.empty() : {self.queue.empty()}")
-            #logger.error(f"self.queue.empty() : {self.queue.qsize()}")
-            #if self.queue.empty():
-            #    continue
-
-
-    def run(self):
-        while True:
-            try:
-                max_process_count = ModelSetting.get_int(f'{name}_max_process_count')
-                while True:
-                    try:
-                        if self.process_count < max_process_count:
-                            break
-                        time.sleep(5)
-                    except Exception as e: 
-                        logger.error(f'Exception:{str(e)}')
-                        logger.error(traceback.format_exc())  
-                        break
-                item = self.queue.get()
-                item = ModelScanItem.get_by_id(item.id)
-                self.scan(item)
-                logger.error(item)
-                self.queue.task_done()
-            except Exception as e: 
-                logger.error(f'Exception:{str(e)}')
-                logger.error(traceback.format_exc())   
-            finally:
-                item.save()
-
-
-    def scan(self, item):
-        def func(db_id):
-            item = ModelScanItem.get_by_id(db_id)
-            self.process_count += 1
-            PlexBinaryScanner.scan_refresh2(item.section_id, item.scan_folder, timeout=60*30)
-            time.sleep(100)
-            self.process_count -= 1
+            cache_size = int(cache_size)
             
-            #self.queue.task_done()
-            item.finish_time = datetime.now()
-            if item.target_mode == 'file':
-                data = self.get_meta(item)
-                logger.debug(data)
-                if item.mode == 'add' and len(data) > 0:
-                    item.add_metadata_item_id = data[0]['metadata_item_id']
-                #if item.mode == 'remove' and len(data) == 0:
-                #    item.set_status('finish_remove_already_not_in_db')
-                #    raise ScanException('finish_remove_already_not_in_db')
-            item.set_status(f'finish_{item.mode}', save=True)
-        t = threading.Thread(target=func, args=(item.id,))
-        t.daemon = True
-        t.start()
+            diff = abs(original_size-cache_size)
+            if diff < 1024 * 1024 * 10: # 10메가
+                logger.warning("캐시 완료")
+                action_flag = False
+            
+        if action_flag:
+            f = open(self.data['file'], 'rb')
+            count = 0
+            while True:
+                buf = f.read(1024*1024)
+                count += 1
+                current = f.tell()
+                logger.debug(f"count : {count} {current} {int(current/original_size*100)}")
+                if len(buf) == 0:
+                    break

@@ -190,3 +190,49 @@ class PlexBinaryScanner(object):
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
             logger.error('command : %s', command)
+
+
+
+    @classmethod
+    def meta_refresh_by_id(cls, item_id, timeout=None):
+        def demote(user_uid, user_gid):
+            def result():
+                os.setgid(user_gid)
+                os.setuid(user_uid)
+            return result
+        shell = False
+        env = dict(PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR=f"{os.path.dirname(os.path.dirname(ModelSetting.get('base_path_metadata')))}", **os.environ)
+        force_log = False
+        try:
+            if platform.system() == 'Windows':
+                command = f'"{ModelSetting.get("base_bin_scanner")}" --force --refresh --item {item_id}"'
+                tmp = []
+                if type(command) == type([]):
+                    for x in command:
+                        if x.find(' ') == -1:
+                            tmp.append(x)
+                        else:
+                            tmp.append(f'"{x}"')
+                    command = ' '.join(tmp)
+                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell, env=env, encoding='utf8')
+            else:
+                command = [ModelSetting.get("base_bin_scanner"), '--force', '--refresh', '--item', str(item_id)]
+                process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=shell, env=env, preexec_fn=demote(ModelSetting.get_int('base_bin_scanner_uid'), ModelSetting.get_int('base_bin_scanner_gid')), encoding='utf8')
+
+            new_ret = {'status':'finish', 'log':None}
+            logger.debug(f"PLEX SCANNER COMMAND\n{' '.join(command)}")
+            try:
+                process_ret = process.wait(timeout=timeout)
+                logger.debug(f"process_ret : {process_ret}")
+            except:
+                import psutil
+                process = psutil.Process(process.pid)
+                for proc in process.children(recursive=True):
+                    proc.kill()
+                process.kill()
+        except Exception as exception: 
+            logger.error('Exception:%s', exception)
+            logger.error(traceback.format_exc())
+            logger.error('command : %s', command)
+        finally:
+            pass

@@ -109,7 +109,9 @@ $(function(){
       if (key == 'refresh_web') {
         global_send_command_sub('refresh_web', data.metadata_items_id);
       } else if (key == 'refresh_bin') {
-        global_send_command_sub('refresh_bin', data.library_section_id, data.file);
+        global_send_command_sub('refresh_bin', data.metadata_items_id);
+      } else if (key == 'scan_bin') {
+        global_send_command_sub('scan_bin', data.library_section_id, data.file);
       } else if (key == 'analyze_web') {
         global_send_command_sub('analyze_web', data.metadata_items_id);
       } else if (key == 'analyze_bin') {
@@ -128,6 +130,7 @@ $(function(){
     items: {
         "refresh_web": {name: "메타데이터 새로 고침 (웹)", icon: "edit"},
         "refresh_bin": {name: "메타데이터 새로 고침 (Bin)", icon: "edit"},
+        "scan_bin": {name: "디렉토리 스캔 (Bin)", icon: "edit"},
         "analyze_web": {name: "분석 (웹)", icon: "edit"},
         "analyze_bin": {name: "분석 (Bin)", icon: "edit"},
         "remove_metadata": {name: "메타데이터 폴더 삭제", icon: "delete"},
