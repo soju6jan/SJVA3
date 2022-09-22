@@ -157,6 +157,9 @@ function show_result_add_download(data) {
     } else if (data.default_torrent_program == '3') {
       program = 'aria2에 토렌트'
       sub = 'aria2'
+    } else if (data.default_torrent_program == '4') {
+      program = 'PikPak에 토렌트'
+      sub = 'pikpak'
     }
   }
   catch {
