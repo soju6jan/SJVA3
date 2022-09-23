@@ -207,6 +207,7 @@ function get_torrent_program_name(p) {
   else if (p == '1') return '다운로드스테이션'
   else if (p == '2') return '큐빗토렌트'
   else if (p == '3') return 'aria2'
+  else if (p == '4') return 'PikPak'
 }
 
 
