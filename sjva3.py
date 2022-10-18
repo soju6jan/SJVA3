@@ -35,9 +35,13 @@ def prepare_starting():
         """
         remove_plugins = ['klive', 'klive_plus']
         for plugin in remove_plugins:
-            plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', plugin)
-            if os.path.exists(plugin_path):
-                shutil.rmtree(os.path.join(plugin_path, '.git'))
+            try:
+                plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', plugin)
+                if os.path.exists(plugin_path):
+                    shutil.rmtree(os.path.join(plugin_path, '.git'))
+            except Exception as exception:
+                print('Exception:%s' % exception)
+                print(traceback.format_exc())
 
     except Exception as exception:
         print('Exception:%s' % exception)
