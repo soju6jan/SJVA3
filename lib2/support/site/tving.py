@@ -390,6 +390,9 @@ class SupportTving:
         try:
             #raise Exception('test')
             import sc
+            logger.debug(mediacode)
+            logger.debug(ts)
+            logger.debug(url)
             ret = sc.td1(mediacode, str(ts), url).strip()
             #data = sc.td1(code, ts, url)
             ret = re.sub('[^ -~]+', '', ret)

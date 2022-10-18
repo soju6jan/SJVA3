@@ -23,6 +23,7 @@ def prepare_starting():
     ######################################
 
     try:
+        """
         remove_plugins = ['av_agent', 'aria2', 'kthoom', 'synoindex', 'nginx', 'launcher_calibre_web', 'launcher_gateone', 'launcher_greentunnel', 'launcher_guacamole', 'launcher_ivViewer', 'launcher_tautulli', 'launcher_torrssen2', 'launcher_xteve']
         for plugin in remove_plugins:
             plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', plugin)
@@ -31,6 +32,13 @@ def prepare_starting():
                 shutil.rmtree(plugin_path)
             if os.path.exists(plugin_db_path):
                 os.remove(plugin_db_path)
+        """
+        remove_plugins = ['klive', 'klive_plus']
+        for plugin in remove_plugins:
+            plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', plugin)
+            if os.path.exists(plugin_path):
+                shutil.rmtree(os.path.join(plugin_path, '.git'))
+
     except Exception as exception:
         print('Exception:%s' % exception)
         print(traceback.format_exc())
