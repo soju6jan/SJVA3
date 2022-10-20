@@ -33,7 +33,7 @@ def prepare_starting():
             if os.path.exists(plugin_db_path):
                 os.remove(plugin_db_path)
         """
-        remove_plugins = ['klive', 'klive_plus']
+        remove_plugins = ['klive', 'klive_plus', 'wavve', 'tving', 'lib_wvtool']
         for plugin in remove_plugins:
             try:
                 plugin_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'custom', plugin)
