@@ -205,7 +205,7 @@ class SystemLogic(object):
             SystemLogic.set_restart_scheduler()
             #SystemLogic.set_statistics_scheduler()
             SystemLogic.set_scheduler_check_scheduler()
-            SystemLogic.get_recent_version()
+            #SystemLogic.get_recent_version()
            
         except Exception as exception: 
             logger.error('Exception:%s', exception)
