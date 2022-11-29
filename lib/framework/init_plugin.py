@@ -24,6 +24,7 @@ def is_include_menu(plugin_name):
 
 def plugin_init():
     try:
+        logger.warning('plugin_init')
         if not app.config['config']['auth_status']:
             return
         import inspect
@@ -40,7 +41,7 @@ def plugin_init():
             plugins = os.listdir(plugin_path)
         """
         plugins = os.listdir(plugin_path)
-        
+        logger.warning(plugins)
         pass_include = []
         except_plugin_list = []
 
@@ -58,7 +59,7 @@ def plugin_init():
         except Exception as exception:
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-
+        logger.warning(plugins)
         # 2018-09-04
         try:
             plugin_path = SystemModelSetting.get('plugin_dev_path')
@@ -77,7 +78,7 @@ def plugin_init():
         except Exception as exception:
             logger.error('Exception:%s', exception)
             logger.error(traceback.format_exc())
-
+        logger.warning(plugins)
 
         plugins = sorted(plugins)
 
