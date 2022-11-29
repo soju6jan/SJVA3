@@ -11,7 +11,7 @@
   {{ macros.info_text('python_version', 'Python 버전') }}
   {{ macros.info_text('platform', 'Platform') }}
   {{ macros.info_text('processor', 'Processor') }}
-  {{ macros.info_text_and_buttons('version', 'SJVA 버전', [['changelog_btn', '업데이트 내역'], ['recent_version_btn', '최신버전 확인']]) }}
+  {{ macros.info_text_and_buttons('version', 'SJVA 버전', [['changelog_btn', '업데이트 내역']]) }}
   {{ macros.info_text('path_app_root', 'SJVA 폴더') }}
   {{ macros.info_text('running_type', '실행타입') }}
   {{ macros.info_text('auth', '인증') }}
@@ -138,11 +138,13 @@ function make_system(data) {
         document.getElementById(key).innerHTML = data.system[key];
     }
     tmp = data.system['version']
+    /*
     if (data.system['version'] == data.system['recent_version']) {
       tmp += ' <span style="color:red;font-weight: bold;">(최신버전)</span>';
     } else {
       tmp += ' <span style="color:red;font-weight: bold;">(최신버전이 아닙니다. 최신:'+data.system['recent_version']+')</span>';
     }
+    */
     document.getElementById('version').innerHTML = tmp;
   }
   //console.log(document.getElementById('version'))
