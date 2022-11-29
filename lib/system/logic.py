@@ -147,6 +147,7 @@ class SystemLogic(object):
     @staticmethod
     def db_init():
         try:
+            
             logger.debug('setting count : %s', db.session.query(ModelSetting).filter_by().count())
             is_first = False
             for key, value in SystemLogic.db_default.items():
@@ -157,6 +158,7 @@ class SystemLogic(object):
                         value = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
                     db.session.add(ModelSetting(key, value))
                     db.session.commit()
+            logger.warning("db_init1")
             # 기존...사람들을 위해 토큰이 있는 사용자면 추가할때 True로 해준다
             for key, value in SystemLogic.db_default2.items():
                 if db.session.query(ModelSetting).filter_by(key=key).count() == 0:
@@ -166,6 +168,7 @@ class SystemLogic(object):
                     db.session.add(ModelSetting(key, tmp))
                     db.session.commit()
             #db.session.commit()
+            logger.warning("db_init2")
 
             for key, value in SystemLogic.db_default3.items():
                 if db.session.query(ModelSetting).filter_by(key=key).count() == 0:
@@ -174,7 +177,7 @@ class SystemLogic(object):
                         tmp = 'True'
                     db.session.add(ModelSetting(key, tmp))
                     db.session.commit()
-
+            logger.warning("db_init3")
             #for key, value in SystemLogic.db_default_etc.items():
             #    if db.session.query(ModelSetting).filter_by(key=key).count() == 0:
             #        db.session.add(ModelSetting(key, value))
