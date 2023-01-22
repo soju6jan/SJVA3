@@ -388,19 +388,21 @@ class SupportTving:
 
     def __decrypt2(self, mediacode, ts, url):
         try:
-            raise Exception('test')
-            import sc
-            logger.debug(mediacode)
-            logger.debug(ts)
-            logger.debug(url)
-            ret = sc.td1(mediacode, str(ts), url).strip()
+            # raise Exception('test')
+            # import sc
+            # logger.debug(mediacode)
+            # logger.debug(ts)
+            # logger.debug(url)
+            # ret = sc.td1(mediacode, str(ts), url).strip()
             #data = sc.td1(code, ts, url)
+            import tvdc
+            ret = tvdc.decrypt3(mediacode, ts, url).strip()
             ret = re.sub('[^ -~]+', '', ret)
             #logger.error(f"[{ret}]")
             return ret
         except Exception as e:
-            #logger.error(f"Exception:{str(e)}")
-            #logger.error(traceback.format_exc())
+            logger.error(f"Exception:{str(e)}")
+            logger.error(traceback.format_exc())
             data = {'url':url, 'code':mediacode, 'ts':ts}
             ret = requests.post('https://sjva.me/sjva/tving.php', data=data).json()
             logger.debug(ret)
